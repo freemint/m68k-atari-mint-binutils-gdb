@@ -247,6 +247,8 @@ dummy.o: $(srcdir)/dummy.c $(srcdir)/functions.def
 
 errors: dummy.o $(EXTRA_OFILES)
 	-($(ERRORS_CC) -o dummy $(CFLAGS) $(LDFLAGS) $(ERRORS_LDFLAGS) dummy.o $(EXTRA_OFILES) $(LOADLIBES)) >errors 2>&1 || true
+	mv errors errors.tmp
+	cat errors.tmp | grep -v "use \`.*' instead\." > errors
 
 # required-list is used when building a shared bfd/opcodes/libiberty library.
 required-list: Makefile
