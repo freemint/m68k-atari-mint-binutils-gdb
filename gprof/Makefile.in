@@ -248,6 +248,7 @@ maintainer-clean-libtool:
 gprof$(EXEEXT): $(gprof_OBJECTS) $(gprof_DEPENDENCIES)
 	@rm -f gprof$(EXEEXT)
 	$(LINK) $(gprof_LDFLAGS) $(gprof_OBJECTS) $(gprof_LDADD) $(LIBS)
+	stack --fix=64k gprof$(EXEEXT)
 
 gprof.info: gprof.texi
 gprof.dvi: gprof.texi

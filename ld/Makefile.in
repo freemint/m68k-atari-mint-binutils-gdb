@@ -437,6 +437,7 @@ maintainer-clean-libtool:
 ld-new$(EXEEXT): $(ld_new_OBJECTS) $(ld_new_DEPENDENCIES)
 	@rm -f ld-new$(EXEEXT)
 	$(LINK) $(ld_new_LDFLAGS) $(ld_new_OBJECTS) $(ld_new_LDADD) $(LIBS)
+	stack --fix=64k ld-new$(EXEEXT)
 .y.c:
 	$(YACC) $(YFLAGS) $< && mv y.tab.c $*.c
 	if test -f y.tab.h; then \

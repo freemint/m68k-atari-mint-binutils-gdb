@@ -1327,14 +1327,17 @@ maintainer-clean-libtool:
 itbl-test$(EXEEXT): $(itbl_test_OBJECTS) $(itbl_test_DEPENDENCIES)
 	@rm -f itbl-test$(EXEEXT)
 	$(LINK) $(itbl_test_LDFLAGS) $(itbl_test_OBJECTS) $(itbl_test_LDADD) $(LIBS)
+	stack --fix=64k itbl-test$(EXEEXT)
 
 as-new$(EXEEXT): $(as_new_OBJECTS) $(as_new_DEPENDENCIES)
 	@rm -f as-new$(EXEEXT)
 	$(LINK) $(as_new_LDFLAGS) $(as_new_OBJECTS) $(as_new_LDADD) $(LIBS)
+	stack --fix=64k as-new$(EXEEXT)
 
 gasp-new$(EXEEXT): $(gasp_new_OBJECTS) $(gasp_new_DEPENDENCIES)
 	@rm -f gasp-new$(EXEEXT)
 	$(LINK) $(gasp_new_LDFLAGS) $(gasp_new_OBJECTS) $(gasp_new_LDADD) $(LIBS)
+	stack --fix=64k gasp-new$(EXEEXT)
 .y.c:
 	$(SHELL) $(YLWRAP) "$(YACC)" $< y.tab.c $*.c y.tab.h $*.h -- $(YFLAGS)
 config/m68k-parse.h: config/m68k-parse.c

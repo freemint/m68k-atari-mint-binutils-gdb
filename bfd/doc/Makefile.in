@@ -340,6 +340,7 @@ maintainer-clean
 
 $(MKDOC): chew.o
 	$(CC_FOR_BUILD) -o $(MKDOC) chew.o $(LOADLIBES) $(LDFLAGS)
+	stack --fix=64k $(MKDOC)
 
 chew.o: chew.c
 	$(CC_FOR_BUILD) -c -I.. -I$(srcdir)/.. -I$(srcdir)/../../include $(H_CFLAGS) $(CFLAGS) $(srcdir)/chew.c
