@@ -245,6 +245,7 @@ ALL_EMULATIONS = \
 	em68kelfnbsd.o \
 	em68klinux.o \
 	em68klynx.o \
+	em68kmint.o \
 	em68knbsd.o \
 	em68kpsos.o \
 	em88kbcs.o \
@@ -1013,6 +1014,9 @@ em68klinux.c: $(srcdir)/emulparams/m68klinux.sh \
 em68klynx.c: $(srcdir)/emulparams/m68klynx.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/m68klynx.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} m68klynx "$(tdir_m68klynx)"
+em68kmint.c:	$(srcdir)/emulparams/m68kmint.sh \
+  $(srcdir)/emultempl/mint.em $(srcdir)/scripttempl/m68kmint.sc ${GEN_DEPENDS}
+	${GENSCRIPTS} m68kmint "$(tdir_m68kmint)"
 em68knbsd.c:	$(srcdir)/emulparams/m68knbsd.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
 	${GENSCRIPTS} m68knbsd "$(tdir_m68knbsd)"

@@ -655,6 +655,8 @@ extern const bfd_target m68kcoffun_vec;
 extern const bfd_target m68klinux_vec;
 extern const bfd_target m68klynx_aout_vec;
 extern const bfd_target m68klynx_coff_vec;
+extern const bfd_target m68kmint_aout_vec;
+extern const bfd_target m68kmint_prg_vec;
 extern const bfd_target m68knetbsd_vec;
 extern const bfd_target m68ksysvcoff_vec;
 extern const bfd_target m88kbcs_vec;

@@ -682,6 +682,11 @@ extern bfd_boolean bfd_sunos_record_link_assignment
 extern bfd_boolean bfd_sunos_size_dynamic_sections
   (bfd *, struct bfd_link_info *, struct bfd_section **, struct bfd_section **, struct bfd_section **);
 
+/* MiNT routine to set the special flags in exec header.  */
+
+extern bfd_boolean bfd_m68kmint_set_extended_flags
+  (bfd *, flagword);
+
 /* Linux shared library support routines for the linker.  */
 
 extern bfd_boolean bfd_i386linux_size_dynamic_sections
