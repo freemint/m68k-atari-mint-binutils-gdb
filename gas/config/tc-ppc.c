@@ -4514,9 +4514,9 @@ ppc_fix_adjustable (fix)
       /* Don't adjust if this is a reloc in the toc section.  */
       && (S_GET_SEGMENT (fix->fx_addsy) != data_section
 	  || ppc_toc_csect == NULL
-	  || fix->fx_frag->fr_address < ppc_toc_frag->fr_address
+	  || val < ppc_toc_frag->fr_address
 	  || (ppc_after_toc_frag != NULL
-	      && fix->fx_frag->fr_address >= ppc_after_toc_frag->fr_address)))
+	      && val >= ppc_after_toc_frag->fr_address)))
     {
       symbolS *csect;
 

@@ -1,3 +1,11 @@
+Fri Apr 24 16:07:57 1998  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386-dis.c (OP_DSSI): Print segment override.
+
+Tue Apr 21 16:31:51 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* mips-dis.c (print_insn_arg): Restore accidentally lost code.
+
 Sun Apr  5 16:04:39 1998  H.J. Lu  <hjl@gnu.org>
 
 	* Makefile.am (stamp-lib): Check that .libs/libopcodes.a exists

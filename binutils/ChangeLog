@@ -1,3 +1,8 @@
+Mon Apr 27 13:45:26 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Set version number to 2.9.1.
+	* configure: Rebuild.
+
 Tue Apr  7 15:41:15 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* Makefile.am (DISTSTUFF): Add defparse.h, defparse.c, rclex.c,

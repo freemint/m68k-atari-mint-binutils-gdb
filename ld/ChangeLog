@@ -1,3 +1,21 @@
+Mon Apr 27 11:56:21 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Set version number to 2.9.1.
+	* configure: Rebuild.
+
+	Based on patch from H.J. Lu <hjl@gnu.org>:
+	* emultempl/elf32.em (global_vercheck_needed): New file static
+	variable.
+	(global_vercheck_failed): New file static variable.
+	(gld${EMULATION_NAME}_after_open): Check for shared libraries
+	twice, once with force set to 0 and once with it set to 1.
+ 	(gld${EMULATION_NAME}_check_ld_so_conf): Add force parameter.
+	Change all callers.
+	(gld${EMULATION_NAME}_search_needed): Likewise.
+	(gld${EMULATION_NAME}_try_needed): Likewise.  If not force, check
+	whether the libraries needs any incompatible versions.
+	(gld${EMULATION_NAME}_vercheck): New static function.
+
 Tue Apr  7 13:35:29 1998  H.J. Lu  <hjl@gnu.org>
 
 	* configure.in (TESTBFDLIB): New.  Defined and substituted.

@@ -2724,12 +2724,21 @@ coff_write_object_contents (abfd)
 	  unsigned int i, count;
 	  asymbol **psym;
 	  coff_symbol_type *csym = NULL;
+	  asymbol **psymsec;
 
+	  psymsec = NULL;
 	  count = bfd_get_symcount (abfd);
 	  for (i = 0, psym = abfd->outsymbols; i < count; i++, psym++)
 	    {
-	      /* Here *PSYM is the section symbol for CURRENT.  */
+	      if ((*psym)->section != current)
+		continue;
 
+	      /* Remember the location of the first symbol in this
+                 section.  */
+	      if (psymsec == NULL)
+		psymsec = psym;
+
+	      /* See if this is the section symbol.  */
 	      if (strcmp ((*psym)->name, current->name) == 0)
 		{
 		  csym = coff_symbol_from (abfd, *psym);
@@ -2739,6 +2748,9 @@ coff_write_object_contents (abfd)
 		      || csym->native->u.syment.n_sclass != C_STAT
 		      || csym->native->u.syment.n_type != T_NULL)
 		    continue;
+
+		  /* Here *PSYM is the section symbol for CURRENT.  */
+
 		  break;
 		}
 	    }
@@ -2774,6 +2786,24 @@ coff_write_object_contents (abfd)
 		  aux->u.auxent.x_scn.x_comdat =
 		    IMAGE_COMDAT_SELECT_EXACT_MATCH;
 		  break;
+		}
+
+	      /* The COMDAT symbol must be the first symbol from this
+                 section in the symbol table.  In order to make this
+                 work, we move the COMDAT symbol before the first
+                 symbol we found in the search above.  It's OK to
+                 rearrange the symbol table at this point, because
+                 coff_renumber_symbols is going to rearrange it
+                 further and fix up all the aux entries.  */
+	      if (psym != psymsec)
+		{
+		  asymbol *hold;
+		  asymbol **pcopy;
+
+		  hold = *psym;
+		  for (pcopy = psym; pcopy > psymsec; pcopy--)
+		    pcopy[0] = pcopy[-1];
+		  *psymsec = hold;
 		}
 	    }
 	}

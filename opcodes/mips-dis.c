@@ -80,6 +80,101 @@ print_insn_arg (d, l, pc, info)
     case ',':
     case '(':
     case ')':
+      (*info->fprintf_func) (info->stream, "%c", *d);
+      break;
+
+    case 's':
+    case 'b':
+    case 'r':
+    case 'v':
+      (*info->fprintf_func) (info->stream, "$%s",
+			     reg_names[(l >> OP_SH_RS) & OP_MASK_RS]);
+      break;
+
+    case 't':
+    case 'w':
+      (*info->fprintf_func) (info->stream, "$%s",
+			     reg_names[(l >> OP_SH_RT) & OP_MASK_RT]);
+      break;
+
+    case 'i':
+    case 'u':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			(l >> OP_SH_IMMEDIATE) & OP_MASK_IMMEDIATE);
+      break;
+
+    case 'j': /* same as i, but sign-extended */
+    case 'o':
+      delta = (l >> OP_SH_DELTA) & OP_MASK_DELTA;
+      if (delta & 0x8000)
+	delta |= ~0xffff;
+      (*info->fprintf_func) (info->stream, "%d",
+			     delta);
+      break;
+
+    case 'h':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (unsigned int) ((l >> OP_SH_PREFX)
+					     & OP_MASK_PREFX));
+      break;
+
+    case 'k':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (unsigned int) ((l >> OP_SH_CACHE)
+					     & OP_MASK_CACHE));
+      break;
+
+    case 'a':
+      (*info->print_address_func)
+	(((pc & 0xF0000000) | (((l >> OP_SH_TARGET) & OP_MASK_TARGET) << 2)),
+	 info);
+      break;
+
+    case 'p':
+      /* sign extend the displacement */
+      delta = (l >> OP_SH_DELTA) & OP_MASK_DELTA;
+      if (delta & 0x8000)
+	delta |= ~0xffff;
+      (*info->print_address_func)
+	((delta << 2) + pc + 4,
+	 info);
+      break;
+
+    case 'd':
+      (*info->fprintf_func) (info->stream, "$%s",
+			     reg_names[(l >> OP_SH_RD) & OP_MASK_RD]);
+      break;
+
+    case 'z':
+      (*info->fprintf_func) (info->stream, "$%s", reg_names[0]);
+      break;
+
+    case '<':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (l >> OP_SH_SHAMT) & OP_MASK_SHAMT);
+      break;
+
+    case 'c':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (l >> OP_SH_CODE) & OP_MASK_CODE);
+      break;
+
+    case 'C':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (l >> OP_SH_COPZ) & OP_MASK_COPZ);
+      break;
+
+    case 'B':
+      (*info->fprintf_func) (info->stream, "0x%x",
+			     (l >> OP_SH_SYSCALL) & OP_MASK_SYSCALL);
+      break;
+
+    case 'S':
+    case 'V':
+      (*info->fprintf_func) (info->stream, "$f%d",
+			     (l >> OP_SH_FS) & OP_MASK_FS);
+      break;
+
 
     case 'T':
     case 'W':

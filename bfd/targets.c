@@ -667,6 +667,7 @@ const bfd_target * const bfd_target_vector[] = {
 	&bfd_elf32_m88k_vec,
 	&bfd_elf32_sparc_vec,
 	&bfd_elf32_powerpc_vec,
+	&bfd_elf32_powerpcle_vec,
 	&bfd_elf32_v850_vec,
 #ifdef BFD64			/* No one seems to use this.  */
 	&bfd_elf64_big_generic_vec,

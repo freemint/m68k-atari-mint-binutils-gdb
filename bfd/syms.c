@@ -728,9 +728,9 @@ struct indexentry
   bfd_vma val;
   bfd_byte *stab;
   bfd_byte *str;
-  bfd_byte *directory_name;
-  bfd_byte *file_name;
-  bfd_byte *function_name;
+  char *directory_name;
+  char *file_name;
+  char *function_name;
 };
 
 /* Compare two indexentry structures.  This is called via qsort.  */
@@ -774,7 +774,7 @@ struct stab_find_info
   struct indexentry *cached_indexentry;
   bfd_vma cached_offset;
   bfd_byte *cached_stab;
-  bfd_byte *cached_file_name;
+  char *cached_file_name;
 #endif
 
   /* Saved ptr to malloc'ed filename.  */

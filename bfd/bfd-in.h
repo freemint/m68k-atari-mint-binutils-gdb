@@ -607,6 +607,8 @@ extern boolean bfd_elf64_record_link_assignment
   PARAMS ((bfd *, struct bfd_link_info *, const char *, boolean));
 extern struct bfd_link_needed_list *bfd_elf_get_needed_list
   PARAMS ((bfd *, struct bfd_link_info *));
+extern boolean bfd_elf_get_bfd_needed_list
+  PARAMS ((bfd *, struct bfd_link_needed_list **));
 extern boolean bfd_elf32_size_dynamic_sections
   PARAMS ((bfd *, const char *, const char *, boolean, const char *,
 	   const char * const *, struct bfd_link_info *, struct sec **,

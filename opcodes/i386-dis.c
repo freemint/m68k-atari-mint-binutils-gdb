@@ -2173,7 +2173,16 @@ OP_DSSI (dummy, aflag, dflag)
      int aflag;
      int dflag;
 {
-  oappend ("%ds:(");
+  if ((prefixes
+       & (PREFIX_CS
+	  | PREFIX_DS
+	  | PREFIX_SS
+	  | PREFIX_ES
+	  | PREFIX_FS
+	  | PREFIX_GS)) == 0)
+    prefixes |= PREFIX_DS;
+  append_prefix ();
+  oappend ("(");
   oappend (aflag ? "%esi" : "%si");
   oappend (")");
   return (0);

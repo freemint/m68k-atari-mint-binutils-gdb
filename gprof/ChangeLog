@@ -1,3 +1,8 @@
+Mon Apr 27 13:45:35 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Set version number to 2.9.1.
+	* configure: Rebuild.
+
 Tue Apr  7 12:43:37 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	From hjl@lucon.org <H.J. Lu>:

@@ -343,6 +343,7 @@ asconfig.texi: $(CONFIG).texi
 	  || cp $(srcdir)/$(CONFIG).texi ./asconfig.texi
 
 as.info: $(srcdir)/as.texinfo asconfig.texi $(CPU_DOCS)
+as.dvi: $(srcdir)/as.texinfo asconfig.texi $(CPU_DOCS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -26,32 +26,32 @@ versions.
 
 Indirect:
 binutils.info-1: 979
-binutils.info-2: 50568
+binutils.info-2: 50570
 
 Tag Table:
 (Indirect)
 Node: Top979
-Node: ar2059
-Node: ar cmdline4225
-Node: ar scripts11460
-Node: nm17141
-Node: objcopy23689
-Node: objdump34031
-Node: ranlib42318
-Node: size43052
-Node: strings45778
-Node: strip47603
-Node: c++filt50568
-Node: addr2line53129
-Node: nlmconv55526
-Node: windres58131
-Node: Selecting The Target System62603
-Node: Target Selection63620
-Node: Architecture Selection66320
-Node: Linker Emulation Selection67552
-Node: Reporting Bugs68430
-Node: Bug Criteria69181
-Node: Bug Reporting69727
-Node: Index76708
+Node: ar2061
+Node: ar cmdline4227
+Node: ar scripts11462
+Node: nm17143
+Node: objcopy23691
+Node: objdump34033
+Node: ranlib42320
+Node: size43054
+Node: strings45780
+Node: strip47605
+Node: c++filt50570
+Node: addr2line53131
+Node: nlmconv55528
+Node: windres58133
+Node: Selecting The Target System62605
+Node: Target Selection63622
+Node: Architecture Selection66322
+Node: Linker Emulation Selection67554
+Node: Reporting Bugs68432
+Node: Bug Criteria69183
+Node: Bug Reporting69729
+Node: Index76710
 
 End Tag Table

@@ -1,3 +1,25 @@
+Mon Apr 27 13:45:04 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Set version number to 2.9.1.
+	* configure: Rebuild.
+
+Fri Apr 24 12:47:42 1998  Philippe De Muyter  <phdm@macqel.be>
+
+	* read.c (s_set): Cast xmalloc return value to fragS *.
+	* config/tc-m68k.c (m68k_ip): Function made static to match
+	previous forward declaration.
+	(insert_reg, init_regtable, md_convert_frag_1): Likewise.
+
+Thu Apr 23 19:23:23 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* config/tc-ppc.c (ppc_fix_adjustable): Correct test of whether a
+	reloc is in the TOC csect.
+
+Tue Apr 21 16:18:12 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* doc/Makefile.am (as.dvi): New target.
+	* doc/Makefile.in: Rebuild.
+
 Thu Apr  2 16:36:47 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* gasp.c (main): Set next field of new include_path structure to

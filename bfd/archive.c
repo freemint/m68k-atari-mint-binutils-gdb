@@ -646,6 +646,8 @@ bfd_generic_archive_p (abfd)
     {
       bfd_release (abfd, bfd_ardata (abfd));
       abfd->tdata.aout_ar_data = tdata_hold;
+      if (bfd_get_error () != bfd_error_system_call)
+	bfd_set_error (bfd_error_wrong_format);
       return NULL;
     }
 
@@ -653,6 +655,8 @@ bfd_generic_archive_p (abfd)
     {
       bfd_release (abfd, bfd_ardata (abfd));
       abfd->tdata.aout_ar_data = tdata_hold;
+      if (bfd_get_error () != bfd_error_system_call)
+	bfd_set_error (bfd_error_wrong_format);
       return NULL;
     }
 

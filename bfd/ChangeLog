@@ -1,3 +1,36 @@
+Mon Apr 27 11:49:55 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* configure.in: Set version number to 2.9.1.
+	* configure: Rebuild.
+
+	Based on patch from H.J. Lu <hjl@gnu.org>:
+	* elf.c (bfd_elf_get_bfd_needed_list): New function.
+	* bfd-in.h (bfd_elf_get_bfd_needed_list): Declare.
+	* bfd-in2.h: Rebuild.
+
+Fri Apr 24 12:09:18 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* syms.c (struct indexentry): Change directory_name, file_name,
+	and function_name fields to char *.
+	(struct stab_find_info): Change cached_file_name field to char *.
+
+Thu Apr 16 11:43:33 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* archive.c (bfd_generic_archive_p): If a slurp subroutine returns
+ 	an error other than bfd_error_system_call, set the error to
+ 	bfd_error_wrong_format.
+
+	* targets.c (bfd_target_vector) [SELECT_VECS not defined]: Add
+	bfd_elf32_powerpcle_vec.
+
+	* elf.c (copy_private_bfd_data): If all the p_paddr fields in the
+	program segments are zero, don't set p_paddr_valid.
+
+Fri Apr 10 13:44:27 1998  Ian Lance Taylor  <ian@cygnus.com>
+
+	* coffcode.h (coff_write_object_contents): Move a PE COMDAT symbol
+	before any other symbols in the same section.
+
 Tue Apr  7 12:35:18 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* archures.c (bfd_default_scan): Add m68k cases back to default

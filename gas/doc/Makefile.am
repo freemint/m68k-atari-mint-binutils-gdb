@@ -34,6 +34,7 @@ CPU_DOCS = \
 	c-z8k.texi
 
 as.info: $(srcdir)/as.texinfo asconfig.texi $(CPU_DOCS)
+as.dvi: $(srcdir)/as.texinfo asconfig.texi $(CPU_DOCS)
 
 # This one isn't ready for prime time yet.  Not even a little bit.
 
