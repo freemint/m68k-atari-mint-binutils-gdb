@@ -1,0 +1,119 @@
+typedef union {
+  bfd_vma integer;
+  char *name;
+  int token;
+  union etree_union *etree;
+  struct phdr_info
+    {
+      boolean filehdr;
+      boolean phdrs;
+      union etree_union *at;
+      union etree_union *flags;
+    } phdr;
+  struct lang_nocrossref *nocrossref;
+  struct lang_output_section_phdr_list *section_phdr;
+  struct bfd_elf_version_deps *deflist;
+  struct bfd_elf_version_expr *versyms;
+  struct bfd_elf_version_tree *versnode;
+} YYSTYPE;
+#define	INT	258
+#define	NAME	259
+#define	LNAME	260
+#define	PLUSEQ	261
+#define	MINUSEQ	262
+#define	MULTEQ	263
+#define	DIVEQ	264
+#define	LSHIFTEQ	265
+#define	RSHIFTEQ	266
+#define	ANDEQ	267
+#define	OREQ	268
+#define	OROR	269
+#define	ANDAND	270
+#define	EQ	271
+#define	NE	272
+#define	LE	273
+#define	GE	274
+#define	LSHIFT	275
+#define	RSHIFT	276
+#define	UNARY	277
+#define	END	278
+#define	ALIGN_K	279
+#define	BLOCK	280
+#define	BIND	281
+#define	QUAD	282
+#define	SQUAD	283
+#define	LONG	284
+#define	SHORT	285
+#define	BYTE	286
+#define	SECTIONS	287
+#define	PHDRS	288
+#define	SIZEOF_HEADERS	289
+#define	OUTPUT_FORMAT	290
+#define	FORCE_COMMON_ALLOCATION	291
+#define	OUTPUT_ARCH	292
+#define	INCLUDE	293
+#define	MEMORY	294
+#define	DEFSYMEND	295
+#define	NOLOAD	296
+#define	DSECT	297
+#define	COPY	298
+#define	INFO	299
+#define	OVERLAY	300
+#define	DEFINED	301
+#define	TARGET_K	302
+#define	SEARCH_DIR	303
+#define	MAP	304
+#define	ENTRY	305
+#define	NEXT	306
+#define	SIZEOF	307
+#define	ADDR	308
+#define	LOADADDR	309
+#define	MAX	310
+#define	MIN	311
+#define	STARTUP	312
+#define	HLL	313
+#define	SYSLIB	314
+#define	FLOAT	315
+#define	NOFLOAT	316
+#define	NOCROSSREFS	317
+#define	ORIGIN	318
+#define	FILL	319
+#define	LENGTH	320
+#define	CREATE_OBJECT_SYMBOLS	321
+#define	INPUT	322
+#define	GROUP	323
+#define	OUTPUT	324
+#define	CONSTRUCTORS	325
+#define	ALIGNMOD	326
+#define	AT	327
+#define	PROVIDE	328
+#define	CHIP	329
+#define	LIST	330
+#define	SECT	331
+#define	ABSOLUTE	332
+#define	LOAD	333
+#define	NEWLINE	334
+#define	ENDWORD	335
+#define	ORDER	336
+#define	NAMEWORD	337
+#define	FORMAT	338
+#define	PUBLIC	339
+#define	BASE	340
+#define	ALIAS	341
+#define	TRUNCATE	342
+#define	REL	343
+#define	INPUT_SCRIPT	344
+#define	INPUT_MRI_SCRIPT	345
+#define	INPUT_DEFSYM	346
+#define	CASE	347
+#define	EXTERN	348
+#define	START	349
+#define	VERS_TAG	350
+#define	VERS_IDENTIFIER	351
+#define	GLOBAL	352
+#define	LOCAL	353
+#define	VERSIONK	354
+#define	INPUT_VERSION_SCRIPT	355
+
+
+extern YYSTYPE yylval;
