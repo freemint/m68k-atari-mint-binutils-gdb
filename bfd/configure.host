@@ -64,6 +64,10 @@ m68*-hp-hpux*)		HDEFINES=-DHOST_HP300HPUX ;;
 			HOST_U_64BIT_TYPE="unsigned long long"
 			;;
 
+m68*-*-mint*)           HOST_64BIT_TYPE="long long"
+			HOST_U_64BIT_TYPE="unsigned long long"
+			;;
+
 *-*-solaris*)		HOST_64BIT_TYPE="long long"
 			HOST_U_64BIT_TYPE="unsigned long long"
 			;;

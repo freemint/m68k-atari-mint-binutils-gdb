@@ -1946,6 +1946,11 @@ emit_stringtab (abfd, tab)
   bfd_byte buffer[BYTES_IN_WORD];
   bfd_size_type amt = BYTES_IN_WORD;
 
+  /* The MiNT backend writes past the string table.  It therefore has to
+     know about the table size.  */
+  obj_aout_external_string_size (abfd) = _bfd_stringtab_size (tab) +
+    BYTES_IN_WORD;
+
   /* The string table starts with the size.  */
   PUT_WORD (abfd, _bfd_stringtab_size (tab) + BYTES_IN_WORD, buffer);
   if (bfd_bwrite ((PTR) buffer, amt, abfd) != amt)
