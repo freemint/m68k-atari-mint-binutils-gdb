@@ -472,6 +472,8 @@ do
     m68klinux_vec)		tb="$tb m68klinux.lo aout32.lo" ;;
     m68klynx_aout_vec)		tb="$tb m68klynx.lo lynx-core.lo aout32.lo" ;;
     m68klynx_coff_vec)		tb="$tb cf-m68klynx.lo coff-m68k.lo cofflink.lo lynx-core.lo" ;;
+    m68kmint_aout_vec)          tb="$tb aout-mint.lo aout32.lo" ;;
+    m68kmint_prg_vec)           tb="$tb prg-mint.lo aout32.lo" ;;
     m68knetbsd_vec)		tb="$tb m68knetbsd.lo aout32.lo" ;;
     m68k4knetbsd_vec)		tb="$tb m68k4knetbsd.lo aout32.lo" ;;
     m68kaux_coff_vec)		tb="$tb coff-aux.lo coff-m68k.lo cofflink.lo" ;;
@@ -600,3 +602,19 @@ esac
 
 rm -f doc/config.status
 AC_OUTPUT(Makefile doc/Makefile bfd-in3.h:bfd-in2.h)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

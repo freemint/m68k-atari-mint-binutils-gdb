@@ -824,6 +824,10 @@ case $basic_machine in
 		basic_machine=z8k-unknown
 		os=-sim
 		;;
+	*mint | *MiNT)
+		basic_machine=m68k-atari
+		os=-mint
+		;;
 	none)
 		basic_machine=none-none
 		os=-none
@@ -1012,6 +1016,9 @@ case $os in
 	-xenix)
 		os=-xenix
 		;;
+        -*mint | -*MiNT)
+	        os=-mint
+		;;
 	-none)
 		;;
 	*)
@@ -1160,6 +1167,9 @@ case $basic_machine in
 	*-apple)					# CYGNUS LOCAL
 		os=-macos
 		;;
+	*-atari*)
+		os=-mint
+		;;
 	*)
 		os=-none
 		;;
@@ -1220,9 +1230,14 @@ case $basic_machine in
 			-mpw* | -macos*)		# CYGNUS LOCAL
 				vendor=apple
 				;;
+			-*mint | -*MiNT)
+				vendor=atari
+				;;
 		esac
 		basic_machine=`echo $basic_machine | sed "s/unknown/$vendor/"`
 		;;
 esac
 
 echo $basic_machine$os
+
+

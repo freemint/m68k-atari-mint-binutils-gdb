@@ -45,6 +45,10 @@ mips*-*-riscos*)	HDEFINES="-G 4" ;;
 
 m68*-hp-hpux*)		HDEFINES=-DHOST_HP300HPUX ;;
 
+m68*-*-mint*)           HOST_64BIT_TYPE="long long"
+			HOST_U_64BIT_TYPE="unsigned long long"
+			;;
+
 *-*-solaris*)		HOST_64BIT_TYPE="long long"
 			HOST_U_64BIT_TYPE="unsigned long long"
 			;;
@@ -67,3 +71,15 @@ m68*-hp-hpux*)		HDEFINES=-DHOST_HP300HPUX ;;
 			ac_cv_header_unistd_h=no
 			;;
 esac
+
+
+
+
+
+
+
+
+
+
+
+
