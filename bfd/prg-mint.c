@@ -1216,7 +1216,7 @@ link_write_traditional_syms (abfd, info)
 					    ibfd->my_archive->filename,
 					    A_TFILE, val);
 
-	  if (written_bytes <= 0)
+	  if (written_bytes < 0)
 	    return false;
 	  else
 	    myinfo->symtab_size += written_bytes;
@@ -1236,7 +1236,7 @@ link_write_traditional_syms (abfd, info)
 
 	  written_bytes = write_dri_symbol (abfd, ibfd->filename,
 					    A_TFILE, val);
-	  if (written_bytes <= 0)
+	  if (written_bytes < 0)
 	    return false;
 	  else
 	    myinfo->symtab_size += written_bytes;
@@ -1517,7 +1517,7 @@ link_write_traditional_syms (abfd, info)
 	  a_type |= A_GLOBL;
 
 	written_bytes = write_dri_symbol (abfd, name, a_type, val);
-	if (written_bytes <= 0)
+	if (written_bytes < 0)
 	  return false;
 	myinfo->symtab_size += written_bytes;
       }
@@ -1544,6 +1544,15 @@ write_dri_symbol (abfd, name, type, value)
   int i = sizeof (sym.a_name);
   int written_bytes = 0;
 
+  // MODIF VR
+  if (type == A_TFILE || type == A_TFARC)
+  {
+    return written_bytes;
+  }
+
+  type |= A_DEF;
+  // ENDMODIF VR
+	
   bfd_put_16 (abfd, type, sym.a_type);
   bfd_put_32 (abfd, value, sym.a_value);
 
