@@ -1,0 +1,9 @@
+# Host: m68k-atari running FreeMiNT
+
+XM_FILE= xm-mint.h
+XDEPFILES= ser-tcp.o
+
+NAT_FILE= nm-mint.h
+NATDEPFILES= infptrace.o inftarg.o fork-child.o m68kmint-nat.o
+
+GDBSERVER_DEPFILES= low-mint.o

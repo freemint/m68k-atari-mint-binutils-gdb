@@ -784,6 +784,8 @@ unpush_target (t)
   update_current_target ();
   cleanup_target (&current_target);
 
+  TARGET_POST_UNPUSH_TARGET_HOOK(t);
+
   return 1;
 }
 
