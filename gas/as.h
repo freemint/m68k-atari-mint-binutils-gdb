@@ -188,7 +188,8 @@ extern char **environ;
 #endif /* __FILE__ */
 
 #ifndef FOPEN_WB
-#ifdef GO32
+//#ifdef GO32
+#if 1
 #include "fopen-bin.h"
 #else
 #include "fopen-same.h"

@@ -152,6 +152,7 @@ ALL_MACHINES_CFILES = \
 BFD32_BACKENDS = \
 	aout-adobe.lo \
 	aout-arm.lo \
+	aout-mint.lo \
 	aout-cris.lo \
 	aout-ns32k.lo \
 	aout-sparcle.lo \
@@ -289,6 +290,7 @@ BFD32_BACKENDS = \
 	pei-mips.lo \
 	peigen.lo \
 	ppcboot.lo \
+	prg-mint.lo \
 	reloc16.lo \
 	riscix.lo \
 	sparclinux.lo \
@@ -309,6 +311,7 @@ BFD32_BACKENDS = \
 BFD32_BACKENDS_CFILES = \
 	aout-adobe.c \
 	aout-arm.c \
+	aout-mint.c \
 	aout-cris.c \
 	aout-ns32k.c \
 	aout-sparcle.c \
@@ -444,6 +447,7 @@ BFD32_BACKENDS_CFILES = \
 	pe-mips.c \
 	pei-mips.c \
 	ppcboot.c \
+	prg-mint.c \
 	reloc16.c \
 	riscix.c \
 	sparclinux.c \
@@ -943,6 +947,10 @@ aout-cris.lo: aout-cris.c aout32.c aoutx.h $(INCDIR)/filenames.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/bfdlink.h libaout.h \
   $(INCDIR)/aout/aout64.h $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
   $(INCDIR)/aout/ar.h aout-target.h
+aout-mint.lo: aout-mint.c libbfd.h libaout.h \
+  $(INCDIR)/bfdlink.h aout-target.h $(INCDIR)/aout/aout64.h \
+  $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
+  $(INCDIR)/aout/ar.h
 aout-ns32k.lo: aout-ns32k.c $(INCDIR)/aout/aout64.h \
   ns32k.h libaout.h $(INCDIR)/bfdlink.h aoutx.h $(INCDIR)/filenames.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
@@ -1414,6 +1422,9 @@ pei-mips.lo: pei-mips.c $(INCDIR)/filenames.h pe-mips.c \
   $(INCDIR)/coff/pe.h libcoff.h $(INCDIR)/bfdlink.h coffcode.h \
   peicode.h libpei.h
 ppcboot.lo: ppcboot.c $(INCDIR)/safe-ctype.h $(INCDIR)/filenames.h
+prg-mint.lo: prg-mint.c $(INCDIR)/aout/aout64.h \
+  $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
+  $(INCDIR)/bfdlink.h libaout.h aoutx.h aout-target.h
 reloc16.lo: reloc16.c $(INCDIR)/filenames.h $(INCDIR)/bfdlink.h \
   genlink.h $(INCDIR)/coff/internal.h libcoff.h
 riscix.lo: riscix.c $(INCDIR)/filenames.h libaout.h \

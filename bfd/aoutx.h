@@ -1946,8 +1946,13 @@ emit_stringtab (abfd, tab)
   bfd_byte buffer[BYTES_IN_WORD];
   bfd_size_type amt = BYTES_IN_WORD;
 
+  /* The MiNT backend writes past the string table.  It therefore has to
+     know about the table size.  */
+  obj_aout_external_string_size (abfd) = _bfd_stringtab_size (tab) +
+    BYTES_IN_WORD;
+
   /* The string table starts with the size.  */
-  PUT_WORD (abfd, _bfd_stringtab_size (tab) + BYTES_IN_WORD, buffer);
+  PUT_WORD (abfd, obj_aout_external_string_size (abfd), buffer);
   if (bfd_bwrite ((PTR) buffer, amt, abfd) != amt)
     return false;
 
@@ -3989,7 +3994,7 @@ NAME(aout,final_link) (abfd, info, callback)
 	  || ! emit_stringtab (abfd, aout_info.strtab))
 	goto error_return;
     }
-  else if (obj_textsec (abfd)->reloc_count == 0
+/*  else if (obj_textsec (abfd)->reloc_count == 0
 	   && obj_datasec (abfd)->reloc_count == 0)
     {
       bfd_byte b;
@@ -4001,7 +4006,7 @@ NAME(aout,final_link) (abfd, info, callback)
 	  || bfd_bwrite (&b, (bfd_size_type) 1, abfd) != 1)
 	goto error_return;
     }
-
+*/
   return true;
 
  error_return:
@@ -5510,10 +5515,12 @@ aout_link_input_section_ext (finfo, input_bfd, input_section, relocs,
 	    }
 
 	  if (r_type != (unsigned int) RELOC_SPARC_REV32)
-	    r = MY_final_link_relocate (howto_table_ext + r_type,
-					input_bfd, input_section,
-					contents, r_addr, relocation,
-					r_addend);
+	    {
+	      r = MY_final_link_relocate (howto_table_ext + r_type,
+					  input_bfd, input_section,
+					  contents, r_addr, relocation,
+					  r_addend);
+	    }
 	  else
 	    {
 	      bfd_vma x;
