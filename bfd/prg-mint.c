@@ -134,6 +134,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include "bfd.h"
 #include "sysdep.h"
 
+#include <libiberty.h>
+
      /* Forward declarations.  */
 struct internal_exec;
 struct external_exec;
@@ -283,7 +285,7 @@ struct dri_symbol {
 #define MY_close_and_cleanup MY_bfd_free_cached_info
 #define MY_bfd_copy_private_bfd_data MY_bfd_copy_private_bfd_data
 
-static CONST bfd_target* MY_object_p PARAMS ((bfd*));
+static const bfd_target* MY_object_p PARAMS ((bfd*));
 
 /* This is a hack.  We have to retrieve the symbol name.  But
    to do achieve this with reasonable effort we need an extra
@@ -301,19 +303,19 @@ bfd_reloc_status_type m68kmint_prg_final_link_relocate
 static boolean MY_bfd_final_link PARAMS ((bfd*, struct bfd_link_info*));
 static boolean MY_bfd_free_cached_info PARAMS ((bfd*));
 static boolean MY_bfd_copy_private_bfd_data PARAMS ((bfd*, bfd*));
-static CONST char* m68kmint_prg_find_symbol_name
+static const char* m68kmint_prg_find_symbol_name
   PARAMS ((reloc_howto_type*, bfd*, asection*, bfd_vma, bfd_byte*,
 	   struct reloc_std_external* rel));
+static int vma_cmp PARAMS ((const void*, const void*));
 
-static int cmp_vma PARAMS ((bfd_vma*, bfd_vma*));
 static int squirt_out_tparel PARAMS ((bfd*, struct internal_exec*,
 				      struct external_exec*));
 
 static boolean link_write_traditional_syms
      PARAMS ((bfd*, struct bfd_link_info*));
-static int write_dri_symbol PARAMS ((bfd*, CONST char*, bfd_vma, bfd_vma));
+static int write_dri_symbol PARAMS ((bfd*, const char*, bfd_vma, bfd_vma));
 
-extern CONST bfd_target MY(vec);
+extern const bfd_target MY(vec);
 
 /* aoutx.h requires definitions for BMAGIC and QMAGIC.  Other 
    implementations have either chosen OMAGIC or zero for BMAGIC if
@@ -325,7 +327,6 @@ extern CONST bfd_target MY(vec);
       {									      \
 	bfd_size_type text_size; /* dummy vars */			      \
 	file_ptr text_end;						      \
-        struct mint_internal_info* myinfo = obj_aout_ext (abfd);              \
                                                                               \
 	if (adata(abfd).magic == undecided_magic)			      \
 	  NAME(aout,adjust_sizes_and_vmas) (abfd, &text_size, &text_end);     \
@@ -401,13 +402,13 @@ bfd_m68kmint_set_extended_flags (abfd, prg_flags)
   return true;
 }
 
-static CONST bfd_target*
+static const bfd_target*
 MY_object_p (abfd)
      bfd* abfd;
 {
   struct external_exec exec_bytes;	/* Raw exec header from file */
   struct internal_exec exec;		/* Cleaned-up exec header */
-  CONST bfd_target* target;
+  const bfd_target* target;
   struct mint_internal_info* myinfo;
   boolean is_executable = true;
 
@@ -538,10 +539,10 @@ MY_bfd_free_cached_info (abfd)
 
 /* This is used for qsort to sort addresses for the TPA relocation table.  */
 static int vma_cmp (v1, v2)
-     bfd_vma* v1;
-     bfd_vma* v2;
+     const void* v1;
+     const void* v2;
 {
-  return (int) ((*v1) - (*v2));
+  return (int) ((*((bfd_vma*) v1)) - (*((bfd_vma*) v2)));
 }
 
 /* Final link routine.  We need to use a call back to get the correct
@@ -554,7 +555,6 @@ MY_bfd_final_link (abfd, info)
      struct bfd_link_info* info;
 {
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
-  boolean retval;
   unsigned long i;
   bfd_size_type bytes;
   unsigned char* ptr;
@@ -630,6 +630,8 @@ MY_bfd_final_link (abfd, info)
 	      break;
 	    case bfd_link_hash_common:
 	      myinfo->stkpos = h->root.u.c.size + 0x1c;
+	      break;
+	    default:  /* Ignore other types.  */
 	      break;
 	    }
 	}
@@ -717,7 +719,7 @@ warning: traditional format is obsolete");
     }
   bfd_put_32 (abfd, 0, ptr);
   
-  return retval;
+  return true;
 }
 
 static boolean 
@@ -745,7 +747,7 @@ MY_bfd_copy_private_bfd_data (ibfd, obfd)
 	     state to "out of memory".  */
 	  return false;
 	}
-	
+
 	memcpy (myinfo_out, myinfo_in, sizeof (struct mint_internal_info));
 	myinfo_out->tparel = NULL;
 	obj_aout_ext (obfd) = myinfo_out;
@@ -753,7 +755,7 @@ MY_bfd_copy_private_bfd_data (ibfd, obfd)
       
       if (myinfo_out->tparel != NULL)
 	free (myinfo_out->tparel);
-    
+
       if (myinfo_in->tparel != NULL) 
       {
 	if (bfd_seek (ibfd, myinfo_in->tparel_pos, SEEK_SET) != 0)
@@ -790,7 +792,7 @@ error: the input file ``%s'' contains no", ibfd->filename);
 }
 
 static
-CONST char* m68kmint_prg_find_symbol_name (howto, input_bfd,
+const char* m68kmint_prg_find_symbol_name (howto, input_bfd,
 					   input_section, value,
 					   location, rel)
      reloc_howto_type* howto;
@@ -806,7 +808,7 @@ CONST char* m68kmint_prg_find_symbol_name (howto, input_bfd,
   struct aout_link_hash_entry** sym_hashes
     = obj_aout_sym_hashes (input_bfd);
   struct aout_link_hash_entry* h = NULL;
-  CONST char* name;
+  const char* name;
   int r_index;
   int r_extern;
   
@@ -1036,7 +1038,7 @@ m68kmint_prg_final_link_relocate (howto, input_bfd, input_section,
   if (!howto->pc_relative && bfd_get_reloc_size (howto) == 4) {
 
     /* Enlarge the buffer if necessary.  */
-    if (myinfo->relocs_used <= myinfo->relocs_allocated) {
+    if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated) {
       bfd_vma* newbuf;
       myinfo->relocs_allocated += MINT_RELOC_CHUNKSIZE;
       newbuf = bfd_realloc (myinfo->relocs, myinfo->relocs_allocated);
@@ -1164,7 +1166,6 @@ link_write_traditional_syms (abfd, info)
   bfd*                       ibfd;
   enum bfd_link_strip        strip = info->strip;
   enum bfd_link_discard      discard = info->discard;
-  bfd_size_type              symcount = 0;
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
   bfd*                       last_archive = NULL;
 
@@ -1178,7 +1179,6 @@ link_write_traditional_syms (abfd, info)
     {
       bfd_size_type sym_count = obj_aout_external_sym_count (ibfd);
       char* strings = obj_aout_external_strings (ibfd);
-      bfd_size_type strtab_index;
       register struct external_nlist* sym = obj_aout_external_syms (ibfd);
       struct external_nlist* sym_end = sym + sym_count;
       struct aout_link_hash_entry** sym_hash = obj_aout_sym_hashes (ibfd);
@@ -1250,7 +1250,7 @@ link_write_traditional_syms (abfd, info)
 #define mark_written(h) ((int) h->written = (int) true + 1) 
 #define is_written(h) ((int) h->written == (int) true + 1)
       for (; sym < sym_end; sym++, sym_hash++) {
-	CONST char* name = strings + GET_WORD (ibfd, sym->e_strx);
+	const char* name = strings + GET_WORD (ibfd, sym->e_strx);
 	struct aout_link_hash_entry* h = NULL;
 	int type;
 	
@@ -1532,13 +1532,13 @@ link_write_traditional_syms (abfd, info)
 static int
 write_dri_symbol (abfd, name, type, value)
      bfd* abfd;
-     CONST char* name;
+     const char* name;
      bfd_vma type;
      bfd_vma value;
 {
   struct dri_symbol sym;
   char* ptr = &sym.a_name[0];
-  CONST char* str = name;
+  const char* str = name;
   char more_name[DRI_SYMBOL_SIZE];
   int i = sizeof (sym.a_name);
   int written_bytes = 0;
@@ -1583,7 +1583,7 @@ write_dri_symbol (abfd, name, type, value)
   return written_bytes;
 }
 
-CONST bfd_target MY(vec) = 
+const bfd_target MY(vec) = 
 {
   TARGETNAME,           /* name */
   bfd_target_aout_flavour,
