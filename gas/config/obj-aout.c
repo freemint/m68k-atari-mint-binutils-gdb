@@ -487,7 +487,12 @@ obj_crawl_symbol_chain (headers)
 	 All other symbols are output.  We complain if a deleted
 	 symbol was marked external. */
 
-
+      /* Unfortunately the definition of N_REGISTER in struc-symbol.h
+         conflicts with N_WARNING in gnu_aout.h.  But if register 
+         symbols have been properly created with symbol_create instead
+         of symbol_new we don't  have to check for register symbols
+         again here.  */
+#if 0
       if (!S_IS_REGISTER (symbolP)
 	  && (!S_GET_NAME (symbolP)
 	      || S_IS_DEBUG (symbolP)
@@ -495,6 +500,14 @@ obj_crawl_symbol_chain (headers)
 	      || S_IS_EXTERNAL (symbolP)
 	      || (S_GET_NAME (symbolP)[0] != '\001'
 		  && (flag_keep_locals || !S_LOCAL_NAME (symbolP)))))
+#else
+      if (!S_GET_NAME (symbolP)
+	      || S_IS_DEBUG (symbolP)
+	      || !S_IS_DEFINED (symbolP)
+	      || S_IS_EXTERNAL (symbolP)
+	      || (S_GET_NAME (symbolP)[0] != '\001'
+		  && (flag_keep_locals || !S_LOCAL_NAME (symbolP))))
+#endif
 	{
 	  symbolP->sy_number = symbol_number++;
 

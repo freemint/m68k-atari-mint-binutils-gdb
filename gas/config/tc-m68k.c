@@ -3129,14 +3129,18 @@ insert_reg (regname, regnum)
     }
 #endif
 
-  symbol_table_insert (symbol_new (regname, reg_section, regnum,
+  /* Use symbol_create here instead of symbol_new so we don't try to
+     output registers into the object file's symbol table.  */
+  symbol_table_insert (symbol_create (regname, reg_section, regnum,
 				   &zero_address_frag));
 
   for (i = 0; regname[i]; i++)
     buf[i] = islower (regname[i]) ? toupper (regname[i]) : regname[i];
   buf[i] = '\0';
 
-  symbol_table_insert (symbol_new (buf, reg_section, regnum,
+  /* Use symbol_create here instead of symbol_new so we don't try to
+     output registers into the object file's symbol table.  */
+  symbol_table_insert (symbol_create (buf, reg_section, regnum,
 				   &zero_address_frag));
 }
 
