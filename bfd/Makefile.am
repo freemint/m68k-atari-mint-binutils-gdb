@@ -120,6 +120,7 @@ ALL_MACHINES_CFILES = \
 BFD32_BACKENDS = \
 	aout-adobe.lo \
 	aout-arm.lo \
+	aout-mint.lo \
 	aout-ns32k.lo \
 	aout-sparcle.lo \
 	aout-tic30.lo \
@@ -233,6 +234,7 @@ BFD32_BACKENDS = \
 	pei-mips.lo \
 	peigen.lo \
 	ppcboot.lo \
+	prg-mint.lo \
 	reloc16.lo \
 	riscix.lo \
 	sparclinux.lo \
@@ -364,6 +366,7 @@ BFD32_BACKENDS_CFILES = \
 	pei-mips.c \
 	peigen.c \
 	ppcboot.c \
+	prg-mint.c \
 	reloc16.c \
 	riscix.c \
 	sparclinux.c \
