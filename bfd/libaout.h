@@ -473,7 +473,7 @@ struct  aout_data_struct {
 #define obj_aout_string_window(bfd) (adata(bfd).string_window)
 #define obj_aout_sym_hashes(bfd) (adata(bfd).sym_hashes)
 #define obj_aout_dynamic_info(bfd) (adata(bfd).dynamic_info)
-#define obj_aout_ext(bfd)        (adata(bfd).ext)
+#define obj_aout_ext(bfd)	(adata(bfd).ext)
 
 /* We take the address of the first element of an asymbol to ensure that the
    macro is only ever applied to an asymbol */

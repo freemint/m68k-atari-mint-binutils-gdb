@@ -697,6 +697,11 @@ extern boolean bfd_sunos_size_dynamic_sections
   PARAMS ((bfd *, struct bfd_link_info *, struct sec **, struct sec **,
 	   struct sec **));
 
+/* MiNT routine to set the special flags in exec header.  */
+
+extern boolean bfd_m68kmint_set_extended_flags
+  PARAMS ((bfd *, flagword));
+
 /* Linux shared library support routines for the linker.  */
 
 extern boolean bfd_i386linux_size_dynamic_sections
@@ -705,10 +710,6 @@ extern boolean bfd_m68klinux_size_dynamic_sections
   PARAMS ((bfd *, struct bfd_link_info *));
 extern boolean bfd_sparclinux_size_dynamic_sections
   PARAMS ((bfd *, struct bfd_link_info *));
-
-/* MiNT routine to set the special flags in exec header.  */
-extern boolean bfd_m68kmint_set_extended_flags
-  PARAMS ((bfd *, flagword));
 
 /* mmap hacks */
 

@@ -312,6 +312,7 @@ BFD32_BACKENDS_CFILES = \
 	aout-adobe.c \
 	aout-arm.c \
 	aout-cris.c \
+	aout-mint.c \
 	aout-ns32k.c \
 	aout-sparcle.c \
 	aout-tic30.c \
