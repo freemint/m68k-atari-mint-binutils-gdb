@@ -741,6 +741,10 @@ extern bfd_boolean bfd_m68klinux_size_dynamic_sections
 extern bfd_boolean bfd_sparclinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
 
+/* MiNT routine to set the special flags in exec header.  */
+extern bfd_boolean bfd_m68kmint_set_extended_flags
+  (bfd *, flagword);
+
 /* mmap hacks */
 
 struct _bfd_window_internal;

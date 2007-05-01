@@ -210,7 +210,7 @@ extern int vsnprintf(char *, size_t, const char *, va_list);
 #endif /* __FILE__ */
 
 #ifndef FOPEN_WB
-#if defined GO32 || defined __MINGW32__
+#if defined GO32 || defined __MINGW32__ || defined __CYGWIN__
 #include "fopen-bin.h"
 #else
 #include "fopen-same.h"

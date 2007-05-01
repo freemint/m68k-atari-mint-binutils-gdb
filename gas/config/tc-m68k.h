@@ -37,7 +37,7 @@ struct fix;
 #define TARGET_FORMAT "a.out-m68k-linux"
 #endif
 #ifndef TARGET_FORMAT
-#define TARGET_FORMAT "a.out-zero-big"
+#define TARGET_FORMAT "a.out-mint"
 #endif
 #endif
 
