@@ -187,7 +187,6 @@ BFD32_BACKENDS = \
 	aout-adobe.lo \
 	aout-arm.lo \
 	aout-cris.lo \
-	aout-mint.lo \
 	aout-ns32k.lo \
 	aout-sparcle.lo \
 	aout-tic30.lo \
@@ -361,7 +360,6 @@ BFD32_BACKENDS_CFILES = \
 	aout-adobe.c \
 	aout-arm.c \
 	aout-cris.c \
-	aout-mint.c \
 	aout-ns32k.c \
 	aout-sparcle.c \
 	aout-tic30.c \
@@ -1088,10 +1086,6 @@ aout-cris.lo: aout-cris.c aout32.c aoutx.h $(INCDIR)/filenames.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/bfdlink.h libaout.h \
   $(INCDIR)/hashtab.h $(INCDIR)/aout/aout64.h $(INCDIR)/aout/stab_gnu.h \
   $(INCDIR)/aout/stab.def $(INCDIR)/aout/ar.h aout-target.h
-aout-mint.lo: aout-mint.c libbfd.h libaout.h \
-  $(INCDIR)/bfdlink.h aout-target.h $(INCDIR)/aout/aout64.h \
-  $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
-  $(INCDIR)/aout/ar.h
 aout-ns32k.lo: aout-ns32k.c $(INCDIR)/aout/aout64.h \
   ns32k.h libaout.h $(INCDIR)/bfdlink.h aoutx.h $(INCDIR)/filenames.h \
   $(INCDIR)/safe-ctype.h $(INCDIR)/hashtab.h $(INCDIR)/aout/stab_gnu.h \

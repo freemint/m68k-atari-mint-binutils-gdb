@@ -277,15 +277,13 @@ struct dri_symbol {
 			         conflicts with the bits in A_LNAM.  */
 
 
-#define MY_object_p MY_object_p
-#define MY_BFD_TARGET MY_bfd_target
+#define MY_object_p m68kmint_prg_object_p
 #define MY_get_section_contents _bfd_generic_get_section_contents
-#define MY_bfd_final_link MY_bfd_final_link
-#define MY_bfd_free_cached_info MY_bfd_free_cached_info
-#define MY_close_and_cleanup MY_bfd_free_cached_info
-#define MY_bfd_copy_private_bfd_data MY_bfd_copy_private_bfd_data
+#define MY_bfd_final_link m68kmint_prg_bfd_final_link
+#define MY_bfd_free_cached_info m68kmint_prg_bfd_free_cached_info
+#define MY_bfd_copy_private_bfd_data m68kmint_prg_bfd_copy_private_bfd_data
 
-static const bfd_target* MY_object_p (bfd*);
+static const bfd_target* m68kmint_prg_object_p (bfd*);
 
 /* This is a hack.  We have to retrieve the symbol name.  But
    to do achieve this with reasonable effort we need an extra
@@ -300,11 +298,11 @@ bfd_reloc_status_type m68kmint_prg_final_link_relocate
      (reloc_howto_type*, bfd*, asection*, bfd_byte*, bfd_vma,
 	      bfd_vma, bfd_vma, struct reloc_std_external*);
 
-static bfd_boolean MY_bfd_final_link (bfd*, struct bfd_link_info*);
-static bfd_boolean MY_bfd_free_cached_info (bfd*);
-static bfd_boolean MY_bfd_copy_private_bfd_data (bfd*, bfd*);
-static const char* m68kmint_prg_find_symbol_name
-  (reloc_howto_type*, bfd*, asection*, bfd_vma, bfd_byte*,
+static bfd_boolean m68kmint_prg_bfd_final_link (bfd*, struct bfd_link_info*);
+static bfd_boolean m68kmint_prg_bfd_free_cached_info (bfd*);
+static bfd_boolean m68kmint_prg_bfd_copy_private_bfd_data (bfd*, bfd*);
+static const char* find_symbol_name
+  (reloc_howto_type*, bfd*, bfd_byte*,
 	   struct reloc_std_external* rel);
 static int vma_cmp (const void*, const void*);
 
@@ -314,8 +312,6 @@ static int squirt_out_tparel (bfd*, struct internal_exec*,
 static bfd_boolean link_write_traditional_syms
      (bfd*, struct bfd_link_info*);
 static int write_dri_symbol (bfd*, const char*, bfd_vma, bfd_vma);
-
-extern const bfd_target MY(vec);
 
 /* aoutx.h requires definitions for BMAGIC and QMAGIC.  Other
    implementations have either chosen OMAGIC or zero for BMAGIC if
@@ -393,7 +389,7 @@ bfd_m68kmint_set_extended_flags (bfd* abfd, flagword prg_flags)
 
   obj_aout_ext (abfd) = myinfo;
 
-  if (abfd->xvec != &(MY (vec)) || myinfo == NULL)
+  if (abfd->xvec != &m68kmint_prg_vec || myinfo == NULL)
     return FALSE;
 
   myinfo->prg_flags = prg_flags;
@@ -401,7 +397,7 @@ bfd_m68kmint_set_extended_flags (bfd* abfd, flagword prg_flags)
 }
 
 static const bfd_target*
-MY_object_p (bfd* abfd)
+m68kmint_prg_object_p (bfd* abfd)
 {
   struct external_exec exec_bytes;	/* Raw exec header from file */
   struct internal_exec exec;		/* Cleaned-up exec header */
@@ -463,7 +459,7 @@ MY_object_p (bfd* abfd)
   exec.a_info = SWAP_MAGIC (exec_bytes.e_info);
 #endif /* SWAP_MAGIC */
 
-  target = NAME(aout,some_aout_object_p) (abfd, &exec, MY(callback));
+  target = NAME(aout,some_aout_object_p) (abfd, &exec, m68kmint_prg_callback);
 
   myinfo = bfd_zalloc (abfd, sizeof (struct bfd_link_info));
 
@@ -515,7 +511,7 @@ MY_object_p (bfd* abfd)
 }
 
 static bfd_boolean
-MY_bfd_free_cached_info (bfd* abfd)
+m68kmint_prg_bfd_free_cached_info (bfd* abfd)
 {
   if (obj_aout_ext (abfd) != NULL)
     {
@@ -546,7 +542,7 @@ static int vma_cmp (v1, v2)
    buffers.  */
 
 static bfd_boolean
-MY_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
+m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
 {
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
   unsigned long i;
@@ -717,7 +713,7 @@ warning: traditional format is obsolete");
 }
 
 static bfd_boolean
-MY_bfd_copy_private_bfd_data (bfd* ibfd, bfd* obfd)
+m68kmint_prg_bfd_copy_private_bfd_data (bfd* ibfd, bfd* obfd)
 {
   struct mint_internal_info* myinfo_in = obj_aout_ext (ibfd);
   struct mint_internal_info* myinfo_out = obj_aout_ext (obfd);
@@ -727,7 +723,7 @@ MY_bfd_copy_private_bfd_data (bfd* ibfd, bfd* obfd)
      to me if this function is a method of the input or the output
      bfd.  One part of the following AND relation is not redundant,
      but which one?  */
-  if (ibfd->xvec == &(MY (vec)) && obfd->xvec == &(MY (vec)))
+  if (ibfd->xvec == &m68kmint_prg_vec && obfd->xvec == &m68kmint_prg_vec)
     {
       BFD_ASSERT (myinfo_in != NULL);
 
@@ -764,7 +760,7 @@ MY_bfd_copy_private_bfd_data (bfd* ibfd, bfd* obfd)
       memcpy (myinfo_out->tparel, myinfo_in->tparel,
 	      myinfo_out->tparel_size);
     }
-  else if (ibfd->xvec != &(MY (vec)))
+  else if (ibfd->xvec != &m68kmint_prg_vec)
     {
       /* Can this ever happen?  FIXME!  */
       _bfd_error_handler ("\
@@ -784,8 +780,7 @@ error: the input file ``%s'' contains no", ibfd->filename);
 }
 
 static
-const char* m68kmint_prg_find_symbol_name (reloc_howto_type* howto, bfd* input_bfd,
-					   asection* input_section ATTRIBUTE_UNUSED, bfd_vma value ATTRIBUTE_UNUSED,
+const char* find_symbol_name (reloc_howto_type* howto, bfd* input_bfd,
 					   bfd_byte* location, struct reloc_std_external* rel)
 {
   /* Find out the symbol name.  */
@@ -950,9 +945,7 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
 	  else if (relocation == (input_section->output_section->vma
 				  + input_section->output_section->size))
 	    {
-	      name = m68kmint_prg_find_symbol_name (howto, input_bfd,
-						    input_section,
-						    value,
+	      name = find_symbol_name (howto, input_bfd,
 						    contents + address,
 						    rel);
 	      if (strcmp (name, "_etext") == 0)
@@ -970,9 +963,7 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
 	  if (callbacks->reloc_dangerous != NULL)
 	    {
 	      if (name == NULL)
-		name = m68kmint_prg_find_symbol_name (howto, input_bfd,
-						      input_section,
-						      value,
+		name = find_symbol_name (howto, input_bfd,
 						      contents + address,
 						      rel);
 
@@ -1220,7 +1211,7 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 	 here.  If we would do it the clean way we would have
 	 to traverse the entire symbol map and reset the written
 	 flag.  We hack here instead...  */
-#define mark_written(h) ((int) h->written = (int) TRUE + 1)
+#define mark_written(h) (* (int*) &h->written = (int) TRUE + 1)
 #define is_written(h) ((int) h->written == (int) TRUE + 1)
       for (; sym < sym_end; sym++, sym_hash++) {
 	const char* name = strings + GET_WORD (ibfd, sym->e_strx);
@@ -1507,7 +1498,7 @@ static int
 write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
 {
   struct dri_symbol sym;
-  char* ptr = &sym.a_name[0];
+  char* ptr = (char*)&sym.a_name[0];
   const char* str = name;
   char more_name[DRI_SYMBOL_SIZE];
   int i = sizeof (sym.a_name);
@@ -1561,44 +1552,3 @@ write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
 
   return written_bytes;
 }
-
-const bfd_target MY(vec) =
-{
-  TARGETNAME,           /* name */
-  bfd_target_aout_flavour,
-  BFD_ENDIAN_BIG,               /* target byte order (big) */
-  BFD_ENDIAN_BIG,               /* target headers byte order (big) */
-  (HAS_RELOC | EXEC_P |         /* object flags */
-   HAS_LINENO | HAS_DEBUG |
-   HAS_SYMS | HAS_LOCALS | WP_TEXT),
-  (SEC_HAS_CONTENTS | SEC_ALLOC | SEC_LOAD | SEC_RELOC | SEC_CODE | SEC_DATA),
-  MY_symbol_leading_char,
-  AR_PAD_CHAR,                  /* ar_pad_char */
-  15,                           /* ar_max_namelen */
-  bfd_getb64, bfd_getb_signed_64, bfd_putb64,
-     bfd_getb32, bfd_getb_signed_32, bfd_putb32,
-  bfd_getb16, bfd_getb_signed_16, bfd_putb16, /* data */
-  bfd_getb64, bfd_getb_signed_64, bfd_putb64,
-     bfd_getb32, bfd_getb_signed_32, bfd_putb32,
-  bfd_getb16, bfd_getb_signed_16, bfd_putb16, /* hdrs */
-  {_bfd_dummy_target, MY_object_p, /* bfd_check_format */
-   bfd_generic_archive_p, MY_core_file_p},
-  {bfd_false, MY_mkobject,    /* bfd_set_format */
-   _bfd_generic_mkarchive, bfd_false},
-  {bfd_false, MY_write_object_contents, /* bfd_write_contents */
-   _bfd_write_archive_contents, bfd_false},
-
-     BFD_JUMP_TABLE_GENERIC (MY),
-     BFD_JUMP_TABLE_COPY (MY),
-     BFD_JUMP_TABLE_CORE (MY),
-     BFD_JUMP_TABLE_ARCHIVE (MY),
-     BFD_JUMP_TABLE_SYMBOLS (MY),
-     BFD_JUMP_TABLE_RELOCS (MY),
-     BFD_JUMP_TABLE_WRITE (MY),
-     BFD_JUMP_TABLE_LINK (MY),
-     BFD_JUMP_TABLE_DYNAMIC (MY),
-
-  NULL,
-
-  (PTR) MY_backend_data,
-};
