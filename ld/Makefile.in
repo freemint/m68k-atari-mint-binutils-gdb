@@ -481,8 +481,8 @@ ALL_EMULATIONS = \
 	em68kelf.o \
 	em68kelfnbsd.o \
 	em68klinux.o \
-	em68knbsd.o \
 	em68kmint.o \
+	em68knbsd.o \
 	em68kpsos.o \
 	em88kbcs.o \
 	emaxqcoff.o \

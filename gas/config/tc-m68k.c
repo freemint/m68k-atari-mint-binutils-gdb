@@ -957,7 +957,9 @@ tc_m68k_fix_adjustable (fixS *fixP)
 
 #define get_reloc_code(SIZE,PCREL,OTHER) NO_RELOC
 
-#define relaxable_symbol(symbol) 1
+/* PR gas/3041 Weak symbols are not relaxable
+   because they must be treated as extern.  */
+#define relaxable_symbol(symbol)   (!(S_IS_WEAK (symbol)))
 
 #endif /* OBJ_ELF */
 
@@ -1051,6 +1053,14 @@ tc_gen_reloc (asection *section ATTRIBUTE_UNUSED, fixS *fixp)
 #ifndef OBJ_ELF
   if (fixp->fx_pcrel)
     reloc->addend = fixp->fx_addnumber;
+  else if (OUTPUT_FLAVOR == bfd_target_aout_flavour
+	   && fixp->fx_addsy
+	   && S_IS_WEAK (fixp->fx_addsy)
+	   && ! bfd_is_und_section (S_GET_SEGMENT (fixp->fx_addsy)))
+    /* PR gas/3041 Adjust addend in order to force bfd_install_relocation()
+       to put the symbol offset into frags referencing a weak symbol.  */
+    reloc->addend = fixp->fx_addnumber
+		    - (S_GET_VALUE (fixp->fx_addsy) * 2);
   else
     reloc->addend = 0;
 #else
@@ -4545,6 +4555,14 @@ md_apply_fix (fixS *fixP, valueT *valP, segT seg ATTRIBUTE_UNUSED)
 	  && !S_IS_DEFINED (fixP->fx_addsy)
 	  && !S_IS_WEAK (fixP->fx_addsy))
 	S_SET_WEAK (fixP->fx_addsy);
+      return;
+    }
+#elif defined(OBJ_AOUT)
+  /* PR gas/3041 Do not fix frags referencing a weak symbol.  */
+  if (fixP->fx_addsy && S_IS_WEAK (fixP->fx_addsy))
+    {
+      memset (buf, 0, fixP->fx_size);
+      fixP->fx_addnumber = val;	/* Remember value for emit_reloc.  */
       return;
     }
 #endif

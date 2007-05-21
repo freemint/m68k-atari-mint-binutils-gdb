@@ -1,22 +1,23 @@
 /* BFD backend for traditional MiNT executables.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright 1998, 2007 Free Software Foundation, Inc.
    Written by Guido Flohr (gufl0000@stud.uni-sb.de).
+   Modified by Vincent Riviere (vincent.riviere@freesbee.fr).
 
-This file is part of BFD, the Binary File Descriptor library.
+   This file is part of BFD, the Binary File Descriptor library.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* The format of executables on Atari is actually not a.out,  it is
    only chosen as an approach which comes close enough.  The layout of a
@@ -29,7 +30,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    +-----------------+
    | Data segment    |
    +-----------------+
-   | BSS             |
+   | BSS	     |
    +-----------------+
    | Symbol table    |
    +-----------------+
@@ -38,7 +39,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
    The 28 byte exec header used to look like this:
 
-   struct old_exec_header {
+   struct old_exec_header
+   {
      bfd_byte a_magic[2];
      bfd_byte a_text[4];
      bfd_byte a_data[4];
@@ -65,20 +67,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    If the last member A_ABS of the exec header is zero the program
    image contains an additional table with relocation information
    at the end of the image.  The kernel can load program images at
-   virtually any address in the address space.  In fact it will load
+   virtually any address in the address space.	In fact it will load
    it at the start of the biggest block of free memory.  This block
    is then called the Transient Program Area TPA and the image has
-   to be relocated against the TPA at runtime.  The relocation info
+   to be relocated against the TPA at runtime.	The relocation info
    itself is in a simply way compressed:  It starts with a four-byte
    value, the first address within the image to be relocated.  Now
-   following are one-byte offsets to the last address.  The special
+   following are one-byte offsets to the last address.	The special
    value of 1 (which is impossible as an offset) signifies that 254
-   has to be added to the next offset.  The table is finished with
+   has to be added to the next offset.	The table is finished with
    a zero-byte.
 
    I now simply extended the header from its old 28 bytes to 256
    bytes.  The first 28 bytes give home to a standard Atari header,
-   the rest is for extensions.  The extension header starts with
+   the rest is for extensions.	The extension header starts with
    a ``real'' assembler instsruction, a far jump to the text entry
    point.  The extension header gives home to a standard a.out
    exec header (currently NMAGIC or OMAGIC only) plus some extra
@@ -96,7 +98,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    you're probably right.  But the results (mainly the output of
    the linker) seem to work and they allow to use up-to-date
    binutils on the Atari until a better executable format (maybe
-   ELF) has been established for this machine.  */
+   ELF) has been established for this machine.	*/
 
 #define N_HEADER_IN_TEXT(x) 0
 #define BYTES_IN_WORD 4
@@ -136,7 +138,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #include <libiberty.h>
 
-     /* Forward declarations.  */
+/* Forward declarations.  */
 struct internal_exec;
 struct external_exec;
 struct aout_final_link_info;
@@ -144,30 +146,31 @@ struct bfd_link_info;
 struct reloc_std_external;
 
 /* Data structure that holds some private information for us.  */
-struct mint_internal_info {
+struct mint_internal_info
+{
   struct bfd_link_info* linkinfo;    /* Remembered from final_link.  */
-  bfd_boolean       traditional_format;  /* Saved from link info.  */
-  int           symbol_format;       /* Format of the symbol table.  */
-  PTR           tparel;              /* Data for TPA relative relocation
-                                        information.  */
-  file_ptr      tparel_pos;          /* File position of TPA relative
-					relocation information.  */
-  bfd_size_type tparel_size;         /* Size of TPA relative relocation
+  bfd_boolean	traditional_format;  /* Saved from link info.  */
+  int		symbol_format;	     /* Format of the symbol table.  */
+  void *	tparel; 	     /* Data for TPA relative relocation
 					information.  */
-  bfd_size_type symtab_size;         /* Size of traditional symbol table.  */
+  file_ptr	tparel_pos;	     /* File position of TPA relative
+					relocation information.  */
+  bfd_size_type tparel_size;	     /* Size of TPA relative relocation
+					information.  */
+  bfd_size_type symtab_size;	     /* Size of traditional symbol table.  */
 
 #define MINT_RELOC_CHUNKSIZE 0x1000
-  bfd_vma*      relocs;              /* Array of address relocations.  */
-  unsigned long relocs_used;         /* Number of relocation entries
-                                        already used up.  */
+  bfd_vma*	relocs; 	     /* Array of address relocations.  */
+  unsigned long relocs_used;	     /* Number of relocation entries
+					already used up.  */
   unsigned long relocs_allocated;    /* Number of relocation entries
-                                        allocated.  */
+					allocated.  */
 
-  bfd_vma       stkpos;              /* File offset to value of _stksize.  */
+  bfd_vma	stkpos; 	     /* File offset to value of _stksize.  */
 
-  flagword      prg_flags;           /* Standard GEMDOS flags.  */
+  flagword	prg_flags;	     /* Standard GEMDOS flags.	*/
 
-  bfd_boolean       reloc_error;         /* True if an unhandled error during
+  bfd_boolean	reloc_error;	     /* True if an unhandled error during
 					relocation occured.  */
 };
 
@@ -175,18 +178,19 @@ struct mint_internal_info {
    for GEMDOS executables fit into the standard a.out format.
    We start with the original header.  */
 #define external_exec external_exec
-struct external_exec {
-  bfd_byte g_branch[2];              /* 0x601a (or 0xdead for relocatable
-				        linker output).  */
-  bfd_byte g_text[4];                /* Length of text section.  */
-  bfd_byte g_data[4];                /* Length of data section.  */
-  bfd_byte g_bss[4];                 /* Length of bss section.  */
-  bfd_byte g_syms[4];                /* Length of symbol table.  */
-  bfd_byte g_extmagic[4];            /* Always 0x4d694e54
+struct external_exec
+{
+  bfd_byte g_branch[2]; 	     /* 0x601a (or 0xdead for relocatable
+					linker output).  */
+  bfd_byte g_text[4];		     /* Length of text section.  */
+  bfd_byte g_data[4];		     /* Length of data section.  */
+  bfd_byte g_bss[4];		     /* Length of bss section.	*/
+  bfd_byte g_syms[4];		     /* Length of symbol table.  */
+  bfd_byte g_extmagic[4];	     /* Always 0x4d694e54
 					(in ASCII: ``MiNT'').  */
-  bfd_byte g_flags[4];               /* Atari special flags.  */
-  bfd_byte g_abs[2];                 /* Non-zero if absolute (no relocation
-                                        info.  */
+  bfd_byte g_flags[4];		     /* Atari special flags.  */
+  bfd_byte g_abs[2];		     /* Non-zero if absolute (no relocation
+					info.  */
 
   /* We extend this header now to provide the information that the
      binutils want to see.  Everything following will actually be part
@@ -206,32 +210,32 @@ struct external_exec {
      may differ from the one given on top.  The traditional header
      contains the values that the OS wants to see, the values below
      are the values that make the binutils work.  */
-  bfd_byte e_info[4];                /* Magic number and stuff.  */
-  bfd_byte e_text[4];                /* Length of text section in bytes.  */
-  bfd_byte e_data[4];                /* Length of data section.  */
-  bfd_byte e_bss[4];                 /* Length of standard symbol
-					table.  */
-  bfd_byte e_syms[4];                /* Length of symbol table.  */
-  bfd_byte e_entry[4];               /* Start address.  */
-  bfd_byte e_trsize[4];              /* Length of text relocation
-                                        info.  */
-  bfd_byte e_drsize[4];              /* Length of data relocation
+  bfd_byte e_info[4];		     /* Magic number and stuff.  */
+  bfd_byte e_text[4];		     /* Length of text section in bytes.  */
+  bfd_byte e_data[4];		     /* Length of data section.  */
+  bfd_byte e_bss[4];		     /* Length of standard symbol
+					table.	*/
+  bfd_byte e_syms[4];		     /* Length of symbol table.  */
+  bfd_byte e_entry[4];		     /* Start address.	*/
+  bfd_byte e_trsize[4]; 	     /* Length of text relocation
+					info.  */
+  bfd_byte e_drsize[4]; 	     /* Length of data relocation
 					info.  */
 
-  bfd_byte g_tparel_pos[4];          /* File position of TPA relative
+  bfd_byte g_tparel_pos[4];	     /* File position of TPA relative
 					relocation info.  */
-  bfd_byte g_tparel_size[4];         /* Length of TPA relative relocation
+  bfd_byte g_tparel_size[4];	     /* Length of TPA relative relocation
 					info.  */
 
   /* This is for extensions.  */
-  bfd_byte g_stkpos[4];              /* If stacksize is hardcoded into
-                                        the executable you will find it
+  bfd_byte g_stkpos[4]; 	     /* If stacksize is hardcoded into
+					the executable you will find it
 					at file offset g_stkpos.  If
 					not this is NULL.  */
 
-  bfd_byte g_symbol_format[4];       /* Format of the symbol table.  See
-                                        definitions for _MINT_SYMBOL_FORMAT*
-                                        above.  */
+  bfd_byte g_symbol_format[4];	     /* Format of the symbol table.  See
+					definitions for _MINT_SYMBOL_FORMAT*
+					above.	*/
 
   /* Pad with zeros.  */
   bfd_byte g_pad0[172];
@@ -252,29 +256,30 @@ struct external_exec {
 		      N_MAGIC (e) != ZMAGIC)
 #endif
 
-     /* For DRI symbol table format.  */
-struct dri_symbol {
-  bfd_byte a_name[8];     /* Symbol name */
-  bfd_byte a_type[2];     /* Type flag, i.e. A_TEXT etc; see below.  */
-  bfd_byte a_value[4];    /* value of this symbol (or sdb offset).  */
+/* For DRI symbol table format.  */
+struct dri_symbol
+{
+  bfd_byte a_name[8];	  /* Symbol name */
+  bfd_byte a_type[2];	  /* Type flag, i.e. A_TEXT etc; see below.  */
+  bfd_byte a_value[4];	  /* value of this symbol (or sdb offset).  */
 };
 #define DRI_SYMBOL_SIZE 14
 
 /* Simple values for a_type.  */
-#define A_UNDF  0
-#define A_BSS   0x0100
-#define A_TEXT  0x0200
-#define A_DATA  0x0400
-#define A_EXT   0x0800        /* External.  */
-#define A_EQREG 0x1000        /* Equated register.  */
-#define A_GLOBL 0x2000        /* Global.  */
-#define A_EQU   0x4000        /* Equated.  */
-#define A_DEF   0x8000        /* Defined.  */
-#define A_LNAM  0x0048        /* GST compatible long name.  */
-                              /* File symbols ala aln.  */
-#define A_TFILE 0x0280        /* Text file corresponding to object module.  */
-#define A_TFARC 0x02C0        /* Text file archive.  Unfortunately this
-			         conflicts with the bits in A_LNAM.  */
+#define A_UNDF	0
+#define A_BSS	0x0100
+#define A_TEXT	0x0200
+#define A_DATA	0x0400
+#define A_EXT	0x0800	      /* External.  */
+#define A_EQREG 0x1000	      /* Equated register.  */
+#define A_GLOBL 0x2000	      /* Global.  */
+#define A_EQU	0x4000	      /* Equated.  */
+#define A_DEF	0x8000	      /* Defined.  */
+#define A_LNAM	0x0048	      /* GST compatible long name.  */
+			      /* File symbols ala aln.	*/
+#define A_TFILE 0x0280	      /* Text file corresponding to object module.  */
+#define A_TFARC 0x02C0	      /* Text file archive.  Unfortunately this
+				 conflicts with the bits in A_LNAM.  */
 
 
 #define MY_object_p m68kmint_prg_object_p
@@ -287,10 +292,10 @@ static const bfd_target* m68kmint_prg_object_p (bfd*);
 
 /* This is a hack.  We have to retrieve the symbol name.  But
    to do achieve this with reasonable effort we need an extra
-   parameter.   */
-#define MY_final_link_relocate(howto, ibfd, isec, contents, \
+   parameter.	*/
+#define MY_final_link_relocate(howto, input_bfd, input_section, contents, \
 			       address, value, addend) \
-m68kmint_prg_final_link_relocate (howto, ibfd, isec, contents, \
+m68kmint_prg_final_link_relocate (howto, input_bfd, input_section, contents, \
 				  address, value, addend, \
 				  (struct reloc_std_external*) rel)
 
@@ -311,59 +316,59 @@ static int squirt_out_tparel (bfd*, struct internal_exec*,
 
 static bfd_boolean link_write_traditional_syms
      (bfd*, struct bfd_link_info*);
-static int write_dri_symbol (bfd*, const char*, bfd_vma, bfd_vma);
+static int write_dri_symbol (bfd*, const char*, int, bfd_vma);
 
-/* aoutx.h requires definitions for BMAGIC and QMAGIC.  Other
+/* aoutx.h requires definitions for BMAGIC and QMAGIC.	Other
    implementations have either chosen OMAGIC or zero for BMAGIC if
    not available.  We try it with 0777 which is hopefully impossible. */
 #define BMAGIC 0777
 #define QMAGIC 0314
 
 #define WRITE_HEADERS(abfd, execp)					      \
-      {									      \
+      { 								      \
 	bfd_size_type text_size; /* dummy vars */			      \
 	file_ptr text_end;						      \
-                                                                              \
+									      \
 	if (adata(abfd).magic == undecided_magic)			      \
 	  NAME(aout,adjust_sizes_and_vmas) (abfd, &text_size, &text_end);     \
-    									      \
+									      \
 	execp->a_syms = bfd_get_symcount (abfd) * EXTERNAL_NLIST_SIZE;	      \
 	execp->a_entry = bfd_get_start_address (abfd);			      \
-    									      \
+									      \
 	execp->a_trsize = ((obj_textsec (abfd)->reloc_count) *		      \
 			   obj_reloc_entry_size (abfd));		      \
 	execp->a_drsize = ((obj_datasec (abfd)->reloc_count) *		      \
 			   obj_reloc_entry_size (abfd));		      \
-	/* We don't have to call swap_exec_header_out here because the        \
-           contents will be overwritten in a second pass.  */                 \
+	/* We don't have to call swap_exec_header_out here because the	      \
+	   contents will be overwritten in a second pass.  */		      \
 									      \
-	if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0) return FALSE;	      \
-	if (bfd_bwrite ((PTR) &exec_bytes, EXEC_BYTES_SIZE, abfd)	      \
-	    != EXEC_BYTES_SIZE)						      \
-	  return FALSE;							      \
+	if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0) return FALSE;       \
+	if (bfd_bwrite ((void *) &exec_bytes, EXEC_BYTES_SIZE, abfd)	      \
+	    != EXEC_BYTES_SIZE) 					      \
+	  return FALSE; 						      \
 	/* Now write out reloc info, followed by syms and strings.  */	      \
-  									      \
-        if (bfd_seek (abfd, (file_ptr)(N_SYMOFF(*execp)), SEEK_SET) != 0)     \
-          return FALSE;                                                       \
-	if (bfd_get_outsymbols (abfd) != (asymbol**) NULL		      \
-	    && bfd_get_symcount (abfd) != 0) 				      \
+									      \
+	if (bfd_seek (abfd, (file_ptr)(N_SYMOFF(*execp)), SEEK_SET) != 0)     \
+	  return FALSE; 						      \
+	if (bfd_get_outsymbols (abfd) != NULL				      \
+	    && bfd_get_symcount (abfd) != 0)				      \
 	  {								      \
-            if (! NAME(aout,write_syms)(abfd))                                \
-              return FALSE;		                                      \
+	    if (! NAME(aout,write_syms)(abfd))				      \
+	      return FALSE;						      \
 	  }								      \
 									      \
-	/* This will also rewrite  the exec header.  */                       \
-        if (squirt_out_tparel (abfd, execp, &exec_bytes) != 0)                \
-          return FALSE;                                                       \
+	/* This will also rewrite  the exec header.  */ 		      \
+	if (squirt_out_tparel (abfd, execp, &exec_bytes) != 0)		      \
+	  return FALSE; 						      \
 	if (bfd_seek (abfd, (file_ptr)(N_TRELOFF(*execp)), SEEK_SET) != 0)    \
-	  return FALSE;						      	      \
-	if (!NAME(aout,squirt_out_relocs) (abfd, obj_textsec (abfd)))         \
-	  return FALSE;						      	      \
+	  return FALSE; 						      \
+	if (!NAME(aout,squirt_out_relocs) (abfd, obj_textsec (abfd)))	      \
+	  return FALSE; 						      \
 									      \
 	if (bfd_seek (abfd, (file_ptr)(N_DRELOFF(*execp)), SEEK_SET) != 0)    \
-	  return FALSE;						      	      \
-	if (!NAME(aout,squirt_out_relocs)(abfd, obj_datasec (abfd)))          \
-	  return FALSE;						      	      \
+	  return FALSE; 						      \
+	if (!NAME(aout,squirt_out_relocs)(abfd, obj_datasec (abfd)))	      \
+	  return FALSE; 						      \
       }
 
 #include "aoutx.h"
@@ -405,12 +410,13 @@ m68kmint_prg_object_p (bfd* abfd)
   struct mint_internal_info* myinfo;
   bfd_boolean is_executable = TRUE;
 
-  if (bfd_bread ((PTR) &exec_bytes, EXEC_BYTES_SIZE, abfd)
-      != EXEC_BYTES_SIZE) {
-    if (bfd_get_error () != bfd_error_system_call)
-      bfd_set_error (bfd_error_wrong_format);
-    return 0;
-  }
+  if (bfd_bread ((void *) &exec_bytes, EXEC_BYTES_SIZE, abfd)
+      != EXEC_BYTES_SIZE)
+    {
+      if (bfd_get_error () != bfd_error_system_call)
+	bfd_set_error (bfd_error_wrong_format);
+      return 0;
+    }
 
   /* Instead of byte-swapping we compare bytes.  */
   if (exec_bytes.g_branch[0] == 0xde
@@ -493,13 +499,13 @@ m68kmint_prg_object_p (bfd* abfd)
     }
   else
     {
-    /* Read the information from the bfd.  */
-    if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0
-	|| (bfd_bread (myinfo->tparel, myinfo->tparel_size, abfd)
-	    != myinfo->tparel_size))
-      {
-	return 0;
-      }
+      /* Read the information from the bfd.  */
+      if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0
+	  || (bfd_bread (myinfo->tparel, myinfo->tparel_size, abfd)
+	      != myinfo->tparel_size))
+	{
+	  return 0;
+	}
     }
 
   myinfo->stkpos = GET_WORD (abfd, exec_bytes.g_stkpos);
@@ -537,8 +543,8 @@ static int vma_cmp (v1, v2)
   return (int) ((*((bfd_vma*) v1)) - (*((bfd_vma*) v2)));
 }
 
-/* Final link routine.  We need to use a call back to get the correct
-   offsets in the output file.  And we need to malloc some internal
+/* Final link routine.	We need to use a call back to get the correct
+   offsets in the output file.	And we need to malloc some internal
    buffers.  */
 
 static bfd_boolean
@@ -574,7 +580,7 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
      sets the stacksize accordingly.  In your programs (if they need
      an unusual stacksize) you can then simply code:
 
-           long _stksize = 0x2000;
+	   long _stksize = 0x2000;
 
      This will create a program stack of 2k.  Since MiNT cannot detect
      a stack overflow this is the only way to prevent program crashes
@@ -631,16 +637,10 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
     {
       if (info->relocatable)
 	{
-	  _bfd_error_handler ("\
-warning: traditional format not supported for relocatable output");
+	  _bfd_error_handler ("warning: traditional format not supported for relocatable output");
 	}
       else
 	{
-	  _bfd_error_handler ("\
-warning: traditional format is obsolete");
-	  _bfd_error_handler ("\
-(Executables in traditional format will not be recognized");
-	  _bfd_error_handler ("by other bfd front ends.)");
 	  myinfo->traditional_format = TRUE;
 	  myinfo->symbol_format = _MINT_SYMBOL_FORMAT_DRI;
 	}
@@ -667,7 +667,7 @@ warning: traditional format is obsolete");
       && link_write_traditional_syms (abfd, info) != TRUE)
     return FALSE;
 
-  /* Sort the relocation info.  */
+  /* Sort the relocation info.	*/
   if (myinfo->relocs != NULL)
     qsort (myinfo->relocs, myinfo->relocs_used, sizeof (bfd_vma),
 	   vma_cmp);
@@ -676,14 +676,15 @@ warning: traditional format is obsolete");
      is encoded as follows:  The first entry is a 32-bit value
      denoting the first offset to relocate.  All following entries
      are relative to the preceding one.  For relative offsets of
-     more than 254 bytes a value of 1 is used.  The OS will then
+     more than 254 bytes a value of 1 is used.	The OS will then
      add 254 bytes to the current offset.  The list is then terminated
-     with 0L.  */
-  bytes = 4 + 4;    /* First entry is a long, last is (long) 0.  */
-  for (i = 1; i < myinfo->relocs_used; i++) {
-    unsigned long diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
-    bytes += 1 + diff / 254;
-  }
+     with the byte 0.  */
+  bytes = 4 + 1;    /* First entry is a long, last is (bfd_byte) 0.  */
+  for (i = 1; i < myinfo->relocs_used; i++)
+    {
+      unsigned long diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
+      bytes += 1 + diff / 254;
+    }
 
   myinfo->tparel_size = bytes;
   myinfo->tparel = bfd_alloc (abfd, bytes);
@@ -699,72 +700,74 @@ warning: traditional format is obsolete");
   for (i = 1; i < myinfo->relocs_used; i++)
     {
       unsigned long addr = myinfo->relocs[i] - myinfo->relocs[i - 1];
-      while (addr > 254) {
-	*ptr = 1;
-	addr -= 254;
-	ptr++;
-      }
+      while (addr > 254)
+	{
+	  *ptr = 1;
+	  addr -= 254;
+	  ptr++;
+	}
       *ptr = (bfd_byte) addr;
       ptr++;
     }
-  bfd_put_32 (abfd, 0, ptr);
+  *ptr = 0;
 
   return TRUE;
 }
 
 static bfd_boolean
-m68kmint_prg_bfd_copy_private_bfd_data (bfd* ibfd, bfd* obfd)
+m68kmint_prg_bfd_copy_private_bfd_data (bfd* input_bfd, bfd* output_bfd)
 {
-  struct mint_internal_info* myinfo_in = obj_aout_ext (ibfd);
-  struct mint_internal_info* myinfo_out = obj_aout_ext (obfd);
+  struct mint_internal_info* myinfo_in = obj_aout_ext (input_bfd);
+  struct mint_internal_info* myinfo_out = obj_aout_ext (output_bfd);
 
   /* Our routine only makes sense if both the input and the output
      bfd are MiNT program files.  FIXME:  It is not absolutely clear
      to me if this function is a method of the input or the output
      bfd.  One part of the following AND relation is not redundant,
      but which one?  */
-  if (ibfd->xvec == &m68kmint_prg_vec && obfd->xvec == &m68kmint_prg_vec)
+  if (input_bfd->xvec == &m68kmint_prg_vec && output_bfd->xvec == &m68kmint_prg_vec)
     {
       BFD_ASSERT (myinfo_in != NULL);
 
-      if (myinfo_out == NULL) {
-	myinfo_out = bfd_zalloc (obfd, sizeof (struct mint_internal_info));
+      if (myinfo_out == NULL)
+	{
+	  myinfo_out = bfd_zalloc (output_bfd, sizeof (struct mint_internal_info));
 
-	if (myinfo_out == NULL) {
-	  /* The internal function bfd_zalloc has already set the error
-	     state to "out of memory".  */
-	  return FALSE;
+	  if (myinfo_out == NULL)
+	    {
+	      /* The internal function bfd_zalloc has already set the error
+		 state to "out of memory".  */
+	      return FALSE;
+	    }
+
+	  memcpy (myinfo_out, myinfo_in, sizeof (struct mint_internal_info));
+	  myinfo_out->tparel = NULL;
+	  obj_aout_ext (output_bfd) = myinfo_out;
 	}
-
-	memcpy (myinfo_out, myinfo_in, sizeof (struct mint_internal_info));
-	myinfo_out->tparel = NULL;
-	obj_aout_ext (obfd) = myinfo_out;
-      }
 
       if (myinfo_out->tparel != NULL)
 	free (myinfo_out->tparel);
 
       if (myinfo_in->tparel != NULL)
       {
-	if (bfd_seek (ibfd, myinfo_in->tparel_pos, SEEK_SET) != 0)
+	if (bfd_seek (input_bfd, myinfo_in->tparel_pos, SEEK_SET) != 0)
 	  return FALSE;
 
-	if (bfd_bread (myinfo_in->tparel, myinfo_in->tparel_size, ibfd)
+	if (bfd_bread (myinfo_in->tparel, myinfo_in->tparel_size, input_bfd)
 	    != myinfo_in->tparel_size)
 	  return FALSE;
       }
-      myinfo_out->tparel = bfd_alloc (obfd, myinfo_out->tparel_size);
+      myinfo_out->tparel = bfd_alloc (output_bfd, myinfo_out->tparel_size);
       if (myinfo_out->tparel == NULL)
 	return FALSE;
 
       memcpy (myinfo_out->tparel, myinfo_in->tparel,
 	      myinfo_out->tparel_size);
     }
-  else if (ibfd->xvec != &m68kmint_prg_vec)
+  else if (input_bfd->xvec != &m68kmint_prg_vec)
     {
-      /* Can this ever happen?  FIXME!  */
-      _bfd_error_handler ("\
-error: the input file ``%s'' contains no", ibfd->filename);
+      /* Can this ever happen?	FIXME!	*/
+      _bfd_error_handler ("error: the input file ``%s'' contains no", input_bfd->filename);
       _bfd_error_handler ("TPA-relative relocation info.");
 
       /* We will invalidate the output file so that no attempt is
@@ -773,17 +776,17 @@ error: the input file ``%s'' contains no", ibfd->filename);
 	 tried to objcopy onto our format for research reasons.  */
       _bfd_error_handler ("Will mark output file ``%s''");
       _bfd_error_handler ("as non-executable.");
-      obfd->flags &= (~EXEC_P);
+      output_bfd->flags &= (~EXEC_P);
     }
 
-  return TRUE; /*_bfd_generic_bfd_copy_private_bfd_data (ibfd, obfd);*/
+  return TRUE; /*_bfd_generic_bfd_copy_private_bfd_data (input_bfd, output_bfd);*/
 }
 
 static
 const char* find_symbol_name (reloc_howto_type* howto, bfd* input_bfd,
 					   bfd_byte* location, struct reloc_std_external* rel)
 {
-  /* Find out the symbol name.  */
+  /* Find out the symbol name.	*/
   struct external_nlist *syms = obj_aout_external_syms (input_bfd);
   char* strings = obj_aout_external_strings (input_bfd);
   struct aout_link_hash_entry** sym_hashes
@@ -818,7 +821,7 @@ const char* find_symbol_name (reloc_howto_type* howto, bfd* input_bfd,
 
 	  if (this_value == wanted_value)
 	    {
-              bfd_byte symtype = bfd_get_8 (input_bfd, syms[i].e_type);
+	      bfd_byte symtype = bfd_get_8 (input_bfd, syms[i].e_type);
 
 	      /* Skip debug symbols and the like.  */
 	      if ((symtype & N_STAB) != 0)
@@ -863,7 +866,7 @@ const char* find_symbol_name (reloc_howto_type* howto, bfd* input_bfd,
   else if (h != NULL)
     name = h->root.root.string;
   else if (r_index >= obj_aout_external_sym_count (input_bfd))
-    name = "(unknown symbol)";  /* Shouldn't happen.  */
+    name = "(unknown symbol)";	/* Shouldn't happen.  */
   else
     name = strings + GET_WORD (input_bfd, syms[r_index].e_strx);
 
@@ -903,12 +906,12 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
 
 #define _MINT_F_SHTEXT 0x800
 
-  /* Sanity check the address.  */
+  /* Sanity check the address.	*/
   if (address > input_section->size)
     return bfd_reloc_outofrange;
 
   /* This function assumes that we are dealing with a basic relocation
-     against a symbol.  We want to compute the value of the symbol to
+     against a symbol.	We want to compute the value of the symbol to
      relocate to.  This is just VALUE, the value of the symbol, plus
      ADDEND, any addend associated with the reloc.  */
   relocation = value + addend;
@@ -932,7 +935,7 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
 	{
 	  if (!r_extern)
 	    {
-	      /* This is a relocation against another section.  Only
+	      /* This is a relocation against another section.	Only
 		 relocations against the text section are allowed.  */
 	      if (r_index != N_TEXT && r_index != (N_TEXT | N_EXT))
 		error_found = TRUE;
@@ -958,7 +961,7 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
 	  const struct bfd_link_callbacks* callbacks
 	    = myinfo->linkinfo->callbacks;
 
-          myinfo->reloc_error = TRUE;
+	  myinfo->reloc_error = TRUE;
 
 	  if (callbacks->reloc_dangerous != NULL)
 	    {
@@ -1004,31 +1007,34 @@ m68kmint_prg_final_link_relocate (reloc_howto_type* howto, bfd* input_bfd, asect
   /* The symbol has to be relocated again iff the length of the relocation
      is 2 words and it is not pc relative.  */
 
-  if (!howto->pc_relative && bfd_get_reloc_size (howto) == 4) {
+  if (!howto->pc_relative && bfd_get_reloc_size (howto) == 4)
+    {
 
-    /* Enlarge the buffer if necessary.  */
-    if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated) {
-      bfd_vma* newbuf;
-      myinfo->relocs_allocated += MINT_RELOC_CHUNKSIZE;
-      newbuf = bfd_realloc (myinfo->relocs, myinfo->relocs_allocated);
-      if (newbuf == NULL) {
-        bfd_set_error (bfd_error_no_memory);
-        bfd_perror ("fatal error");
-        xexit (1);
-      }
-      myinfo->relocs = newbuf;
+      /* Enlarge the buffer if necessary.  */
+      if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated)
+	{
+	  bfd_vma* newbuf;
+	  myinfo->relocs_allocated += MINT_RELOC_CHUNKSIZE;
+	  newbuf = bfd_realloc (myinfo->relocs, myinfo->relocs_allocated);
+	  if (newbuf == NULL)
+	    {
+	      bfd_set_error (bfd_error_no_memory);
+	      bfd_perror ("fatal error");
+	      xexit (1);
+	    }
+	  myinfo->relocs = newbuf;
+	}
+
+      /* The TPA relative relocation actually just adds the address of
+	 the text segment (i. e. beginning of the executable in memory)
+	 to the addresses at the specified locations.  This allows an
+	 executable to be loaded everywhere in the address space without
+	 memory management.  */
+
+      myinfo->relocs[myinfo->relocs_used++] =
+	input_section->output_section->vma
+	+ input_section->output_offset + address;
     }
-
-    /* The TPA relative relocation actually just adds the address of
-       the text segment (i. e. beginning of the executable in memory)
-       to the addresses at the specified locations.  This allows an
-       executable to be loaded everywhere in the address space without
-       memory management.  */
-
-    myinfo->relocs[myinfo->relocs_used++] =
-      input_section->output_section->vma
-      + input_section->output_offset + address;
-  }
 
   return retval;
 }
@@ -1054,7 +1060,7 @@ squirt_out_tparel (bfd* abfd, struct internal_exec* execp, struct external_exec*
 
   /* Now that we have all the information we need we can fill in the
      MiNT-specific header fields.  Unfortunately this is already the
-     second time that we write out the header.  */
+     second time that we write out the header.	*/
 
   if ((abfd->flags & EXEC_P) == 0)
     bfd_h_put_16 (abfd, 0xdead, exec_bytes->g_branch);
@@ -1081,7 +1087,7 @@ squirt_out_tparel (bfd* abfd, struct internal_exec* execp, struct external_exec*
   bfd_h_put_32 (abfd, myinfo->prg_flags, exec_bytes->g_flags);
   bfd_h_put_16 (abfd, 0, exec_bytes->g_abs);
 
-  /* Generate the jump instruction to the entry point.  In m68k
+  /* Generate the jump instruction to the entry point.	In m68k
      assembler mnemnonics it looks more or less like this:
 
        move.l  exec_bytes->e_entry(pc), d4
@@ -1116,7 +1122,7 @@ squirt_out_tparel (bfd* abfd, struct internal_exec* execp, struct external_exec*
 
   if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0) return FALSE;
 
-  if (bfd_bwrite ((PTR) exec_bytes, EXEC_BYTES_SIZE, abfd)
+  if (bfd_bwrite ((void *) exec_bytes, EXEC_BYTES_SIZE, abfd)
       != EXEC_BYTES_SIZE)
     return 1;
 
@@ -1127,11 +1133,11 @@ squirt_out_tparel (bfd* abfd, struct internal_exec* execp, struct external_exec*
 static bfd_boolean
 link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 {
-  bfd*                       ibfd;
-  enum bfd_link_strip        strip = info->strip;
+  bfd*			     input_bfd;
+  enum bfd_link_strip	     strip = info->strip;
   enum bfd_link_discard      discard = info->discard;
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
-  bfd*                       last_archive = NULL;
+  bfd*			     last_archive = NULL;
 
   /* Position file pointer.  */
   if (bfd_seek (abfd, obj_sym_filepos (abfd), SEEK_SET) != 0)
@@ -1139,13 +1145,13 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 
   myinfo->symtab_size = 0;
 
-  for (ibfd = info->input_bfds; ibfd != NULL; ibfd = ibfd->link_next)
+  for (input_bfd = info->input_bfds; input_bfd != NULL; input_bfd = input_bfd->link_next)
     {
-      bfd_size_type sym_count = obj_aout_external_sym_count (ibfd);
-      char* strings = obj_aout_external_strings (ibfd);
-      register struct external_nlist* sym = obj_aout_external_syms (ibfd);
+      bfd_size_type sym_count = obj_aout_external_sym_count (input_bfd);
+      char* strings = obj_aout_external_strings (input_bfd);
+      struct external_nlist* sym = obj_aout_external_syms (input_bfd);
       struct external_nlist* sym_end = sym + sym_count;
-      struct aout_link_hash_entry** sym_hash = obj_aout_sym_hashes (ibfd);
+      struct aout_link_hash_entry** sym_hash = obj_aout_sym_hashes (input_bfd);
       bfd_boolean pass = FALSE;
       bfd_boolean skip = FALSE;
       bfd_boolean skip_next = FALSE;
@@ -1157,27 +1163,27 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
       /* First write out a symbol for the archive if we do not
 	 strip these symbols and if it differs from the last
 	 one.  */
-      if (ibfd->my_archive != last_archive
-	  && ibfd->my_archive != NULL)
+      if (input_bfd->my_archive != last_archive
+	  && input_bfd->my_archive != NULL)
 	{
 	  write_archive_name = TRUE;
-	  last_archive = ibfd->my_archive;
+	  last_archive = input_bfd->my_archive;
 	}
 
       if (write_archive_name
 	  && strip != strip_all
 	  && (strip != strip_some
 	      || bfd_hash_lookup (info->keep_hash,
-				  ibfd->my_archive->filename,
+				  input_bfd->my_archive->filename,
 				  FALSE, FALSE) != NULL)
 	  && discard != discard_all)
 	{
 	  val = bfd_get_section_vma (abfd,
-				     obj_textsec (ibfd)->output_section)
-	    + obj_textsec (ibfd)->output_offset;
+				     obj_textsec (input_bfd)->output_section)
+	    + obj_textsec (input_bfd)->output_offset;
 
 	  written_bytes = write_dri_symbol (abfd,
-					    ibfd->my_archive->filename,
+					    input_bfd->my_archive->filename,
 					    A_TFILE, val);
 
 	  if (written_bytes < 0)
@@ -1190,15 +1196,15 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 	 strip these symbols.  */
       if (strip != strip_all
 	  && (strip != strip_some
-	      || bfd_hash_lookup (info->keep_hash, ibfd->filename,
+	      || bfd_hash_lookup (info->keep_hash, input_bfd->filename,
 				  FALSE, FALSE) != NULL)
 	  && discard != discard_all)
 	{
 	  val = bfd_get_section_vma (abfd,
-				     obj_textsec (ibfd)->output_section)
-	    + obj_textsec (ibfd)->output_offset;
+				     obj_textsec (input_bfd)->output_section)
+	    + obj_textsec (input_bfd)->output_offset;
 
-	  written_bytes = write_dri_symbol (abfd, ibfd->filename,
+	  written_bytes = write_dri_symbol (abfd, input_bfd->filename,
 					    A_TFILE, val);
 	  if (written_bytes < 0)
 	    return FALSE;
@@ -1208,283 +1214,306 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 
       /* Now we have a problem.  All symbols that we see have already
 	 been marked written (because we write them a second time
-	 here.  If we would do it the clean way we would have
+	 here.	If we would do it the clean way we would have
 	 to traverse the entire symbol map and reset the written
-	 flag.  We hack here instead...  */
+	 flag.	We hack here instead...  */
 #define mark_written(h) (* (int*) &h->written = (int) TRUE + 1)
 #define is_written(h) ((int) h->written == (int) TRUE + 1)
-      for (; sym < sym_end; sym++, sym_hash++) {
-	const char* name = strings + GET_WORD (ibfd, sym->e_strx);
-	struct aout_link_hash_entry* h = NULL;
-	int type;
-
-	val = 0;
-	type = bfd_h_get_8 (ibfd, sym->e_type);
-	name = strings + GET_WORD (ibfd, sym->e_strx);
-
-	if (pass) {
-	  /* Pass this symbol through.  It is the target of an
-	     indirect or warning symbol.  */
-	  val = GET_WORD (ibfd, sym->e_value);
-	  pass = FALSE;
-	} else if (skip_next) {
-	  /* Skip this symbol, which is the target of an indirect
-	     symbol that we have changed to no longer be an indirect
-	     symbol.  */
-	  skip_next = FALSE;
-	  continue;
-	} else {
-	  struct aout_link_hash_entry* hresolve = *sym_hash;
+      for (; sym < sym_end; sym++, sym_hash++)
+	{
+	  const char* name;
+	  int type;
+	  struct aout_link_hash_entry* h;
 	  asection* symsec;
+	  val = 0;
 
-	  /* We have saved the hash table entry for this symbol, if
-	     there is one.  Note that we could just look it up again
-	     in the hash table, provided we first check that it is an
-	     external symbol. */
-	  h = *sym_hash;
+	  type = H_GET_8 (input_bfd, sym->e_type);
+	  name = strings + GET_WORD (input_bfd, sym->e_strx);
 
-	  /* Use the name from the hash table, in case the symbol was
-	     wrapped.  */
-	  if (h != NULL)
-	    name = h->root.root.string;
+	  h = NULL;
 
-	  /* If this is an indirect or warning symbol, then change
-	     hresolve to the base symbol.  */
-	  hresolve = h;
-	  if (h != (struct aout_link_hash_entry*) NULL
-	      && (h->root.type == bfd_link_hash_indirect
-		  || h->root.type == bfd_link_hash_warning)) {
-	    hresolve = (struct aout_link_hash_entry*) h->root.u.i.link;
-	    while (hresolve->root.type == bfd_link_hash_indirect
-		   || hresolve->root.type == bfd_link_hash_warning)
-	      hresolve = ((struct aout_link_hash_entry*)
-			  hresolve->root.u.i.link);
-	  }
-
-	  /* If the symbol has already been written out skip it.  */
-	  if (h != (struct aout_link_hash_entry*) NULL
-	      && h->root.type != bfd_link_hash_warning
-	      && is_written (h)) {
-	    if ((type & N_TYPE) == N_INDR
-		|| type == N_WARNING)
-	      skip_next = TRUE;
-	    continue;
-	  }
-
-	  /* See if we are stripping this symbol.  */
-	  skip = FALSE;
-
-	  /* Skip all debugger symbols.  No way to output them in
-	     DRI format.  This will also reduce a lot of headaches.  */
-	  if ((type & N_STAB) != 0)
-	    skip = TRUE;
-
-	  switch (strip)
+	  if (pass)
 	    {
-	    case strip_none:
-	    case strip_debugger:
-	      break;
-	    case strip_some:
-	      if (bfd_hash_lookup (info->keep_hash, name, FALSE, FALSE)
-		  == NULL)
+	      /* Pass this symbol through.  It is the target of an
+	      indirect or warning symbol.  */
+	      val = GET_WORD (input_bfd, sym->e_value);
+	      pass = FALSE;
+	    }
+	  else if (skip_next)
+	    {
+	      /* Skip this symbol, which is the target of an indirect
+		 symbol that we have changed to no longer be an indirect
+		 symbol.  */
+	      skip_next = FALSE;
+	      continue;
+	    }
+	  else
+	    {
+	      struct aout_link_hash_entry* hresolve = *sym_hash;
+
+	      /* We have saved the hash table entry for this symbol, if
+		 there is one.	Note that we could just look it up again
+		 in the hash table, provided we first check that it is an
+		 external symbol. */
+	      h = *sym_hash;
+
+	      /* Use the name from the hash table, in case the symbol was
+		 wrapped.  */
+	    if (h != NULL
+		&& h->root.type != bfd_link_hash_warning)
+		name = h->root.root.string;
+
+	      /* If this is an indirect or warning symbol, then change
+		 hresolve to the base symbol.  */
+	      hresolve = h;
+	      if (h != (struct aout_link_hash_entry *) NULL
+		  && (h->root.type == bfd_link_hash_indirect
+		      || h->root.type == bfd_link_hash_warning))
+		{
+		  hresolve = (struct aout_link_hash_entry*) h->root.u.i.link;
+		  while (hresolve->root.type == bfd_link_hash_indirect
+			 || hresolve->root.type == bfd_link_hash_warning)
+		    hresolve = ((struct aout_link_hash_entry*)
+				hresolve->root.u.i.link);
+		}
+
+	      /* If the symbol has already been written out skip it.  */
+	      if (h != NULL
+		  && is_written (h))
+		{
+		  if ((type & N_TYPE) == N_INDR
+		      || type == N_WARNING)
+		    skip_next = TRUE;
+		  continue;
+		}
+
+	      /* See if we are stripping this symbol.  */
+	      skip = FALSE;
+
+	      /* Skip all debugger symbols.  No way to output them in
+		 DRI format.  This will also reduce a lot of headaches.  */
+	      if ((type & N_STAB) != 0)
 		skip = TRUE;
-	      break;
-	    case strip_all:
-	      skip = TRUE;
-	      break;
+
+	      switch (strip)
+		{
+		case strip_none:
+		case strip_debugger:
+		  break;
+		case strip_some:
+		  if (bfd_hash_lookup (info->keep_hash, name, FALSE, FALSE)
+		      == NULL)
+		    skip = TRUE;
+		  break;
+		case strip_all:
+		  skip = TRUE;
+		  break;
+		}
+
+	      if (skip)
+		{
+		  if (h != NULL)
+		    mark_written (h);
+		  continue;
+		}
+
+	      /* Get the value of the symbol.  */
+	      if ((type & N_TYPE) == N_TEXT
+		  || type == N_WEAKT)
+		symsec = obj_textsec (input_bfd);
+	      else if ((type & N_TYPE) == N_DATA
+		       || type == N_WEAKD)
+		symsec = obj_datasec (input_bfd);
+	      else if ((type & N_TYPE) == N_BSS
+		       || type == N_WEAKB)
+		symsec = obj_bsssec (input_bfd);
+	      else if ((type & N_TYPE) == N_ABS
+		       || type == N_WEAKA)
+		symsec = bfd_abs_section_ptr;
+	      else if (((type & N_TYPE) == N_INDR
+			&& (hresolve == NULL
+			    || (hresolve->root.type != bfd_link_hash_defined
+				&& hresolve->root.type != bfd_link_hash_defweak
+				&& hresolve->root.type != bfd_link_hash_common)))
+		       || type == N_WARNING)
+		{
+		  /* Pass the next symbol through unchanged.  The
+		     condition above for indirect symbols is so that if
+		     the indirect symbol was defined, we output it with
+		     the correct definition so the debugger will
+		     understand it.  */
+		  pass = TRUE;
+		  val = GET_WORD (input_bfd, sym->e_value);
+		  symsec = NULL;
+		}
+	      else
+		{
+		  /* If we get here with an indirect symbol, it means that
+		     we are outputting it with a real definition.  In such
+		     a case we do not want to output the next symbol,
+		     which is the target of the indirection.  */
+		  if ((type & N_TYPE) == N_INDR)
+		    skip_next = TRUE;
+
+		  symsec = NULL;
+
+		  /* We need to get the value from the hash table.  We use
+		     hresolve so that if we have defined an indirect
+		     symbol we output the final definition.  */
+		  if (h == NULL)
+		    {
+		      switch (type & N_TYPE)
+			{
+			case N_SETT:
+			  symsec = obj_textsec (input_bfd);
+			  break;
+			case N_SETD:
+			  symsec = obj_datasec (input_bfd);
+			  break;
+			case N_SETB:
+			  symsec = obj_bsssec (input_bfd);
+			  break;
+			case N_SETA:
+			  symsec = bfd_abs_section_ptr;
+			  break;
+			default:
+			  val = 0;
+			  break;
+			}
+		    }
+		  else if (hresolve->root.type == bfd_link_hash_defined
+			   || hresolve->root.type == bfd_link_hash_defweak)
+		    {
+		      asection* input_section;
+		      asection* output_section;
+
+		      /* This case usually means a common symbol which was
+			 turned into a defined symbol.	*/
+		      input_section = hresolve->root.u.def.section;
+		      output_section = input_section->output_section;
+		      BFD_ASSERT (bfd_is_abs_section (output_section)
+				  || output_section->owner == abfd);
+		      val = (hresolve->root.u.def.value
+			     + bfd_get_section_vma (abfd, output_section)
+			     + input_section->output_offset);
+
+		      /* Get the correct type based on the section.  If
+			 this is a constructed set, force it to be
+			 globally visible.  */
+		      if (type == N_SETT
+			  || type == N_SETD
+			  || type == N_SETB
+			  || type == N_SETA)
+			type |= N_EXT;
+
+		      type &=~ N_TYPE;
+
+		      if (output_section == obj_textsec (abfd))
+			type |= N_TEXT;
+		      else if (output_section == obj_datasec (abfd))
+			type |= N_DATA;
+		      else if (output_section == obj_bsssec (abfd))
+			type |= N_BSS;
+		      else
+			type |= N_ABS;
+		    }
+		  else if (hresolve->root.type == bfd_link_hash_common)
+		    val = hresolve->root.u.c.size;
+		  else if (hresolve->root.type == bfd_link_hash_undefweak)
+		    {
+		      val = 0;
+		      type = N_UNDF;
+		    }
+		  else
+		    val = 0;
+		}
+	      if (symsec != NULL)
+		{
+		  /* DRI symbols are relative to the beginning of the section.  */
+		  val = (symsec->output_offset
+			 + (GET_WORD (input_bfd, sym->e_value)
+			    - symsec->vma));
+
+		  /* TEXT symbols values must be adjusted
+		     by adding to the size of the extended header.  */
+		  if (symsec == obj_textsec (input_bfd))
+		    val += TEXT_START_ADDR;
+		}
+
+	      /* If this is a global symbol set the written flag, and if
+		 it is a local symbol see if we should discard it.  */
+	      if (h != NULL)
+		{
+		  mark_written (h);
+		}
+	      else if ((type & N_TYPE) != N_SETT
+		       && (type & N_TYPE) != N_SETD
+		       && (type & N_TYPE) != N_SETB
+		       && (type & N_TYPE) != N_SETA)
+		{
+		  switch (discard)
+		    {
+		    case discard_none:
+		    case discard_sec_merge:
+		      break;
+		    case discard_l:
+		      if (bfd_is_local_label_name (input_bfd, name))
+			skip = TRUE;
+		      break;
+		    default:
+		    case discard_all:
+		      skip = TRUE;
+		      break;
+		    }
+		  if (skip)
+		    {
+		      pass = FALSE;
+		      continue;
+		    }
+		}
 	    }
 
-	  if (skip)
+	  /* Now find the nearest type in DRI format.  */
+	  switch (type)
 	    {
-	      if (h != (struct aout_link_hash_entry*) NULL)
-		mark_written (h);
+	    case N_ABS:
+	    case N_ABS | N_EXT:
+	    case N_SETA:
+	    case N_SETA | N_EXT:
+	    case N_WEAKA:
+	      a_type = A_EQU | A_DEF | A_GLOBL;
+	      break;
+	    case N_TEXT:
+	    case N_TEXT | N_EXT:
+	    case N_SETT:
+	    case N_SETT | N_EXT:
+	    case N_WEAKT:
+	      a_type = A_TEXT | A_DEF | A_GLOBL;
+	      break;
+	    case N_DATA:
+	    case N_DATA | N_EXT:
+	    case N_SETD:
+	    case N_SETD | N_EXT:
+	    case N_WEAKD:
+	      a_type = A_DATA | A_DEF | A_GLOBL;
+	      break;
+	    case N_BSS:
+	    case N_BSS | N_EXT:
+	    case N_SETB:
+	    case N_SETB | N_EXT:
+	    case N_WEAKB:
+	      a_type = A_BSS | A_DEF | A_GLOBL;
+	      break;
+	    default:
 	      continue;
 	    }
 
-	  /* Get the value of the symbol.  */
-	  if ((type & N_TYPE) == N_TEXT
-	      || type == N_WEAKT)
-	    symsec = obj_textsec (ibfd);
-	  else if ((type & N_TYPE) == N_DATA
-		   || type == N_WEAKD)
-	    symsec = obj_datasec (ibfd);
-	  else if ((type & N_TYPE) == N_BSS
-		   || type == N_WEAKB)
-	    symsec = obj_bsssec (ibfd);
-	  else if ((type & N_TYPE) == N_ABS
-		   || type == N_WEAKA)
-	    symsec = bfd_abs_section_ptr;
-	  else if (((type & N_TYPE) == N_INDR
-		    && (hresolve == (struct aout_link_hash_entry*) NULL
-			|| (hresolve->root.type != bfd_link_hash_defined
-			    && hresolve->root.type != bfd_link_hash_defweak
-			    && hresolve->root.type != bfd_link_hash_common)))
-		   || type == N_WARNING) {
-	    /* Pass the next symbol through unchanged.  The
-	       condition above for indirect symbols is so that if
-	       the indirect symbol was defined, we output it with
-	       the correct definition so the debugger will
-	       understand it.  */
-	    pass = TRUE;
-	    val = GET_WORD (ibfd, sym->e_value);
-	    symsec = NULL;
-	  } else {
-	    /* If we get here with an indirect symbol, it means that
-	       we are outputting it with a real definition.  In such
-	       a case we do not want to output the next symbol,
-	       which is the target of the indirection.  */
-	    if ((type & N_TYPE) == N_INDR)
-	      skip_next = TRUE;
+	  written_bytes = write_dri_symbol (abfd, name, a_type, val);
+	  if (written_bytes < 0)
+	    return FALSE;
 
-	    symsec = NULL;
-
-	    /* We need to get the value from the hash table.  We use
-	       hresolve so that if we have defined an indirect
-	       symbol we output the final definition.  */
-	    if (h == (struct aout_link_hash_entry*) NULL)
-	      {
-		switch (type & N_TYPE)
-		  {
-		  case N_SETT:
-		    symsec = obj_textsec (ibfd);
-		    break;
-		  case N_SETD:
-		    symsec = obj_datasec (ibfd);
-		    break;
-		  case N_SETB:
-		    symsec = obj_bsssec (ibfd);
-		    break;
-		  case N_SETA:
-		    symsec = bfd_abs_section_ptr;
-		    break;
-		  default:
-		    val = 0;
-		    break;
-		  }
-	      }
-	    else if (hresolve->root.type == bfd_link_hash_defined
-		     || hresolve->root.type == bfd_link_hash_defweak)
-	      {
-		asection* input_section;
-		asection* output_section;
-
-		/* This case usually means a common symbol which was
-		   turned into a defined symbol.  */
-		input_section = hresolve->root.u.def.section;
-		output_section = input_section->output_section;
-		BFD_ASSERT (bfd_is_abs_section (output_section)
-			    || output_section->owner == abfd);
-		val = (hresolve->root.u.def.value
-		       + bfd_get_section_vma (abfd, output_section)
-		       + input_section->output_offset);
-
-		/* Get the correct type based on the section.  If
-		   this is a constructed set, force it to be
-		   globally visible.  */
-		if (type == N_SETT
-		    || type == N_SETD
-		    || type == N_SETB
-		    || type == N_SETA)
-		  type |= N_EXT;
-
-		type &=~ N_TYPE;
-
-		if (output_section == obj_textsec (abfd))
-		  type |= N_TEXT;
-		else if (output_section == obj_datasec (abfd))
-		  type |= N_DATA;
-		else if (output_section == obj_bsssec (abfd))
-		  type |= N_BSS;
-		else
-	      type |= N_ABS;
-	      }
-	    else if (hresolve->root.type == bfd_link_hash_common)
-	      val = hresolve->root.u.c.size;
-	    else if (hresolve->root.type == bfd_link_hash_undefweak) {
-	      val = 0;
-	      type = N_UNDF;
-	    }
-	    else
-	      val = 0;
-	  }
-	  if (symsec != (asection*) NULL)
-	  val = (symsec->output_section->vma
-		 + symsec->output_offset
-		 + (GET_WORD (ibfd, sym->e_value)
-		    - symsec->vma));
-
-	  /* If this is a global symbol set the written flag, and if
-	     it is a local symbol see if we should discard it.  */
-	  if (h != (struct aout_link_hash_entry*) NULL) {
-	    mark_written (h);
-	  } else if ((type & N_TYPE) != N_SETT
-		     && (type & N_TYPE) != N_SETD
-		     && (type & N_TYPE) != N_SETB
-		     && (type & N_TYPE) != N_SETA) {
-	    switch (discard)
-	      {
-	      case discard_none:
-		break;
-	      case discard_l:
-		if (bfd_is_local_label_name (ibfd, name))
-		  skip = TRUE;
-		break;
-		  default:
-	      case discard_all:
-		skip = TRUE;
-		break;
-	      }
-	    if (skip)
-	      {
-		pass = FALSE;
-		continue;
-	      }
-	  }
+	  myinfo->symtab_size += written_bytes;
 	}
-
-	/* Now find the nearest type in DRI format.  We actually
-	   don't have to care about weak symbols because we have
-	   ignored the weak character of a symbol above.  Better
-	   is better yet.  */
-	switch (type & ~N_EXT)
-	  {
-	  case N_UNDF:
-	  case N_WEAKU:
-	    a_type = A_UNDF;
-	    break;
-	  case N_ABS:
-	  case N_WEAKA:
-	  case N_SETA:
-	    a_type = A_EQU;
-	    break;
-	  case N_TEXT:
-	  case N_WEAKT:
-	  case N_SETT:
-	    a_type = A_TEXT;
-	    break;
-	  case N_DATA:
-	  case N_WEAKD:
-	  case N_SETD:
-	    a_type = A_DATA;
-	    break;
-	  case N_BSS:
-	  case N_WEAKB:
-	  case N_SETB:
-	    a_type = A_BSS;
-	    break;
-	  default:
-	    a_type = A_UNDF;
-	    break;
-	  }
-
-	if (type & N_EXT)
-	  a_type |= A_GLOBL;
-
-	written_bytes = write_dri_symbol (abfd, name, a_type, val);
-	if (written_bytes < 0)
-	  return FALSE;
-	myinfo->symtab_size += written_bytes;
-      }
     }
 
   obj_aout_external_string_size (abfd) = 0;
@@ -1495,7 +1524,7 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
    symbol exceeds 8 characters write a long symbol.  If it
    exceeds 22 characters truncate the name.  */
 static int
-write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
+write_dri_symbol (bfd* abfd, const char* name, int type, bfd_vma value)
 {
   struct dri_symbol sym;
   char* ptr = (char*)&sym.a_name[0];
@@ -1504,15 +1533,6 @@ write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
   int i = sizeof (sym.a_name);
   int written_bytes = 0;
 
-  // MODIF VR
-  if (type == A_TFILE || type == A_TFARC)
-  {
-    return written_bytes;
-  }
-
-  type |= A_DEF;
-  // ENDMODIF VR
-	
   bfd_put_16 (abfd, type, sym.a_type);
   bfd_put_32 (abfd, value, sym.a_value);
 
@@ -1521,7 +1541,7 @@ write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
 
   /* If i >= 0 then *str == '\0' and if i == 0 there is nothing to fill.  */
   if (i > 0)
-    {   /* We are done - fill it with 0.  */
+    {	/* We are done - fill it with 0.  */
       do
 	*ptr++ = '\0';
       while (--i > 0);
@@ -1533,7 +1553,7 @@ write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
       i = sizeof sym;
     }
 
-  if (bfd_bwrite ((PTR) &sym, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
+  if (bfd_bwrite ((void *) &sym, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
     return -1;
   written_bytes += DRI_SYMBOL_SIZE;
 
@@ -1544,7 +1564,7 @@ write_dri_symbol (bfd* abfd, const char* name, bfd_vma type, bfd_vma value)
       while (--i >= 0 && ('\0' != (*ptr++ = *str)))
 	str++;
 
-      if (bfd_bwrite ((PTR) more_name, sizeof more_name, abfd)
+      if (bfd_bwrite ((void *) more_name, sizeof more_name, abfd)
 	  != sizeof more_name)
 	return -1;
       written_bytes += sizeof more_name;
