@@ -326,11 +326,11 @@ static int write_dri_symbol (bfd*, const char*, int, bfd_vma);
 
 #define WRITE_HEADERS(abfd, execp)					      \
       { 								      \
-	bfd_size_type text_size; /* dummy vars */			      \
+	bfd_size_type text_size; /* Dummy vars.  */			      \
 	file_ptr text_end;						      \
 									      \
 	if (adata(abfd).magic == undecided_magic)			      \
-	  NAME(aout,adjust_sizes_and_vmas) (abfd, &text_size, &text_end);     \
+	  NAME (aout, adjust_sizes_and_vmas) (abfd, & text_size, & text_end); \
 									      \
 	execp->a_syms = bfd_get_symcount (abfd) * EXTERNAL_NLIST_SIZE;	      \
 	execp->a_entry = bfd_get_start_address (abfd);			      \
@@ -341,34 +341,37 @@ static int write_dri_symbol (bfd*, const char*, int, bfd_vma);
 			   obj_reloc_entry_size (abfd));		      \
 	/* We don't have to call swap_exec_header_out here because the	      \
 	   contents will be overwritten in a second pass.  */		      \
+	NAME (aout, swap_exec_header_out) (abfd, execp, & exec_bytes);	      \
 									      \
-	if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0) return FALSE;       \
-	if (bfd_bwrite ((void *) &exec_bytes, EXEC_BYTES_SIZE, abfd)	      \
-	    != EXEC_BYTES_SIZE) 					      \
-	  return FALSE; 						      \
+	if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0		      \
+	    || bfd_bwrite (& exec_bytes, (bfd_size_type) EXEC_BYTES_SIZE,     \
+			  abfd) != EXEC_BYTES_SIZE)			      \
+	  return FALSE;							      \
 	/* Now write out reloc info, followed by syms and strings.  */	      \
 									      \
-	if (bfd_seek (abfd, (file_ptr)(N_SYMOFF(*execp)), SEEK_SET) != 0)     \
-	  return FALSE; 						      \
 	if (bfd_get_outsymbols (abfd) != NULL				      \
-	    && bfd_get_symcount (abfd) != 0)				      \
+	    && bfd_get_symcount (abfd) != 0) 				      \
 	  {								      \
-	    if (! NAME(aout,write_syms)(abfd))				      \
+	    if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(*execp)), SEEK_SET) != 0)\
+	      return FALSE;						      \
+									      \
+	    if (! NAME (aout, write_syms) (abfd))			      \
 	      return FALSE;						      \
 	  }								      \
 									      \
 	/* This will also rewrite  the exec header.  */ 		      \
 	if (squirt_out_tparel (abfd, execp, &exec_bytes) != 0)		      \
 	  return FALSE; 						      \
-	if (bfd_seek (abfd, (file_ptr)(N_TRELOFF(*execp)), SEEK_SET) != 0)    \
-	  return FALSE; 						      \
-	if (!NAME(aout,squirt_out_relocs) (abfd, obj_textsec (abfd)))	      \
-	  return FALSE; 						      \
 									      \
-	if (bfd_seek (abfd, (file_ptr)(N_DRELOFF(*execp)), SEEK_SET) != 0)    \
-	  return FALSE; 						      \
-	if (!NAME(aout,squirt_out_relocs)(abfd, obj_datasec (abfd)))	      \
-	  return FALSE; 						      \
+	if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (*execp)), SEEK_SET) != 0)  \
+	  return FALSE;						      	      \
+	if (!NAME (aout, squirt_out_relocs) (abfd, obj_textsec (abfd)))       \
+	  return FALSE;						      	      \
+									      \
+	if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (*execp)), SEEK_SET) != 0)  \
+	  return FALSE;						      	      \
+	if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))       \
+	  return FALSE;						      	      \
       }
 
 #include "aoutx.h"
@@ -410,7 +413,7 @@ m68kmint_prg_object_p (bfd* abfd)
   struct mint_internal_info* myinfo;
   bfd_boolean is_executable = TRUE;
 
-  if (bfd_bread ((void *) &exec_bytes, EXEC_BYTES_SIZE, abfd)
+  if (bfd_bread (&exec_bytes, EXEC_BYTES_SIZE, abfd)
       != EXEC_BYTES_SIZE)
     {
       if (bfd_get_error () != bfd_error_system_call)
@@ -648,11 +651,7 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
 
   /* Unconditionally unset the traditional flag.  The only effect in
      the a.out code is to disable string hashing (with respect to
-     SunOS gdx).  This is not necessary for us.
-
-     Just in case you are interested in orthography:  In the above
-     paragraph there seems to be an apostrophe missing after SunOS.
-     But this breaks emacs (sigh, again) C mode.  */
+     SunOS gdx).  This is not necessary for us.  */
 
   abfd->flags &= ~BFD_TRADITIONAL_FORMAT;
 
@@ -679,12 +678,15 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
      more than 254 bytes a value of 1 is used.	The OS will then
      add 254 bytes to the current offset.  The list is then terminated
      with the byte 0.  */
-  bytes = 4 + 1;    /* First entry is a long, last is (bfd_byte) 0.  */
+  bytes = 4; /* First entry is a long.  */
   for (i = 1; i < myinfo->relocs_used; i++)
     {
       unsigned long diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
       bytes += 1 + diff / 254;
     }
+  /* Last entry is (bfd_byte) 0 if there are some relocations.  */
+  if (myinfo->relocs_used > 0)
+    bytes++;
 
   myinfo->tparel_size = bytes;
   myinfo->tparel = bfd_alloc (abfd, bytes);
@@ -695,8 +697,10 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
   ptr = (bfd_byte*) myinfo->tparel;
   if (myinfo->relocs != NULL)
     bfd_put_32 (abfd, myinfo->relocs[0], ptr);
-
+  else
+    bfd_put_32 (abfd, 0, ptr);
   ptr += 4;
+
   for (i = 1; i < myinfo->relocs_used; i++)
     {
       unsigned long addr = myinfo->relocs[i] - myinfo->relocs[i - 1];
@@ -709,7 +713,9 @@ m68kmint_prg_bfd_final_link (bfd* abfd, struct bfd_link_info* info)
       *ptr = (bfd_byte) addr;
       ptr++;
     }
-  *ptr = 0;
+  
+  if (myinfo->relocs_used > 0)
+    *ptr = 0;
 
   return TRUE;
 }
@@ -1122,7 +1128,7 @@ squirt_out_tparel (bfd* abfd, struct internal_exec* execp, struct external_exec*
 
   if (bfd_seek (abfd, (file_ptr) 0, SEEK_SET) != 0) return FALSE;
 
-  if (bfd_bwrite ((void *) exec_bytes, EXEC_BYTES_SIZE, abfd)
+  if (bfd_bwrite (exec_bytes, EXEC_BYTES_SIZE, abfd)
       != EXEC_BYTES_SIZE)
     return 1;
 
@@ -1527,7 +1533,7 @@ static int
 write_dri_symbol (bfd* abfd, const char* name, int type, bfd_vma value)
 {
   struct dri_symbol sym;
-  char* ptr = (char*)&sym.a_name[0];
+  char* ptr = sym.a_name;
   const char* str = name;
   char more_name[DRI_SYMBOL_SIZE];
   int i = sizeof (sym.a_name);
@@ -1553,7 +1559,7 @@ write_dri_symbol (bfd* abfd, const char* name, int type, bfd_vma value)
       i = sizeof sym;
     }
 
-  if (bfd_bwrite ((void *) &sym, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
+  if (bfd_bwrite (&sym, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
     return -1;
   written_bytes += DRI_SYMBOL_SIZE;
 
@@ -1564,7 +1570,7 @@ write_dri_symbol (bfd* abfd, const char* name, int type, bfd_vma value)
       while (--i >= 0 && ('\0' != (*ptr++ = *str)))
 	str++;
 
-      if (bfd_bwrite ((void *) more_name, sizeof more_name, abfd)
+      if (bfd_bwrite (more_name, sizeof more_name, abfd)
 	  != sizeof more_name)
 	return -1;
       written_bytes += sizeof more_name;

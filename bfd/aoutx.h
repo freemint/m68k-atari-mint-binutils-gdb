@@ -5537,7 +5537,7 @@ NAME (aout, final_link) (bfd *abfd,
 	  || ! emit_stringtab (abfd, aout_info.strtab))
 	goto error_return;
     }
-  else if (obj_textsec (abfd)->reloc_count == 0
+/*  else if (obj_textsec (abfd)->reloc_count == 0
 	   && obj_datasec (abfd)->reloc_count == 0)
     {
       bfd_byte b;
@@ -5548,7 +5548,7 @@ NAME (aout, final_link) (bfd *abfd,
       if (bfd_seek (abfd, pos, SEEK_SET) != 0
 	  || bfd_bwrite (&b, (bfd_size_type) 1, abfd) != 1)
 	goto error_return;
-    }
+    }*/
 
   return TRUE;
 
