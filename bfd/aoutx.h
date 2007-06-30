@@ -1939,7 +1939,10 @@ NAME (aout, swap_std_reloc_out) (bfd *abfd,
 
   if (bfd_is_com_section (output_section)
       || bfd_is_abs_section (output_section)
-      || bfd_is_und_section (output_section))
+      || bfd_is_und_section (output_section)
+      /* PR gas/3041  a.out relocs against weak symbols
+	 must be treated as if they were against externs.  */
+      || (sym->flags & BSF_WEAK))
     {
       if (bfd_abs_section_ptr->symbol == sym)
 	{
@@ -5537,7 +5540,8 @@ NAME (aout, final_link) (bfd *abfd,
 	  || ! emit_stringtab (abfd, aout_info.strtab))
 	goto error_return;
     }
-/*  else if (obj_textsec (abfd)->reloc_count == 0
+/* PR gas/4694 ld corrupts a.out text sections
+  else if (obj_textsec (abfd)->reloc_count == 0
 	   && obj_datasec (abfd)->reloc_count == 0)
     {
       bfd_byte b;
@@ -5548,7 +5552,8 @@ NAME (aout, final_link) (bfd *abfd,
       if (bfd_seek (abfd, pos, SEEK_SET) != 0
 	  || bfd_bwrite (&b, (bfd_size_type) 1, abfd) != 1)
 	goto error_return;
-    }*/
+    }
+*/
 
   return TRUE;
 
