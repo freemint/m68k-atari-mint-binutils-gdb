@@ -1533,7 +1533,7 @@ static int
 write_dri_symbol (bfd* abfd, const char* name, int type, bfd_vma value)
 {
   struct dri_symbol sym;
-  char* ptr = sym.a_name;
+  char* ptr = (char*)sym.a_name;
   const char* str = name;
   char more_name[DRI_SYMBOL_SIZE];
   int i = sizeof (sym.a_name);
