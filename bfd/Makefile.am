@@ -351,6 +351,7 @@ BFD32_BACKENDS = \
 	pei-mips.lo \
 	peigen.lo \
 	ppcboot.lo \
+	prg-mint.lo \
 	reloc16.lo \
 	riscix.lo \
 	sparclinux.lo \
@@ -529,6 +530,7 @@ BFD32_BACKENDS_CFILES = \
 	pe-mips.c \
 	pei-mips.c \
 	ppcboot.c \
+	prg-mint.c \
 	reloc16.c \
 	riscix.c \
 	sparclinux.c \
@@ -1754,6 +1756,9 @@ pei-mips.lo: pei-mips.c $(INCDIR)/filenames.h pe-mips.c \
   $(INCDIR)/bfdlink.h coffcode.h peicode.h libpei.h
 ppcboot.lo: ppcboot.c $(INCDIR)/filenames.h $(INCDIR)/safe-ctype.h \
   $(INCDIR)/hashtab.h
+prg-mint.lo: prg-mint.c $(INCDIR)/aout/aout64.h \
+  $(INCDIR)/aout/stab_gnu.h $(INCDIR)/aout/stab.def \
+  $(INCDIR)/bfdlink.h libaout.h aoutx.h aout-target.h
 reloc16.lo: reloc16.c $(INCDIR)/filenames.h $(INCDIR)/hashtab.h \
   $(INCDIR)/bfdlink.h genlink.h $(INCDIR)/coff/internal.h \
   libcoff.h

@@ -13459,7 +13459,7 @@ fi
 
 
 case "${host}" in
-*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
+*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows* | *-*-mint*)
 
 cat >>confdefs.h <<\_ACEOF
 #define USE_BINARY_FOPEN 1
