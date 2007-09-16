@@ -1398,9 +1398,18 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 		      output_section = input_section->output_section;
 		      BFD_ASSERT (bfd_is_abs_section (output_section)
 				  || output_section->owner == abfd);
+
+		      /* The following reference to the output section VMA
+			 is commented out because DRI symbols are relative
+			 to the beginning of the section.  */
 		      val = (hresolve->root.u.def.value
-			     + bfd_get_section_vma (abfd, output_section)
+			     /*+ bfd_get_section_vma (abfd, output_section)*/
 			     + input_section->output_offset);
+
+		      /* TEXT symbols values must be adjusted
+			 by adding the size of the extended header.  */
+		      if (output_section == obj_textsec (abfd))
+			val += TEXT_START_ADDR;
 
 		      /* Get the correct type based on the section.  If
 			 this is a constructed set, force it to be
@@ -1434,13 +1443,16 @@ link_write_traditional_syms (bfd* abfd, struct bfd_link_info* info)
 		}
 	      if (symsec != NULL)
 		{
-		  /* DRI symbols are relative to the beginning of the section.  */
-		  val = (symsec->output_offset
+		  /* The following reference to the output section VMA
+		     is commented out because DRI symbols are relative
+		     to the beginning of the section.  */
+		  val = (/*symsec->output_section->vma
+			 +*/ symsec->output_offset
 			 + (GET_WORD (input_bfd, sym->e_value)
-			    - symsec->vma));
+			 - symsec->vma));
 
 		  /* TEXT symbols values must be adjusted
-		     by adding to the size of the extended header.  */
+		     by adding the size of the extended header.  */
 		  if (symsec == obj_textsec (input_bfd))
 		    val += TEXT_START_ADDR;
 		}
