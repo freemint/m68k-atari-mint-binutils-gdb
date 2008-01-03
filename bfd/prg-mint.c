@@ -1341,6 +1341,16 @@ m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
   bfd *output_bfd = input_section->output_section->owner;
   struct mint_internal_info *myinfo = obj_aout_ext (output_bfd);
   bfd_reloc_status_type retval;
+  int r_index;
+  int r_extern;
+  bfd_boolean need_tpa_relocation;
+
+  /* The input bfd is always big-endian.  There is no need to
+     call bfd_header_big_endian (input_bfd).  */
+  r_index  = ((rel->r_index[0] << 16)
+	      | (rel->r_index[1] << 8)
+	      | (rel->r_index[2]));
+  r_extern = (0 != (rel->r_type[0] & RELOC_STD_BITS_EXTERN_BIG));
 
 #define _MINT_F_SHTEXT 0x800
 
@@ -1361,12 +1371,6 @@ m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
     {
       bfd_boolean error_found = FALSE;
       const char *name = NULL;
-      /* The input bfd is always big-endian.  There is no need to
-	 call bfd_header_big_endian (input_bfd).  */
-      int r_index  = ((rel->r_index[0] << 16)
-		      | (rel->r_index[1] << 8)
-		      | (rel->r_index[2]));
-      int r_extern = (0 != (rel->r_type[0] & RELOC_STD_BITS_EXTERN_BIG));
 
       if (input_section == obj_textsec (input_bfd))
 	{
@@ -1437,10 +1441,31 @@ m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
 
   /* The symbol has to be relocated again iff the length of the relocation
      is 2 words and it is not pc relative.  */
-
+  need_tpa_relocation = FALSE;
   if (!howto->pc_relative && bfd_get_reloc_size (howto) == 4)
     {
+      if (r_extern)
+	{
+	  struct aout_link_hash_entry **sym_hashes = obj_aout_sym_hashes (input_bfd);
+	  struct aout_link_hash_entry *h = sym_hashes[r_index];
+	  asection *output_section = h->root.u.def.section->output_section;
 
+	  /* Do not relocate absolute symbols.  */
+	  if (output_section == obj_textsec (output_bfd)
+	      || output_section == obj_datasec (output_bfd)
+	      || output_section == obj_bsssec (output_bfd))
+	    {
+	      need_tpa_relocation = TRUE;
+	    }
+	}
+      else
+	{
+	  need_tpa_relocation = TRUE;
+	}
+    }
+
+  if (need_tpa_relocation)
+    {
       /* Enlarge the buffer if necessary.  */
       if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated)
 	{
