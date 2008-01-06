@@ -103,7 +103,6 @@
 
 #include "sysdep.h"
 #include "bfd.h"
-#include "libiberty.h"
 
 #define N_HEADER_IN_TEXT(x) 0
 #define BYTES_IN_WORD 4
@@ -966,6 +965,7 @@ fill_tparel (bfd *abfd)
   for (i = 1; i < myinfo->relocs_used; i++)
     {
       unsigned long diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
+      BFD_ASSERT(diff > 0);
       bytes += (diff + 253) / 254;
     }
   /* Last entry is (bfd_byte) 0 if there are some relocations.  */
@@ -1464,32 +1464,18 @@ m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
 	}
     }
 
+  /* Here we add the TPA relocation entries for the address references
+     located inside the input sections. Note that if some references
+     to addresses are generated using data statements in the linker
+     script, they will not be relocated here because they do not
+     belong to any input section.  */
   if (need_tpa_relocation)
     {
-      /* Enlarge the buffer if necessary.  */
-      if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated)
-	{
-	  bfd_vma *newbuf;
-	  myinfo->relocs_allocated += MINT_RELOC_CHUNKSIZE;
-	  newbuf = bfd_realloc (myinfo->relocs, myinfo->relocs_allocated);
-	  if (newbuf == NULL)
-	    {
-	      bfd_set_error (bfd_error_no_memory);
-	      bfd_perror ("fatal error");
-	      xexit (1);
-	    }
-	  myinfo->relocs = newbuf;
-	}
-
-      /* The TPA relative relocation actually just adds the address of
-	 the text segment (i. e. beginning of the executable in memory)
-	 to the addresses at the specified locations.  This allows an
-	 executable to be loaded everywhere in the address space without
-	 memory management.  */
-
-      myinfo->relocs[myinfo->relocs_used++] =
-	input_section->output_section->vma
+      bfd_vma tpa_address = input_section->output_section->vma
 	+ input_section->output_offset + address;
+
+      if (!bfd_m68kmint_add_tpa_relocation_entry(output_bfd, tpa_address))
+	return bfd_reloc_other;
     }
 
   return retval;
@@ -1556,8 +1542,8 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
   /* Generate the jump instruction to the entry point.	In m68k
      assembler mnemnonics it looks more or less like this:
 
-       move.l  exec_bytes->e_entry(pc), d4
-       jmp     0(pc,d4.l)
+       move.l  exec_bytes->e_entry(pc),d4
+       jmp     -6(pc,d4.l)
 
      Sorry for the wrong syntax.  As a real assembler addict I
      never actually use an assembler.  I edit my binaries manually
@@ -1680,6 +1666,51 @@ bfd_m68kmint_set_extended_flags (bfd *abfd, flagword prg_flags)
   obj_aout_ext (abfd) = myinfo;
 
   myinfo->prg_flags = prg_flags;
+
+  return TRUE;
+}
+
+/* Add a TPA relocation entry.
+   It is called by BFD when linking the input sections, and by the
+   linker when it generates a reference to an address (in particular,
+   when building the constructors list).  */
+
+bfd_boolean
+bfd_m68kmint_add_tpa_relocation_entry (bfd *abfd, bfd_vma address)
+{
+  struct mint_internal_info *myinfo;
+
+  BFD_ASSERT(abfd != NULL && abfd->xvec == &m68kmint_prg_vec);
+
+  /* Ensure that myinfo is set up.  */
+  myinfo = obj_aout_ext (abfd);
+  if (myinfo == NULL)
+    {
+      myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
+      if (myinfo == NULL)
+	return FALSE;
+
+      obj_aout_ext (abfd) = myinfo;
+    }
+
+  /* Enlarge the buffer if necessary.  */
+  if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated)
+    {
+      bfd_vma *newbuf;
+      myinfo->relocs_allocated += MINT_RELOC_CHUNKSIZE;
+      newbuf = bfd_realloc (myinfo->relocs, myinfo->relocs_allocated);
+      if (newbuf == NULL)
+	return FALSE;
+
+      myinfo->relocs = newbuf;
+    }
+
+  /* The TPA relative relocation actually just adds the address of
+     the text segment (i. e. beginning of the executable in memory)
+     to the addresses at the specified locations.  This allows an
+     executable to be loaded everywhere in the address space without
+     memory management.  */
+  myinfo->relocs[myinfo->relocs_used++] = address;
 
   return TRUE;
 }
