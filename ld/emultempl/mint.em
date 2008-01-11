@@ -254,7 +254,8 @@ gld${EMULATION_NAME}_add_tpa_relocs (lang_statement_union_type *s)
 	  if (ds->type == LONG)
 	    {
 	      bfd_vma tpa_address = ds->output_section->vma + ds->output_offset;
-	      bfd_m68kmint_add_tpa_relocation_entry(output_bfd, tpa_address);
+	      if (!bfd_m68kmint_add_tpa_relocation_entry(output_bfd, tpa_address))
+		einfo (_("%F%P:%B: unable to add a relocation entry\n"), output_bfd);
 	    }
 	    else
 	    {
@@ -270,11 +271,16 @@ gld${EMULATION_NAME}_add_tpa_relocs (lang_statement_union_type *s)
 static void
 gld${EMULATION_NAME}_finish (void)
 {
+  /* Do nothing if we are not generating a MiNT executable (ex: binary).  */
+  if (strcmp (bfd_get_target (output_bfd), "a.out-mintprg") != 0)
+    return;
+
   /* Check the output sections.  */
   lang_for_each_statement (gld${EMULATION_NAME}_check_output_sections);
 
   /* Set the MiNT executable header flags.  */
-  bfd_m68kmint_set_extended_flags (output_bfd, prg_flags);
+  if (!bfd_m68kmint_set_extended_flags (output_bfd, prg_flags))
+    einfo (_("%F%P:%B: unable to set the header flags\n"), output_bfd);
 
   /* Generate TPA relocation entries for the data statements.  */
   lang_for_each_statement (gld${EMULATION_NAME}_add_tpa_relocs);
