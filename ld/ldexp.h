@@ -29,7 +29,7 @@ typedef struct {
   asection *section;
   bfd_boolean valid_p;
 } etree_value_type;
-	
+
 typedef struct {
   int node_code;
   unsigned int lineno;

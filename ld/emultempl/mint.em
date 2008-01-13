@@ -224,11 +224,9 @@ gld${EMULATION_NAME}_check_output_sections (lang_statement_union_type *s)
 
       ASSERT(oss->processed_vma);
 
-#define TEXT_START_ADDR 0xe4
-
-      if (strcmp(oss->bfd_section->name, ".text") == 0 && oss->bfd_section->vma != TEXT_START_ADDR)
+      if (strcmp(oss->bfd_section->name, ".text") == 0 && oss->bfd_section->vma != ${TEXT_START_ADDR})
 	einfo ("%F%P: the VMA of section %A must be 0x%V, but actual value is 0x%V\n",
-	  oss->bfd_section, TEXT_START_ADDR, oss->bfd_section->vma);
+	  oss->bfd_section, ${TEXT_START_ADDR}, oss->bfd_section->vma);
       else if (strcmp(oss->bfd_section->name, ".data") == 0 && oss->addr_tree != NULL)
 	einfo ("%F%P: the VMA of section %A must not be specified\n",
 	  oss->bfd_section);
@@ -272,7 +270,7 @@ static void
 gld${EMULATION_NAME}_finish (void)
 {
   /* Do nothing if we are not generating a MiNT executable (ex: binary).  */
-  if (strcmp (bfd_get_target (output_bfd), "a.out-mintprg") != 0)
+  if (strcmp (bfd_get_target (output_bfd), "${OUTPUT_FORMAT}") != 0)
     return;
 
   /* Check the output sections.  */
