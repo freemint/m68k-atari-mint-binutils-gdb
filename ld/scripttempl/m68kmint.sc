@@ -1,5 +1,6 @@
 cat <<EOF
 OUTPUT_FORMAT("${OUTPUT_FORMAT}")
+${RELOCATING+${LIB_SEARCH_DIRS}}
 SECTIONS
 {
   /* The VMA of the .text segment is ${TEXT_START_ADDR} instead of 0

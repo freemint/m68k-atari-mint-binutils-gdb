@@ -390,7 +390,15 @@ case " $EMULATION_LIBPATH " in
     *" ${EMULATION_NAME} "*) COMPILE_IN=true;;
 esac
 
-if test -n "${BASH+set}"; then
+# Determine if the shell has support for the variable BASH_LINENO.
+# When it is the case, it is only available inside functions.
+has_lineno()
+{
+  test "x$BASH_LINENO" != "x"
+}
+
+# Enable accruate error source in the compiler error messages, if possible.
+if has_lineno; then
   source_em()
   {
     local current_script="$em_script"
