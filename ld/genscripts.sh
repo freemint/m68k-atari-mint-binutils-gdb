@@ -397,7 +397,7 @@ has_lineno()
   test "x$BASH_LINENO" != "x"
 }
 
-# Enable accruate error source in the compiler error messages, if possible.
+# Enable accurate error source in the compiler error messages, if possible.
 if has_lineno; then
   source_em()
   {
