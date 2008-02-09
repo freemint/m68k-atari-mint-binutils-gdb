@@ -8,7 +8,7 @@ AC_CONFIG_SRCDIR([libbfd.c])
 AC_CANONICAL_TARGET
 AC_ISC_POSIX
 
-AM_INIT_AUTOMAKE(bfd, 2.18-mint-20080126)
+AM_INIT_AUTOMAKE(bfd, 2.18)
 
 dnl These must be called before AM_PROG_LIBTOOL, because it may want
 dnl to call AC_CHECK_PROG.
@@ -74,7 +74,7 @@ AC_ARG_WITH(separate-debug-dir,
 [DEBUGDIR="${withval}"])
 AC_SUBST(DEBUGDIR)
 
-ACX_PKGVERSION([GNU Binutils])
+ACX_PKGVERSION([GNU Binutils for MiNT 20080209])
 ACX_BUGURL([http://www.sourceware.org/bugzilla/])
 
 AM_BINUTILS_WARNINGS

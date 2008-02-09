@@ -2994,7 +2994,7 @@ fi
 
 # Define the identity of the package.
  PACKAGE=bfd
- VERSION=2.18-mint-20080126
+ VERSION=2.18
 
 
 cat >>confdefs.h <<_ACEOF
@@ -10527,7 +10527,7 @@ echo "$as_me: error: package version not specified" >&2;}
       *)   PKGVERSION="($withval) " ;;
      esac
 else
-  PKGVERSION="(GNU Binutils) "
+  PKGVERSION="(GNU Binutils for MiNT 20080209) "
 
 fi;
 

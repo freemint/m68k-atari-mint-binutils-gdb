@@ -1,6 +1,6 @@
 /* BFD backend for traditional MiNT executables.
    Copyright 1998, 2007 Free Software Foundation, Inc.
-   Originally written by Guido Flohr (gufl0000@stud.uni-sb.de).
+   Originally written by Guido Flohr (guido@freemint.de).
    Modified by Vincent Riviere (vincent.riviere@freesbee.fr).
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -82,7 +82,7 @@
    I now simply extended the header from its old 28 bytes to 256
    bytes.  The first 28 bytes give home to a standard Atari header,
    the rest is for extensions.	The extension header starts with
-   a ``real'' assembler instsruction, a far jump to the text entry
+   a ``real'' assembler instruction, a far jump to the text entry
    point.  The extension header gives home to a standard a.out
    exec header (currently NMAGIC or OMAGIC only) plus some extra
    more or less useful fields plus space to future extensions.
@@ -199,7 +199,7 @@ struct mint_external_exec
      If the word ``opaque'' always attracts your curiosity in
      typedefs and structs, here's the explanation:  These eight bytes
      are really two assembler instructions.  The first one moves
-     the contents of e_entry into register d4, the second one
+     the contents of e_entry into register d0, the second one
      jumps (pc-relative) to the entry point.  See swap_exec_header_out
      for details.  */
   bfd_byte g_jump_entry[8];
@@ -1542,21 +1542,21 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
   /* Generate the jump instruction to the entry point.	In m68k
      assembler mnemnonics it looks more or less like this:
 
-       move.l  exec_bytes->e_entry(pc),d4
-       jmp     -6(pc,d4.l)
+       move.l  exec_bytes->e_entry(pc),d0
+       jmp     -6(pc,d0.l)
 
      Sorry for the wrong syntax.  As a real assembler addict I
      never actually use an assembler.  I edit my binaries manually
      with a hex editor, looks much cooler and it strengthens your
      abstraction abilities.  */
 
-  exec_bytes->g_jump_entry[0] = 0x28;
+  exec_bytes->g_jump_entry[0] = 0x20;
   exec_bytes->g_jump_entry[1] = 0x3a;
   exec_bytes->g_jump_entry[2] = 0x00;
   exec_bytes->g_jump_entry[3] = 0x1a;
   exec_bytes->g_jump_entry[4] = 0x4e;
   exec_bytes->g_jump_entry[5] = 0xfb;
-  exec_bytes->g_jump_entry[6] = 0x48;
+  exec_bytes->g_jump_entry[6] = 0x08;
   exec_bytes->g_jump_entry[7] = 0xfa;
 
   bfd_h_put_32 (abfd, myinfo->tparel_pos, exec_bytes->g_tparel_pos);
@@ -1598,7 +1598,7 @@ m68kmint_prg_write_object_contents (bfd *abfd)
 
   obj_reloc_entry_size (abfd) = RELOC_STD_SIZE;
 
-  /* Most of the following code comes from the WRITE_HEADERS macro
+  /* Most of the following code come from the WRITE_HEADERS macro
      found in libaout.h.  */
 
   if (adata(abfd).magic == undecided_magic)
@@ -1652,6 +1652,8 @@ bfd_boolean
 bfd_m68kmint_set_extended_flags (bfd *abfd, flagword prg_flags)
 {
   struct mint_internal_info *myinfo = obj_aout_ext (abfd);
+
+  BFD_ASSERT(abfd != NULL && abfd->xvec == &m68kmint_prg_vec);
 
   if (myinfo == NULL)
     myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
