@@ -799,7 +799,7 @@ const pseudo_typeS md_pseudo_table[] =
   {"even", s_even, 0},
   {"skip", s_space, 0},
   {"proc", s_proc, 0},
-#if defined (TE_SUN3) || defined (OBJ_ELF)
+#if defined (TE_SUN3) || defined (TE_MINT) || defined (OBJ_ELF)
   {"align", s_align_bytes, 0},
 #endif
 #ifdef OBJ_ELF
