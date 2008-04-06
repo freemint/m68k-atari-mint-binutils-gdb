@@ -10527,7 +10527,7 @@ echo "$as_me: error: package version not specified" >&2;}
       *)   PKGVERSION="($withval) " ;;
      esac
 else
-  PKGVERSION="(GNU Binutils for MiNT 20080228) "
+  PKGVERSION="(GNU Binutils for MiNT 20080406) "
 
 fi;
 

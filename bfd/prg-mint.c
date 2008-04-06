@@ -478,48 +478,30 @@ m68kmint_prg_bfd_free_cached_info (bfd *abfd)
 static int
 write_dri_symbol (bfd *abfd, const char *name, int type, bfd_vma value)
 {
-  struct dri_symbol sym;
-  char *ptr = (char*)sym.a_name;
-  const char *str = name;
-  char more_name[DRI_SYMBOL_SIZE];
-  int i = sizeof (sym.a_name);
   int written_bytes = 0;
+  struct dri_symbol sym;
+  int is_long_name = strlen (name) > sizeof (sym.a_name);
 
+  if (is_long_name)
+    type |= A_LNAM;
+
+  strncpy ((char*)sym.a_name, name, sizeof (sym.a_name));
   bfd_put_16 (abfd, type, sym.a_type);
   bfd_put_32 (abfd, value, sym.a_value);
-
-  while (--i >= 0 && ('\0' != (*ptr++ = *str)))
-    str++;
-
-  /* If i >= 0 then *str == '\0' and if i == 0 there is nothing to fill.  */
-  if (i > 0)
-    {	/* We are done - fill it with 0.  */
-      do
-	*ptr++ = '\0';
-      while (--i > 0);
-    }
-  else if (*str)
-    {	/* If more to write.  */
-      type |= A_LNAM;
-      bfd_put_16 (abfd, type, sym.a_type);
-      i = sizeof sym;
-    }
 
   if (bfd_bwrite (&sym, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
     return -1;
   written_bytes += DRI_SYMBOL_SIZE;
 
-  if (i > 0)
+  if (is_long_name)
     {
-      ptr = more_name;
-      i = sizeof more_name;
-      while (--i >= 0 && ('\0' != (*ptr++ = *str)))
-	str++;
+      char more_name[DRI_SYMBOL_SIZE];
 
-      if (bfd_bwrite (more_name, sizeof more_name, abfd)
-	  != sizeof more_name)
+      strncpy (more_name, name + sizeof (sym.a_name), DRI_SYMBOL_SIZE);
+
+      if (bfd_bwrite (more_name, DRI_SYMBOL_SIZE, abfd) != DRI_SYMBOL_SIZE)
 	return -1;
-      written_bytes += sizeof more_name;
+      written_bytes += DRI_SYMBOL_SIZE;
     }
 
   return written_bytes;
