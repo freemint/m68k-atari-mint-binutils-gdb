@@ -222,15 +222,13 @@ gld${EMULATION_NAME}_check_output_sections (lang_statement_union_type *s)
     {
       lang_output_section_statement_type *oss = &s->output_section_statement;
 
-      ASSERT(oss->processed_vma);
-
-      if (strcmp(oss->bfd_section->name, ".text") == 0 && oss->bfd_section->vma != ${TEXT_START_ADDR})
+      if (strcmp(oss->name, ".text") == 0 && oss->bfd_section->vma != ${TEXT_START_ADDR})
 	einfo ("%F%P: the VMA of section %A must be 0x%V, but actual value is 0x%V\n",
 	  oss->bfd_section, ${TEXT_START_ADDR}, oss->bfd_section->vma);
-      else if (strcmp(oss->bfd_section->name, ".data") == 0 && oss->addr_tree != NULL)
+      else if (strcmp(oss->name, ".data") == 0 && oss->addr_tree != NULL)
 	einfo ("%F%P: the VMA of section %A must not be specified\n",
 	  oss->bfd_section);
-      else if (strcmp(oss->bfd_section->name, ".bss") == 0 && oss->addr_tree != NULL)
+      else if (strcmp(oss->name, ".bss") == 0 && oss->addr_tree != NULL)
 	einfo ("%F%P: the VMA of section %A must not be specified\n",
 	  oss->bfd_section);
     }
