@@ -1012,6 +1012,13 @@ extern void (*target_new_objfile_hook) (struct objfile *);
 #define TARGET_CREATE_INFERIOR_HOOK(PID)
 #endif
 
+/* Hook to call target dependant code just after a target ops vector is
+   pushed from stack.  */
+
+#ifndef TARGET_POST_UNPUSH_TARGET_HOOK
+#define TARGET_POST_UNPUSH_TARGET_HOOK(t)
+#endif
+
 /* Hardware watchpoint interfaces.  */
 
 /* Returns non-zero if we were stopped by a hardware watchpoint (memory read or

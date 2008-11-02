@@ -98,6 +98,7 @@ m68*-hp-hpux*)		gdb_host=hp300hpux ;;
 # OBSOLETE m68*-isi-*)		gdb_host=isi ;;
 m68*-*-linux*)		gdb_host=linux ;;
 m68*-*-lynxos*)		gdb_host=m68klynx ;;
+m68*-*-mint*)		gdb_host=mint ;;
 m68*-*-netbsd*)		gdb_host=nbsd ;;
 m68*-*-sysv4*)		gdb_host=m68kv4 ;;
 m68*-motorola-*)	gdb_host=delta68 ;;

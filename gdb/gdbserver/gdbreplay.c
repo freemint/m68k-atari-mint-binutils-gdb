@@ -146,7 +146,9 @@ remote_open (char *name)
 					   exits when the remote side dies.  */
     }
 
+#ifndef __MINT__
   fcntl (remote_desc, F_SETFL, FASYNC);
+#endif
 
   fprintf (stderr, "Replay logfile using %s\n", name);
   fflush (stderr);

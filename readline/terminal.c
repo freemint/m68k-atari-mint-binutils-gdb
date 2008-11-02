@@ -537,7 +537,7 @@ _rl_backspace (count)
 int
 crlf ()
 {
-#if defined (NEW_TTY_DRIVER)
+#if defined (NEW_TTY_DRIVER) || defined (__MINT__)
   if (term_cr)
     tputs (term_cr, 1, _rl_output_character_function);
 #endif /* NEW_TTY_DRIVER */

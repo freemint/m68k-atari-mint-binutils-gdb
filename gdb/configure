@@ -6697,7 +6697,7 @@ esac
 if test x$gdb_host = xgo32; then
   TERM_LIB=
 else
-if test x$gdb_cv_os_cygwin = xyes; then
+if test neverx$gdb_cv_os_cygwin = xyes; then
   TERM_LIB='`if test -r ../libtermcap/libtermcap.a; then echo ../libtermcap/libtermcap.a; else echo -ltermcap; fi`'
 else
   TERM_LIB=

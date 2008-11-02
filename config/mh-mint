@@ -1,0 +1,2 @@
+CFLAGS = -O2 -fomit-frame-pointer -D_GNU_SOURCE
+CXXFLAGS = -O -fomit-frame-pointer -D_GNU_SOURCE

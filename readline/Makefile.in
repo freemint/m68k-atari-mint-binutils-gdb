@@ -63,7 +63,7 @@ LOCAL_DEFS = @LOCAL_DEFS@
 TERMCAP_LIB = @TERMCAP_LIB@
 
 # For libraries which include headers from other libraries.
-INCLUDES = -I. -I$(srcdir) -I$(includedir)
+INCLUDES = -I. -I$(srcdir)
 
 CCFLAGS = $(DEFS) $(LOCAL_DEFS) $(CPPFLAGS) $(INCLUDES) $(LOCAL_CFLAGS) $(CFLAGS)
 

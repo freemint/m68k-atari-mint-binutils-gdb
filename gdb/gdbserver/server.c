@@ -199,6 +199,31 @@ main (int argc, char *argv[])
 		  own_buf[0] = '\0';
 		  break;
 		}
+#ifdef __MINT__
+	    case 'q':
+	      if (strcmp ("qOffsets", own_buf) == 0)
+		{
+		  CORE_ADDR offset;
+
+		  if (ptrace (999, inferior_pid, 0, (long) &offset))
+		  {
+		    fprintf (stderr, "cannot get basepage address for pid %d\n", inferior_pid);
+		    write_enn (own_buf);
+		    break;
+		  }
+
+		  offset += 0x100;
+
+		  sprintf (own_buf, "Text=%lX;Data=%lX;Bss=%lX",
+		    (long)offset, (long)offset, (long)offset);
+		}
+	      else
+	        {
+		  /* Unknown query */
+		  own_buf[0] = '\0';
+	        }
+	      break;
+#endif /* __MINT__ */
 	    default:
 	      /* It is a request we don't understand.  Respond with an
 	         empty packet so that gdb knows that we don't support this
