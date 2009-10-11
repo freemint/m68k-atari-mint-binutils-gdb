@@ -19,6 +19,9 @@
 
 #define TE_MINT
 
+/* The % prefix on registers is optional, even with ELF object files.  */
+#define REGISTER_PREFIX_OPTIONAL 1
+
 #define LOCAL_LABELS_DOLLAR 1
 #define LOCAL_LABELS_FB 1
 

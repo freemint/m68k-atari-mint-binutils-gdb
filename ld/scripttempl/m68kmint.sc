@@ -27,5 +27,11 @@ SECTIONS
     ${RELOCATING+_end = .;}
     ${RELOCATING+__end = .;}
   }
+
+  /* Unfortunately, stabs are not mappable from ELF to a.out.
+     It can probably be fixed with some amount of work.  */
+  /DISCARD/ :
+  { *(.stab) *(.stab*) *(.debug) *(.debug*) *(.comment) *(.gnu.warning.*) }
+
 }
 EOF
