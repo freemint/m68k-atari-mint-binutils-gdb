@@ -2922,7 +2922,7 @@ msgid "Multiple renames of section %s"
 msgstr ""
 
 #: objcopy.c:2198
-msgid "error in private h\teader data"
+msgid "error in private header data"
 msgstr ""
 
 #: objcopy.c:2276

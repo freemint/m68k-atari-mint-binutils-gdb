@@ -2195,7 +2195,7 @@ setup_bfd_headers (bfd *ibfd, bfd *obfd)
     {
       status = 1;
       bfd_nonfatal_message (NULL, ibfd, NULL,
-			    _("error in private h	eader data"));
+			    _("error in private header data"));
       return;
     }
 

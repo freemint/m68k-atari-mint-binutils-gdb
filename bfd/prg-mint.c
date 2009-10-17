@@ -1,10 +1,10 @@
 /* BFD backend for traditional MiNT executables.
-   Copyright 1998, 2007 Free Software Foundation, Inc.
+   Copyright 1998, 2007, 2008, 2009 Free Software Foundation, Inc.
    Originally written by Guido Flohr (guido@freemint.de).
    Modified by Vincent Riviere (vincent.riviere@freesbee.fr).
 
    This file is part of BFD, the Binary File Descriptor library.
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
@@ -68,23 +68,23 @@
    If the last member A_ABS of the exec header is zero the program
    image contains an additional table with relocation information
    at the end of the image.  The kernel can load program images at
-   virtually any address in the address space.	In fact it will load
+   virtually any address in the address space.  In fact it will load
    it at the start of the biggest block of free memory.  This block
    is then called the Transient Program Area TPA and the image has
-   to be relocated against the TPA at runtime.	The relocation info
+   to be relocated against the TPA at runtime.  The relocation info
    itself is in a simply way compressed:  It starts with a four-byte
    value, the first address within the image to be relocated.  Now
-   following are one-byte offsets to the last address.	The special
+   following are one-byte offsets to the last address.  The special
    value of 1 (which is impossible as an offset) signifies that 254
-   has to be added to the next offset.	The table is finished with
+   has to be added to the next offset.  The table is finished with
    a zero-byte.
 
    I now simply extended the header from its old 28 bytes to 256
    bytes.  The first 28 bytes give home to a standard Atari header,
-   the rest is for extensions.	The extension header starts with
+   the rest is for extensions.  The extension header starts with
    a ``real'' assembler instruction, a far jump to the text entry
    point.  The extension header gives home to a standard a.out
-   exec header (currently NMAGIC or OMAGIC only) plus some extra
+   exec header (currently NMAGIC) plus some extra
    more or less useful fields plus space to future extensions.
    For the OS the extension header will already belong to the text
    segment, for BFD backends the text segment is 228 (or 0xe4)
@@ -99,7 +99,7 @@
    you're probably right.  But the results (mainly the output of
    the linker) seem to work and they allow to use up-to-date
    binutils on the Atari until a better executable format (maybe
-   ELF) has been established for this machine.	*/
+   ELF) has been established for this machine.  */
 
 #include "sysdep.h"
 #include "bfd.h"
@@ -121,68 +121,16 @@
 #define TARGETNAME "a.out-mintprg"
 #define NAME(x,y) CONCAT3 (mintprg,_32_,y)
 
-/* The only location that the macro ZMAGIC_DISK_BLOCK_SIZE seems to
-   be needed is in aout-target.h where the file position of the text
-   segment is determined.  Our target page size of 2 is actually just a
-   joke (no paging on Atari, we simply short-word-align sections) so
-   we have to explicitely tell aout-target here.  Nonetheless, this
-   doesn't seem clean to me.  Does aoutx.h (adjust_n_magic) has to
-   be modified?  */
-#define ZMAGIC_DISK_BLOCK_SIZE EXEC_BYTES_SIZE
-
-/* If --traditional-format was given to the linker an old-style DRI
-   symbol table is written into the executable.  This is with respect
-   to many old debugging tools or disassemblers which expect this format.
-   Although created by the linker, these executables will not be recognized
-   as a valid bfd input file.  It is too much effort to evaluate the
-   symbols from such files.  */
-#define _MINT_SYMBOL_FORMAT_GNU  0
-#define _MINT_SYMBOL_FORMAT_DRI  1
-
-/* Forward declarations.  */
-struct bfd_link_info;
-struct reloc_std_external;
-
-/* Data structure that holds some private information for us.  */
-struct mint_internal_info
-{
-  struct bfd_link_info *linkinfo;    /* Remembered from final_link.  */
-  bfd_boolean	traditional_format;  /* Saved from link info.  */
-  int		symbol_format;	     /* Format of the symbol table.  */
-  void		*tparel; 	     /* Data for TPA relative relocation
-					information.  */
-  file_ptr	tparel_pos;	     /* File position of TPA relative
-					relocation information.  */
-  bfd_size_type tparel_size;	     /* Size of TPA relative relocation
-					information.  */
-  bfd_size_type symtab_size;	     /* Size of traditional symbol table.  */
-
-#define MINT_RELOC_CHUNKSIZE 0x1000
-  bfd_vma	*relocs; 	     /* Array of address relocations.  */
-  unsigned long relocs_used;	     /* Number of relocation entries
-					already used up.  */
-  unsigned long relocs_allocated;    /* Number of relocation entries
-					allocated.  */
-
-  bfd_vma	stkpos; 	     /* File offset to value of _stksize.  */
-
-  flagword	prg_flags;	     /* Standard GEMDOS flags.	*/
-
-  bfd_boolean	reloc_error;	     /* True if an unhandled error during
-					relocation occured.  */
-};
-
 /* We have to do quite a lot of magic to make the Atari format
    for GEMDOS executables fit into the standard a.out format.
    We start with the original header.  */
 #define external_exec mint_external_exec
 struct mint_external_exec
 {
-  bfd_byte g_branch[2]; 	     /* 0x601a (or 0xdead for relocatable
-					linker output).  */
+  bfd_byte g_branch[2]; 	     /* 0x601a.  */
   bfd_byte g_text[4];		     /* Length of text section.  */
   bfd_byte g_data[4];		     /* Length of data section.  */
-  bfd_byte g_bss[4];		     /* Length of bss section.	*/
+  bfd_byte g_bss[4];		     /* Length of bss section.  */
   bfd_byte g_syms[4];		     /* Length of symbol table.  */
   bfd_byte g_extmagic[4];	     /* Always 0x4d694e54
 					(in ASCII: ``MiNT'').  */
@@ -212,9 +160,9 @@ struct mint_external_exec
   bfd_byte e_text[4];		     /* Length of text section in bytes.  */
   bfd_byte e_data[4];		     /* Length of data section.  */
   bfd_byte e_bss[4];		     /* Length of standard symbol
-					table.	*/
+					table.  */
   bfd_byte e_syms[4];		     /* Length of symbol table.  */
-  bfd_byte e_entry[4];		     /* Start address.	*/
+  bfd_byte e_entry[4];		     /* Start address.  */
   bfd_byte e_trsize[4]; 	     /* Length of text relocation
 					info.  */
   bfd_byte e_drsize[4]; 	     /* Length of data relocation
@@ -233,26 +181,26 @@ struct mint_external_exec
 
   bfd_byte g_symbol_format[4];	     /* Format of the symbol table.  See
 					definitions for _MINT_SYMBOL_FORMAT*
-					above.	*/
+					above.  */
 
   /* Pad with zeros.  */
   bfd_byte g_pad0[172];
 };
-
 #define EXEC_BYTES_SIZE 256
+#define GEMDOS_HEADER_SIZE 28
 
-/* Code indicating object file or impure executable.  */
-#define OMAGIC 0407
-/* Code indicating pure executable.  */
-#define NMAGIC 0410
-/* Code indicating demand-paged executable.  */
-#define ZMAGIC 0413
+/* The following defines are required by aoutx.h.
+   They are not automatically defined in aout/aout64.h
+   if external_exec is defined.  */
 
-#ifndef N_BADMAG
-#define N_BADMAG(x)	  (N_MAGIC(x) != OMAGIC		\
-			   && N_MAGIC(x) != NMAGIC	\
-			   && N_MAGIC(x) != ZMAGIC)
-#endif
+#define OMAGIC 0407	/* Object file or impure executable.  */
+#define NMAGIC 0410	/* Code indicating pure executable.  */
+#define ZMAGIC 0413	/* Code indicating demand-paged executable.  */
+#define BMAGIC 0415	/* Used by a b.out object.  */
+#define QMAGIC 0314	/* Like ZMAGIC but with N_HEADER_IN_TEXT true.  */
+
+/* Files using the following magic flags will not be loaded.  */
+#define N_BADMAG(x)	(N_MAGIC(x) != NMAGIC)
 
 /* For DRI symbol table format.  */
 struct dri_symbol
@@ -274,44 +222,75 @@ struct dri_symbol
 #define A_EQU	0x4000	      /* Equated.  */
 #define A_DEF	0x8000	      /* Defined.  */
 #define A_LNAM	0x0048	      /* GST compatible long name.  */
-			      /* File symbols ala aln.	*/
+			      /* File symbols ala aln.  */
 #define A_TFILE 0x0280	      /* Text file corresponding to object module.  */
 #define A_TFARC 0x02C0	      /* Text file archive.  Unfortunately this
 				 conflicts with the bits in A_LNAM.  */
 
+/* The following include contains the definitions for internal a.out structures
+   as well as the prototypes for the NAME(...) functions defined in aoutx.h.  */
+
+#include "libaout.h"
+
+/* The following function is similar to _bfd_final_link_relocate, except it
+   adds the reloc structure as an additional parameter.
+   It will be used int aoutx.h.  */
+
 static bfd_reloc_status_type
-m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
-				  bfd *input_bfd,
-				  asection *input_section,
-				  bfd_byte *contents,
-				  bfd_vma address,
-				  bfd_vma value,
-				  bfd_vma addend,
-				  struct reloc_std_external *rel);
+m68kmint_prg_final_link_relocate_rel (reloc_howto_type *howto,
+				      bfd *input_bfd,
+				      asection *input_section,
+				      bfd_byte *contents,
+				      bfd_vma address,
+				      bfd_vma value,
+				      bfd_vma addend,
+				      struct reloc_std_external *rel);
 
-/* This is a hack.  We have to retrieve the symbol name.  But
-   to do achieve this with reasonable effort we need an extra
-   parameter.	*/
-#define MY_final_link_relocate(howto, input_bfd, input_section, contents,	\
-			       address, value, addend)				\
-m68kmint_prg_final_link_relocate (howto, input_bfd, input_section, contents,	\
-				  address, value, addend,			\
-				  (struct reloc_std_external *) rel)
+#define MY_final_link_relocate_rel m68kmint_prg_final_link_relocate_rel
 
-/* aoutx.h requires definitions for BMAGIC and QMAGIC.	Other
-   implementations have either chosen OMAGIC or zero for BMAGIC if
-   not available.  We try it with 0777 which is hopefully impossible. */
-#define BMAGIC 0777
-#define QMAGIC 0314
+/* The following include contains the definitions for the NAME(...) functions.  */
 
 #include "aoutx.h"
 
-/* libaout doesn't use NAME for these ...  */
+/* Data structure that holds some private information for us.  */
+struct mint_internal_info
+{
+  struct bfd_link_info *linkinfo;    /* Remembered from final_link.  */
+  bfd_boolean	traditional_format;  /* Saved from link info.  */
+  int		symbol_format;	     /* Format of the symbol table.  */
+  void		*tparel;	     /* Data for TPA relative relocation
+					information.  */
+  file_ptr	tparel_pos;	     /* File position of TPA relative
+					relocation information.  */
+  bfd_size_type tparel_size;	     /* Size of TPA relative relocation
+					information.  */
+  bfd_size_type dri_symtab_size;     /* Size of traditional symbol table.  */
 
-#define MY_get_section_contents aout_32_get_section_contents
+#define MINT_RELOC_CHUNKSIZE 0x1000
+  bfd_vma	*relocs;	     /* Array of address relocations.  */
+  unsigned long relocs_used;	     /* Number of relocation entries
+					already used up.  */
+  unsigned long relocs_allocated;    /* Number of relocation entries
+					allocated.  */
 
-/* The following variables and functions
-   will be provided by aout-target.h.  */
+  bfd_vma	stkpos; 	     /* File offset to value of _stksize.  */
+
+  flagword	prg_flags;	     /* Standard GEMDOS flags.  */
+
+  bfd_boolean	reloc_error;	     /* TRUE if an unhandled error during
+					relocation occured.  */
+};
+
+/* If --traditional-format was given to the linker an old-style DRI
+   symbol table is written into the executable.  This is with respect
+   to many old debugging tools or disassemblers which expect this format.
+   Although created by the linker, these symbols will be ignored from
+   input files.  */
+#define _MINT_SYMBOL_FORMAT_GNU  0
+#define _MINT_SYMBOL_FORMAT_DRI  1
+
+/* Declarations for the variables and functions
+   defined later in aout-target.h.  */
 
 static const bfd_target *
 m68kmint_prg_callback (bfd *abfd);
@@ -323,6 +302,27 @@ MY_final_link_callback (bfd *abfd,
 			file_ptr *psymoff);
 
 extern const bfd_target m68kmint_prg_vec;
+
+/* Initialize a new BFD using our file format.  */
+
+#define MY_mkobject m68kmint_prg_mkobject
+
+static bfd_boolean
+m68kmint_prg_mkobject (bfd *abfd)
+{
+  struct mint_internal_info *myinfo;
+
+  if (!NAME (aout, mkobject (abfd)))
+    return FALSE;
+
+  /* Allocate our private BFD data.  */
+  myinfo = bfd_zalloc (abfd, sizeof (*myinfo));
+  if (myinfo == NULL)
+    return FALSE;
+  obj_aout_ext (abfd) = myinfo;
+
+  return TRUE;
+}
 
 /* Finish up the reading of an a.out file header.  */
 
@@ -336,80 +336,54 @@ m68kmint_prg_object_p (bfd *abfd)
   const bfd_target *target;
   bfd_size_type amt = EXEC_BYTES_SIZE;
   struct mint_internal_info *myinfo;
-  bfd_boolean is_executable = TRUE;
 
-  if (bfd_bread ((void *) &exec_bytes, amt, abfd) != amt)
+  /* Read the exec bytesd from the file.  */
+  if (bfd_bread (&exec_bytes, amt, abfd) != amt)
     {
       if (bfd_get_error () != bfd_error_system_call)
 	bfd_set_error (bfd_error_wrong_format);
-      return 0;
+      return NULL;
     }
 
   /* Instead of byte-swapping we compare bytes.  */
-  if (exec_bytes.g_branch[0] == 0xde
-      && exec_bytes.g_branch[1] == 0xad)
-    {
-      /* This is the result of an invalid objcopy operation.  */
-      is_executable = FALSE;
-    }
-  else if (exec_bytes.g_branch[0] != 0x60
-	   || exec_bytes.g_branch[1] != 0x1a)
-    {
-      bfd_set_error (bfd_error_wrong_format);
-      return 0;
-    }
-
   if (exec_bytes.g_branch[0] != 0x60
       || exec_bytes.g_branch[1] != 0x1a
       || exec_bytes.g_extmagic[0] != 'M'
       || exec_bytes.g_extmagic[1] != 'i'
       || exec_bytes.g_extmagic[2] != 'N'
-      || exec_bytes.g_extmagic[3] != 'T'
-      || exec_bytes.g_symbol_format[0] != 0
-      || exec_bytes.g_symbol_format[1] != 0
-      || exec_bytes.g_symbol_format[2] != 0
-      || exec_bytes.g_symbol_format[3] != 0)
+      || exec_bytes.g_extmagic[3] != 'T')
     {
       bfd_set_error (bfd_error_wrong_format);
-      return 0;
+      return NULL;
     }
 
-#ifdef SWAP_MAGIC
-  exec.a_info = SWAP_MAGIC (exec_bytes.e_info);
-#else
-  exec.a_info = GET_MAGIC (abfd, exec_bytes.e_info);
-#endif
-
-  if (N_BADMAG (exec))
-    return 0;
-
-#ifdef MACHTYPE_OK
-  if (!(MACHTYPE_OK (N_MACHTYPE (exec))))
-    return 0;
-#endif
-
+  /* Swap the standard a.out fields.  */
   NAME (aout, swap_exec_header_in) (abfd, &exec_bytes, &exec);
 
-#ifdef SWAP_MAGIC
-  /* Swap_exec_header_in read in a_info with the wrong byte order.  */
-  exec.a_info = SWAP_MAGIC (exec_bytes.e_info);
-#endif
-
-  target = NAME (aout, some_aout_object_p) (abfd, &exec, m68kmint_prg_callback);
-
-  myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
-
-  if (myinfo == NULL)
+  /* Check a.out magic value.  */
+  if (N_BADMAG (exec))
     {
-      /* Error is already set to "out of memory".  */
-      return 0;
+      bfd_set_error (bfd_error_wrong_format);
+      return NULL;
     }
 
+  /* Initialize this BFD with the exec values.  */
+  target = NAME (aout, some_aout_object_p) (abfd, &exec, m68kmint_prg_callback);
+
+  /* Allocate our private BFD data.  */
+  myinfo = bfd_zalloc (abfd, sizeof (*myinfo));
+  if (myinfo == NULL)
+    return NULL;
   obj_aout_ext (abfd) = myinfo;
 
   /* Now get the missing information.  */
-  myinfo->tparel_pos = GET_WORD (abfd, exec_bytes.g_tparel_pos);
-  myinfo->tparel_size = GET_WORD (abfd, exec_bytes.g_tparel_size);
+  myinfo->prg_flags = bfd_h_get_32 (abfd, exec_bytes.g_flags);
+  myinfo->stkpos = bfd_h_get_32 (abfd, exec_bytes.g_stkpos);
+  myinfo->symbol_format = bfd_h_get_32 (abfd, exec_bytes.g_symbol_format);
+
+  /* TPA relocation information.  */
+  myinfo->tparel_pos = bfd_h_get_32 (abfd, exec_bytes.g_tparel_pos);
+  myinfo->tparel_size = bfd_h_get_32 (abfd, exec_bytes.g_tparel_size);
 
   /* FIXME:  Currently we always read the TPA relative relocation
      information.  This is suboptimal because often times there
@@ -421,7 +395,7 @@ m68kmint_prg_object_p (bfd *abfd)
     myinfo->tparel = bfd_alloc (abfd, myinfo->tparel_size);
 
   if (myinfo->tparel == NULL)
-    return 0;
+    return NULL;
 
   if (myinfo->tparel_size == 0)
     {
@@ -433,16 +407,8 @@ m68kmint_prg_object_p (bfd *abfd)
       if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0
 	  || (bfd_bread (myinfo->tparel, myinfo->tparel_size, abfd)
 	      != myinfo->tparel_size))
-	{
-	  return 0;
-	}
+	return NULL;
     }
-
-  myinfo->stkpos = GET_WORD (abfd, exec_bytes.g_stkpos);
-  myinfo->prg_flags = GET_WORD (abfd, exec_bytes.g_flags);
-
-  /* We don't support other formats for the symbol table actively.  */
-  myinfo->symbol_format = _MINT_SYMBOL_FORMAT_GNU;
 
   return target;
 }
@@ -455,18 +421,17 @@ m68kmint_prg_object_p (bfd *abfd)
 static bfd_boolean
 m68kmint_prg_bfd_free_cached_info (bfd *abfd)
 {
-  if (obj_aout_ext (abfd) != NULL)
+  struct mint_internal_info *myinfo = obj_aout_ext (abfd);
+
+  if (myinfo != NULL && myinfo->relocs != NULL)
     {
-      struct mint_internal_info *myinfo = obj_aout_ext (abfd);
-      if (myinfo != NULL)
-	{
-	  if (myinfo->relocs != NULL)
-	    {
-	      free (myinfo->relocs);
-	      myinfo->relocs = NULL;
-	    }
-	}
+      free (myinfo->relocs);
+      myinfo->relocs = NULL;
     }
+
+  /* myinfo itself has been allocated by bfd_zalloc()
+     so will be automatically freed along with the BFD.
+     Same for myinfo->tparel.  */
 
   return NAME (aout, bfd_free_cached_info) (abfd);
 }
@@ -508,7 +473,7 @@ write_dri_symbol (bfd *abfd, const char *name, int type, bfd_vma value)
 }
 
 /* Emit a traditional DRI symbol table while linking.
-   Most of this code come from aout_link_write_symbols() in aoutx.h.  */
+   Most of this code comes from aout_link_write_symbols() in aoutx.h.  */
 
 static bfd_boolean
 link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
@@ -523,7 +488,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
   if (bfd_seek (abfd, obj_sym_filepos (abfd), SEEK_SET) != 0)
     return FALSE;
 
-  myinfo->symtab_size = 0;
+  myinfo->dri_symtab_size = 0;
 
   for (input_bfd = info->input_bfds; input_bfd != NULL; input_bfd = input_bfd->link_next)
     {
@@ -569,7 +534,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 	  if (written_bytes < 0)
 	    return FALSE;
 	  else
-	    myinfo->symtab_size += written_bytes;
+	    myinfo->dri_symtab_size += written_bytes;
 	}
 
       /* Now write out a symbol for the object file if we do not
@@ -589,14 +554,14 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 	  if (written_bytes < 0)
 	    return FALSE;
 	  else
-	    myinfo->symtab_size += written_bytes;
+	    myinfo->dri_symtab_size += written_bytes;
 	}
 
       /* Now we have a problem.  All symbols that we see have already
 	 been marked written (because we write them a second time
-	 here.	If we would do it the clean way we would have
+	 here.  If we would do it the clean way we would have
 	 to traverse the entire symbol map and reset the written
-	 flag.	We hack here instead...  */
+	 flag.  We hack here instead...  */
 #define mark_written(h) (* (int *) &h->written = (int) TRUE + 1)
 #define is_written(h) ((int) h->written == (int) TRUE + 1)
       for (; sym < sym_end; sym++, sym_hash++)
@@ -632,7 +597,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 	      struct aout_link_hash_entry *hresolve = *sym_hash;
 
 	      /* We have saved the hash table entry for this symbol, if
-		 there is one.	Note that we could just look it up again
+		 there is one.  Note that we could just look it up again
 		 in the hash table, provided we first check that it is an
 		 external symbol. */
 	      h = *sym_hash;
@@ -768,7 +733,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 		      asection *output_section;
 
 		      /* This case usually means a common symbol which was
-			 turned into a defined symbol.	*/
+			 turned into a defined symbol.  */
 		      input_section = hresolve->root.u.def.section;
 		      output_section = input_section->output_section;
 		      BFD_ASSERT (bfd_is_abs_section (output_section)
@@ -904,7 +869,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 	  if (written_bytes < 0)
 	    return FALSE;
 
-	  myinfo->symtab_size += written_bytes;
+	  myinfo->dri_symtab_size += written_bytes;
 	}
     }
 
@@ -912,7 +877,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
   return TRUE;
 }
 
-/* This is used for qsort to sort addresses
+/* This is used for qsort() to sort addresses
    for the TPA relocation table.  */
 
 static int
@@ -931,7 +896,7 @@ fill_tparel (bfd *abfd)
   bfd_size_type bytes;
   unsigned char *ptr;
 
-  /* Sort the relocation info.	*/
+  /* Sort the relocation info.  */
   if (myinfo->relocs != NULL)
     qsort (myinfo->relocs, myinfo->relocs_used, sizeof (bfd_vma),
 	   vma_cmp);
@@ -940,7 +905,7 @@ fill_tparel (bfd *abfd)
      is encoded as follows:  The first entry is a 32-bit value
      denoting the first offset to relocate.  All following entries
      are relative to the preceding one.  For relative offsets of
-     more than 254 bytes a value of 1 is used.	The OS will then
+     more than 254 bytes a value of 1 is used.  The OS will then
      add 254 bytes to the current offset.  The list is then terminated
      with the byte 0.  */
   bytes = 4; /* First entry is a long.  */
@@ -977,15 +942,15 @@ fill_tparel (bfd *abfd)
 	}
       *ptr++ = (bfd_byte) diff;
     }
-  
+
   if (myinfo->relocs_used > 0)
     *ptr = 0;
 
   return TRUE;
 }
 
-/* Final link routine.	We need to use a call back to get the correct
-   offsets in the output file.	And we need to malloc some internal
+/* Final link routine.  We need to use a call back to get the correct
+   offsets in the output file.  And we need to malloc some internal
    buffers.  */
 
 #define MY_bfd_final_link m68kmint_prg_bfd_final_link
@@ -997,17 +962,13 @@ m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
   struct bfd_link_hash_table *hash = info->hash;
   enum bfd_link_strip original_strip = info->strip;
 
-  if (myinfo == NULL)
-    myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
-
-  if (myinfo == NULL)
+  if (info->relocatable)
     {
-      /* The internal function bfd_zalloc has already set the error
-	 state to "out of memory".  */
+      _bfd_error_handler ("%B: relocatable output is not supported by format %s",
+	abfd, bfd_get_target (abfd));
+      bfd_set_error (bfd_error_invalid_operation);
       return FALSE;
     }
-
-  obj_aout_ext (abfd) = myinfo;
 
   myinfo->linkinfo = info;
 
@@ -1058,15 +1019,11 @@ m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 	    case bfd_link_hash_defined:
 	    case bfd_link_hash_defweak:
 	      sec = h->root.u.def.section->output_section;
-	      BFD_ASSERT (bfd_is_abs_section (sec)
-			  || sec->owner == abfd);
+	      BFD_ASSERT (sec->owner == abfd);
 
 	      myinfo->stkpos = (h->root.u.def.value + sec->vma
 				+ h->root.u.def.section->output_offset
-				+ 0x1c);
-	      break;
-	    case bfd_link_hash_common:
-	      myinfo->stkpos = h->root.u.c.size + 0x1c;
+				+ GEMDOS_HEADER_SIZE);
 	      break;
 	    default:  /* Ignore other types.  */
 	      break;
@@ -1076,15 +1033,8 @@ m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 
   if ((abfd->flags & BFD_TRADITIONAL_FORMAT) != 0)
     {
-      if (info->relocatable)
-	{
-	  _bfd_error_handler ("warning: traditional format not supported for relocatable output");
-	}
-      else
-	{
-	  myinfo->traditional_format = TRUE;
-	  myinfo->symbol_format = _MINT_SYMBOL_FORMAT_DRI;
-	}
+      myinfo->traditional_format = TRUE;
+      myinfo->symbol_format = _MINT_SYMBOL_FORMAT_DRI;
     }
 
   /* Unconditionally unset the traditional flag.  The only effect in
@@ -1117,76 +1067,83 @@ m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
   return TRUE;
 }
 
-/* Copy backend specific data from one object module to another.  */
+/* Copy private BFD header information from the input BFD.  */
+
+#define MY_bfd_copy_private_header_data m68kmint_prg_bfd_copy_private_header_data
+
+static bfd_boolean
+m68kmint_prg_bfd_copy_private_header_data (bfd *ibfd, bfd *obfd)
+{
+  (void)obfd; /* Unused.  */
+
+  /* We can only copy BFD files using our own file format.  */
+  if (ibfd->xvec != &m68kmint_prg_vec)
+    {
+      _bfd_error_handler ("%B: cannot convert from format %s to format %s",
+	ibfd, bfd_get_target (ibfd), bfd_get_target (obfd));
+      bfd_set_error (bfd_error_invalid_operation);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+/* Copy backend specific data from one object module to another.
+   This function is used by objcopy and strip.  */
 
 #define MY_bfd_copy_private_bfd_data m68kmint_prg_bfd_copy_private_bfd_data
 
 static bfd_boolean
-m68kmint_prg_bfd_copy_private_bfd_data (bfd *input_bfd, bfd *output_bfd)
+m68kmint_prg_bfd_copy_private_bfd_data (bfd *ibfd, bfd *obfd)
 {
-  /* Our routine only makes sense if both the input and the output
-     bfd are MiNT program files.  FIXME:  It is not absolutely clear
-     to me if this function is a method of the input or the output
-     bfd.  One part of the following AND relation is not redundant,
-     but which one?  */
-  if (input_bfd->xvec == &m68kmint_prg_vec && output_bfd->xvec == &m68kmint_prg_vec)
+  struct mint_internal_info *myinfo_in;
+  struct mint_internal_info *myinfo_out;
+
+  /* obfd uses our file format, ibfd may be foreign.  */
+  if (ibfd->xvec != &m68kmint_prg_vec)
+    return TRUE;
+
+  myinfo_in = obj_aout_ext (ibfd);
+  BFD_ASSERT (myinfo_in != NULL);
+
+  myinfo_out = obj_aout_ext (obfd);
+  BFD_ASSERT (myinfo_out != NULL);
+
+  /* Copy myinfo.  */
+  memcpy (myinfo_out, myinfo_in, sizeof (*myinfo_out));
+
+  /* Copy tparel.  */
+  myinfo_out->tparel = bfd_alloc (obfd, myinfo_out->tparel_size);
+  if (myinfo_out->tparel == NULL)
+    return FALSE;
+  memcpy (myinfo_out->tparel, myinfo_in->tparel, myinfo_out->tparel_size);
+
+  /* Normalize the type of empty symbols.  */
+  if (bfd_get_symcount (obfd) == 0)
+    myinfo_out->symbol_format = _MINT_SYMBOL_FORMAT_GNU;
+
+  return TRUE; /* _bfd_generic_bfd_copy_private_bfd_data (ibfd, obfd); */
+}
+
+/* Merge private BFD information from an input BFD to the output BFD when linking.  */
+
+#define MY_bfd_merge_private_bfd_data m68kmint_prg_merge_private_bfd_data
+
+static bfd_boolean
+m68kmint_prg_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
+{
+  (void)obfd; /* Unused.  */
+
+  /* Our file format cannot be used as linker input.  */
+  if (ibfd->xvec == &m68kmint_prg_vec)
     {
-      struct mint_internal_info *myinfo_in = obj_aout_ext (input_bfd);
-      struct mint_internal_info *myinfo_out = obj_aout_ext (output_bfd);
-
-      BFD_ASSERT (myinfo_in != NULL);
-
-      if (myinfo_out == NULL)
-	{
-	  myinfo_out = bfd_zalloc (output_bfd, sizeof (struct mint_internal_info));
-
-	  if (myinfo_out == NULL)
-	    {
-	      /* The internal function bfd_zalloc has already set the error
-		 state to "out of memory".  */
-	      return FALSE;
-	    }
-
-	  memcpy (myinfo_out, myinfo_in, sizeof (struct mint_internal_info));
-	  myinfo_out->tparel = NULL;
-	  obj_aout_ext (output_bfd) = myinfo_out;
-	}
-
-      if (myinfo_out->tparel != NULL)
-	free (myinfo_out->tparel);
-
-      if (myinfo_in->tparel != NULL)
-      {
-	if (bfd_seek (input_bfd, myinfo_in->tparel_pos, SEEK_SET) != 0)
-	  return FALSE;
-
-	if (bfd_bread (myinfo_in->tparel, myinfo_in->tparel_size, input_bfd)
-	    != myinfo_in->tparel_size)
-	  return FALSE;
-      }
-      myinfo_out->tparel = bfd_alloc (output_bfd, myinfo_out->tparel_size);
-      if (myinfo_out->tparel == NULL)
-	return FALSE;
-
-      memcpy (myinfo_out->tparel, myinfo_in->tparel,
-	      myinfo_out->tparel_size);
-    }
-  else if (input_bfd->xvec != &m68kmint_prg_vec)
-    {
-      /* Can this ever happen?	FIXME!	*/
-      _bfd_error_handler ("error: the input file ``%s'' contains no", input_bfd->filename);
-      _bfd_error_handler ("TPA-relative relocation info.");
-
-      /* We will invalidate the output file so that no attempt is
-	 made to actually run the image.  Maybe we should return
-	 FALSE instead but it is possible that some curious soul has
-	 tried to objcopy onto our format for research reasons.  */
-      _bfd_error_handler ("Will mark output file ``%s''");
-      _bfd_error_handler ("as non-executable.");
-      output_bfd->flags &= (~EXEC_P);
+      _bfd_error_handler ("%B: file format %s cannot be used as linker input",
+	ibfd, bfd_get_target (ibfd));
+      bfd_set_error (bfd_error_invalid_operation);
+      return FALSE;
     }
 
-  return TRUE; /*_bfd_generic_bfd_copy_private_bfd_data (input_bfd, output_bfd);*/
+  return TRUE; /* _bfd_generic_bfd_merge_private_bfd_data (ibfd, obfd); */
 }
 
 /* Find out the symbol name.  */
@@ -1310,14 +1267,14 @@ find_symbol_name (reloc_howto_type *howto, bfd *input_bfd,
    the relocated offset in myinfo->relocs[] for further processing.  */
 
 static bfd_reloc_status_type
-m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
-				  bfd *input_bfd,
-				  asection *input_section,
-				  bfd_byte *contents,
-				  bfd_vma address,
-				  bfd_vma value,
-				  bfd_vma addend,
-				  struct reloc_std_external *rel)
+m68kmint_prg_final_link_relocate_rel (reloc_howto_type *howto,
+				      bfd *input_bfd,
+				      asection *input_section,
+				      bfd_byte *contents,
+				      bfd_vma address,
+				      bfd_vma value,
+				      bfd_vma addend,
+				      struct reloc_std_external *rel)
 {
   bfd_vma relocation;
   bfd *output_bfd = input_section->output_section->owner;
@@ -1358,7 +1315,7 @@ m68kmint_prg_final_link_relocate (reloc_howto_type *howto,
 	{
 	  if (!r_extern)
 	    {
-	      /* This is a relocation against another section.	Only
+	      /* This is a relocation against another section.  Only
 		 relocations against the text section are allowed.  */
 	      if (r_index != N_TEXT && r_index != (N_TEXT | N_EXT))
 		error_found = TRUE;
@@ -1470,12 +1427,12 @@ write_tparel (bfd *abfd, struct internal_exec *execp)
 {
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
 
-  if (myinfo->symtab_size == 0)
+  if (myinfo->dri_symtab_size == 0)
     myinfo->tparel_pos = N_STROFF (*execp)
       + obj_aout_external_string_size (abfd);
   else
     myinfo->tparel_pos = N_SYMOFF (*execp)
-      + myinfo->symtab_size;
+      + myinfo->dri_symtab_size;
 
   if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0)
     return FALSE;
@@ -1495,33 +1452,33 @@ static bfd_boolean
 write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec *exec_bytes)
 {
   struct mint_internal_info *myinfo = obj_aout_ext (abfd);
+  bfd_size_type symtab_size;
 
-  if ((abfd->flags & EXEC_P) == 0)
-    bfd_h_put_16 (abfd, 0xdead, exec_bytes->g_branch);
-  else
-    bfd_h_put_16 (abfd, 0x601a, exec_bytes->g_branch);
+  bfd_h_put_16 (abfd, 0x601a, exec_bytes->g_branch);
 
   /* The OS will load our extension header fields into the text segment.  */
-  PUT_WORD (abfd, execp->a_text + EXEC_BYTES_SIZE - 28,
-	    exec_bytes->g_text);
-  PUT_WORD (abfd, execp->a_data, exec_bytes->g_data);
-  PUT_WORD (abfd, execp->a_bss, exec_bytes->g_bss);
+  bfd_h_put_32 (abfd, execp->a_text + (EXEC_BYTES_SIZE - GEMDOS_HEADER_SIZE),
+		exec_bytes->g_text);
+  bfd_h_put_32 (abfd, execp->a_data, exec_bytes->g_data);
+  bfd_h_put_32 (abfd, execp->a_bss, exec_bytes->g_bss);
 
   /* The OS' notion of the size of the symbol table is another than
      the bfd library's.  We have to fill in the size of the table
      itself plus the size of the string table but only if we have not written
      a traditional symbol table.  If we have written a traditional symbol
      table we know the size.  */
-  if (myinfo->symtab_size != 0)
-    PUT_WORD (abfd, myinfo->symtab_size, exec_bytes->g_syms);
+  if (myinfo->dri_symtab_size != 0)
+    symtab_size = myinfo->dri_symtab_size;
   else
-    PUT_WORD (abfd, myinfo->tparel_pos - N_SYMOFF (*execp),
-	      exec_bytes->g_syms);
+    symtab_size = myinfo->tparel_pos - N_SYMOFF (*execp);
+
+  bfd_h_put_32 (abfd, symtab_size, exec_bytes->g_syms);
+
   bfd_h_put_32 (abfd, 0x4d694e54, exec_bytes->g_extmagic);
   bfd_h_put_32 (abfd, myinfo->prg_flags, exec_bytes->g_flags);
   bfd_h_put_16 (abfd, 0, exec_bytes->g_abs);
 
-  /* Generate the jump instruction to the entry point.	In m68k
+  /* Generate the jump instruction to the entry point.  In m68k
      assembler mnemnonics it looks more or less like this:
 
        move.l  exec_bytes->e_entry(pc),d0
@@ -1543,14 +1500,18 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
 
   bfd_h_put_32 (abfd, myinfo->tparel_pos, exec_bytes->g_tparel_pos);
   bfd_h_put_32 (abfd, myinfo->tparel_size, exec_bytes->g_tparel_size);
+  bfd_h_put_32 (abfd, myinfo->stkpos, exec_bytes->g_stkpos);
 
-  PUT_WORD (abfd, myinfo->stkpos, exec_bytes->g_stkpos);
-  PUT_WORD (abfd, myinfo->symbol_format, exec_bytes->g_symbol_format);
+  /* If there are no symbols, pretend they are in GNU format.  */
+  if (symtab_size == 0)
+    myinfo->symbol_format = _MINT_SYMBOL_FORMAT_GNU;
+
+  bfd_h_put_32 (abfd, myinfo->symbol_format, exec_bytes->g_symbol_format);
 
   memset (&exec_bytes->g_pad0, 0, sizeof (exec_bytes->g_pad0));
 
   /* The standard stuff.  */
-  NAME(aout,swap_exec_header_out) (abfd, execp, exec_bytes);
+  NAME(aout, swap_exec_header_out) (abfd, execp, exec_bytes);
   if (myinfo->symbol_format != _MINT_SYMBOL_FORMAT_GNU)
     PUT_WORD (abfd, 0, exec_bytes->e_syms);
 
@@ -1578,6 +1539,8 @@ m68kmint_prg_write_object_contents (bfd *abfd)
   bfd_size_type text_size;
   file_ptr text_end;
 
+  BFD_ASSERT (obj_aout_ext (abfd) != NULL);
+
   obj_reloc_entry_size (abfd) = RELOC_STD_SIZE;
 
   /* Most of the following code come from the WRITE_HEADERS macro
@@ -1600,17 +1563,11 @@ m68kmint_prg_write_object_contents (bfd *abfd)
       && bfd_get_symcount (abfd) != 0)
     {
       if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(*execp)), SEEK_SET) != 0)
-        return FALSE;
+	return FALSE;
 
       if (! NAME (aout, write_syms) (abfd))
-        return FALSE;
+	return FALSE;
     }
-
-  if (write_tparel (abfd, execp) != TRUE)
-    return FALSE;
-
-  if (write_exec_header (abfd, execp, &exec_bytes) != TRUE)
-    return FALSE;
 
   if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (*execp)), SEEK_SET) != 0)
     return FALSE;
@@ -1622,32 +1579,80 @@ m68kmint_prg_write_object_contents (bfd *abfd)
   if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))
     return FALSE;
 
+  if (write_tparel (abfd, execp) != TRUE)
+    return FALSE;
+
+  if (write_exec_header (abfd, execp, &exec_bytes) != TRUE)
+    return FALSE;
+
   return TRUE;
 }
 
+/* Print private BFD data. Used by objdump -p.  */
+
+#define MY_bfd_print_private_bfd_data m68kmint_prg_print_private_bfd_data
+
+static bfd_boolean
+m68kmint_prg_print_private_bfd_data (bfd *abfd, void *ptr)
+{
+  FILE *file = (FILE *) ptr;
+  struct mint_internal_info *myinfo = obj_aout_ext (abfd);
+  const char* symbol_format;
+  long stksize = 0;
+
+  fprintf (file, "\n");
+
+  fprintf (file, " GEMDOS flags: 0x%08lx\n", (unsigned long) myinfo->prg_flags);
+  fprintf (file, "Start address: 0x%08lx\n", bfd_get_start_address (abfd));
+
+  /* Stack size.  */
+  if (myinfo->stkpos != 0)
+    {
+      if (bfd_seek (abfd, myinfo->stkpos, SEEK_SET) != 0
+	  || (bfd_bread (&stksize, sizeof(long), abfd) != sizeof(long)))
+	return FALSE;
+
+      stksize = bfd_get_signed_32 (abfd, &stksize);
+    }
+  fprintf (file, "   Stack size: %ld\n", stksize);
+
+  /* Symbol format.  */
+  switch (myinfo->symbol_format)
+    {
+      case _MINT_SYMBOL_FORMAT_GNU: symbol_format = "stabs"; break;
+      case _MINT_SYMBOL_FORMAT_DRI: symbol_format = "DRI";   break;
+      default:			    symbol_format = "?";     break;
+    }
+  fprintf (file, "Symbol format: %s\n", symbol_format);
+
+  return TRUE;
+}
+
+/* Special case for NAME (aout, get_section_contents)
+   It is not declared in libaout.h, neither implemented in aoutx.h.
+   Instead, a macro named aout_32_get_section_contents is defined in libaout.h.
+   So the default value of MY_get_section_contents provided by aout-target.h
+   is not correct, it has to be defined here with the right value.  */
+
+#define MY_get_section_contents aout_32_get_section_contents
+
+/* The following include will define m68kmint_prg_vec
+   and a default implementation for all the MY_ functions
+   not overriden here.  */
+
 #include "aout-target.h"
 
-/* Set the executable flags.
+/* Set the GEMDOS executable flags.
    It is called by the linker emulation script.  */
 
 bfd_boolean
 bfd_m68kmint_set_extended_flags (bfd *abfd, flagword prg_flags)
 {
-  struct mint_internal_info *myinfo = obj_aout_ext (abfd);
+  struct mint_internal_info *myinfo;
 
-  BFD_ASSERT(abfd != NULL && abfd->xvec == &m68kmint_prg_vec);
-
-  if (myinfo == NULL)
-    myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
-
-  if (myinfo == NULL)
-    {
-      /* The internal function bfd_zalloc has already set the error
-	 state to "out of memory".  */
-      return FALSE;
-    }
-
-  obj_aout_ext (abfd) = myinfo;
+  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
+  myinfo = obj_aout_ext (abfd);
+  BFD_ASSERT(myinfo != NULL);
 
   myinfo->prg_flags = prg_flags;
 
@@ -1664,18 +1669,9 @@ bfd_m68kmint_add_tpa_relocation_entry (bfd *abfd, bfd_vma address)
 {
   struct mint_internal_info *myinfo;
 
-  BFD_ASSERT(abfd != NULL && abfd->xvec == &m68kmint_prg_vec);
-
-  /* Ensure that myinfo is set up.  */
+  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
   myinfo = obj_aout_ext (abfd);
-  if (myinfo == NULL)
-    {
-      myinfo = bfd_zalloc (abfd, sizeof (struct mint_internal_info));
-      if (myinfo == NULL)
-	return FALSE;
-
-      obj_aout_ext (abfd) = myinfo;
-    }
+  BFD_ASSERT(myinfo != NULL);
 
   /* Enlarge the buffer if necessary.  */
   if (myinfo->relocs_used * sizeof (bfd_vma) >= myinfo->relocs_allocated)

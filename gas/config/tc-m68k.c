@@ -827,7 +827,7 @@ const pseudo_typeS md_pseudo_table[] =
   {"even", s_even, 0},
   {"skip", s_space, 0},
   {"proc", s_proc, 0},
-#if defined (TE_SUN3) || defined (TE_MINT) || defined (OBJ_ELF)
+#if defined (TE_SUN3) || defined (OBJ_ELF)
   {"align", s_align_bytes, 0},
 #endif
 #ifdef OBJ_ELF
@@ -7564,7 +7564,7 @@ md_show_usage (FILE *stream)
     {
       if (i)
 	fprintf (stream, " | ");
-      fprintf (stream, m68k_archs[i].name);
+      fprintf (stream, "%s", m68k_archs[i].name);
     }
   fprintf (stream, "\n");
 
@@ -7573,7 +7573,7 @@ md_show_usage (FILE *stream)
     {
       if (i)
 	fprintf (stream, " | ");
-      fprintf (stream, m68k_cpus[i].name);
+      fprintf (stream, "%s", m68k_cpus[i].name);
     }
   fprintf (stream, _("\n"));
 }

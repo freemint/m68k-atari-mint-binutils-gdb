@@ -4197,10 +4197,17 @@ aout_link_input_section_std (struct aout_final_link_info *finfo,
 		return FALSE;
 	    }
 
+#ifdef MY_final_link_relocate_rel
+	  r = MY_final_link_relocate_rel (howto,
+					  input_bfd, input_section,
+					  contents, r_addr, relocation,
+					  (bfd_vma) 0, rel);
+#else
 	  r = MY_final_link_relocate (howto,
 				      input_bfd, input_section,
 				      contents, r_addr, relocation,
 				      (bfd_vma) 0);
+#endif
 	}
 
       if (r != bfd_reloc_ok)
