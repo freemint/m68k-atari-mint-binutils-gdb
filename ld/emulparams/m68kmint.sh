@@ -1,0 +1,5 @@
+SCRIPT_NAME=m68kmint
+OUTPUT_FORMAT="a.out-mintprg"
+TEXT_START_ADDR=0xe4
+ARCH=m68k
+EXTRA_EM_FILE=mint
