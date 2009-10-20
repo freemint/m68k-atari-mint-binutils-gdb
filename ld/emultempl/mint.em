@@ -42,6 +42,11 @@ fragment <<EOF
 static flagword prg_flags = (_MINT_F_FASTLOAD | _MINT_F_ALTLOAD
 			     | _MINT_F_ALTALLOC | _MINT_F_MEMPRIVATE);
 
+/* If override_stack_size is TRUE, then the executable stack size
+ * must be overriden with the value of stack_size.  */
+static bfd_boolean override_stack_size = FALSE;
+static bfd_signed_vma stack_size;
+
 /* MiNT format extra command line options.  */
 
 /* Used for setting flags in the MiNT header.  */
@@ -60,6 +65,7 @@ static flagword prg_flags = (_MINT_F_FASTLOAD | _MINT_F_ALTLOAD
 #define OPTION_MEM_SUPER (OPTION_MEM_GLOBAL + 1)
 #define OPTION_MEM_READONLY (OPTION_MEM_SUPER + 1)
 #define OPTION_PRG_FLAGS (OPTION_MEM_READONLY + 1)
+#define OPTION_STACK (OPTION_PRG_FLAGS + 1)
 
 static void
 gld${EMULATION_NAME}_add_options
@@ -93,6 +99,7 @@ gld${EMULATION_NAME}_add_options
     {"mreadable-memory", no_argument, NULL, OPTION_MEM_READONLY},
     {"mreadonly-memory", no_argument, NULL, OPTION_MEM_READONLY},
     {"mprg-flags", required_argument, NULL, OPTION_PRG_FLAGS},
+    {"stack", required_argument, NULL, OPTION_STACK},
     {NULL, no_argument, NULL, 0}
   };
 
@@ -172,15 +179,39 @@ gld${EMULATION_NAME}_handle_option (int optc)
       {
 	char* tail;
 	unsigned long flag_value = strtoul (optarg, &tail, 0);
+
 	if (*tail != '\0')
-	  {
-	    einfo (_("%P: warning: ignoring invalid program flags %s\n"), optarg);
-	  }
+	  einfo (_("%P: warning: ignoring invalid program flags %s\n"), optarg);
 	else
+	  prg_flags = flag_value;
+
+	break;
+      }
+    case OPTION_STACK:
+      {
+	char* tail;
+	long size = strtol (optarg, &tail, 0);
+
+	if (*tail == 'K' || *tail == 'k')
 	  {
-	    prg_flags = flag_value;
+	    size *= 1024;
+	    ++tail;
 	  }
-	  break;
+	else if (*tail == 'M' || *tail == 'm')
+	  {
+	    size *= 1024*1024;
+	    ++tail;
+	  }
+
+	if (*tail != '\0')
+	  einfo (_("%P: warning: ignoring invalid stack size %s\n"), optarg);
+	else
+	{
+	  stack_size = (bfd_signed_vma) size;
+	  override_stack_size = TRUE;
+	}
+
+	break;
       }
     }
   return TRUE;
@@ -209,6 +240,7 @@ gld_${EMULATION_NAME}_list_options (FILE *file)
   fprintf (file, _("                              Process memory is readable but not writable\n"));
   fprintf (file, "\n");
   fprintf (file, _("  --mprg-flags <value>        Set all the flags with an integer raw value\n"));
+  fprintf (file, _("  --stack <size>              Override the stack size (suffix k or M allowed)\n"));
 }
 
 /* This callback is called by lang_for_each_statement. It checks that the
@@ -223,13 +255,13 @@ gld${EMULATION_NAME}_check_output_sections (lang_statement_union_type *s)
       lang_output_section_statement_type *oss = &s->output_section_statement;
 
       if (strcmp(oss->name, ".text") == 0 && oss->bfd_section->vma != ${TEXT_START_ADDR})
-	einfo ("%F%P: the VMA of section %A must be 0x%V, but actual value is 0x%V\n",
+	einfo (_("%F%P: the VMA of section %A must be 0x%V, but actual value is 0x%V\n"),
 	  oss->bfd_section, ${TEXT_START_ADDR}, oss->bfd_section->vma);
       else if (strcmp(oss->name, ".data") == 0 && oss->addr_tree != NULL)
-	einfo ("%F%P: the VMA of section %A must not be specified\n",
+	einfo (_("%F%P: the VMA of section %A must not be specified\n"),
 	  oss->bfd_section);
       else if (strcmp(oss->name, ".bss") == 0 && oss->addr_tree != NULL)
-	einfo ("%F%P: the VMA of section %A must not be specified\n",
+	einfo (_("%F%P: the VMA of section %A must not be specified\n"),
 	  oss->bfd_section);
     }
 }
@@ -274,9 +306,14 @@ gld${EMULATION_NAME}_finish (void)
   /* Check the output sections.  */
   lang_for_each_statement (gld${EMULATION_NAME}_check_output_sections);
 
-  /* Set the MiNT executable header flags.  */
+  /* Set the GEMDOS executable header flags.  */
   if (!bfd_m68kmint_set_extended_flags (link_info.output_bfd, prg_flags))
     einfo (_("%F%P:%B: unable to set the header flags\n"), link_info.output_bfd);
+
+  /* Override the stack size.  */
+  if (override_stack_size)
+    if (!bfd_m68kmint_set_stack_size (link_info.output_bfd, stack_size))
+      einfo (_("%F%P:%B: unable to set the stack size\n"), link_info.output_bfd);
 
   /* Generate TPA relocation entries for the data statements.  */
   lang_for_each_statement (gld${EMULATION_NAME}_add_tpa_relocs);

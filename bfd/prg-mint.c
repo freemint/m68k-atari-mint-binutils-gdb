@@ -277,6 +277,10 @@ struct mint_internal_info
 
   flagword	prg_flags;	     /* Standard GEMDOS flags.  */
 
+  bfd_boolean 	override_stack_size; /* TRUE if the executable stack size
+					must be overriden with stack_size.  */
+  bfd_signed_vma stack_size;
+
   bfd_boolean	reloc_error;	     /* TRUE if an unhandled error during
 					relocation occured.  */
 };
@@ -1522,6 +1526,20 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
       != EXEC_BYTES_SIZE)
     return FALSE;
 
+  /* Override the stack size.  */
+  if (myinfo->override_stack_size && myinfo->stkpos)
+  {
+    bfd_byte big_endian_stack_size[4];
+
+    bfd_put_32 (abfd, myinfo->stack_size, &big_endian_stack_size);
+
+    if (bfd_seek (abfd, (file_ptr) myinfo->stkpos, SEEK_SET) != 0)
+      return FALSE;
+
+    if (bfd_bwrite (big_endian_stack_size, 4, abfd) != 4)
+      return FALSE;
+  }
+
   return TRUE;
 }
 
@@ -1655,6 +1673,24 @@ bfd_m68kmint_set_extended_flags (bfd *abfd, flagword prg_flags)
   BFD_ASSERT(myinfo != NULL);
 
   myinfo->prg_flags = prg_flags;
+
+  return TRUE;
+}
+
+/* Override the stack size.
+   It is called by the linker emulation script.  */
+
+bfd_boolean
+bfd_m68kmint_set_stack_size (bfd *abfd, bfd_signed_vma stack_size)
+{
+  struct mint_internal_info *myinfo;
+
+  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
+  myinfo = obj_aout_ext (abfd);
+  BFD_ASSERT(myinfo != NULL);
+
+  myinfo->stack_size = stack_size;
+  myinfo->override_stack_size = TRUE;
 
   return TRUE;
 }
