@@ -8530,7 +8530,11 @@ dump_section_as_strings (Elf_Internal_Shdr * section, FILE * file)
       if (data < end)
 	{
 #ifndef __MSVCRT__
+#if GCC_VERSION < 3000
+	  printf ("  [%6lx]  %s\n", (unsigned long) (data - start), data);
+#else
 	  printf ("  [%6tx]  %s\n", data - start, data);
+#endif
 #else
 	  printf ("  [%6Ix]  %s\n", (size_t) (data - start), data);
 #endif

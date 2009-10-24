@@ -23,6 +23,7 @@
 #
 fragment <<EOF
 
+#include "getopt.h"
 #include "ldgram.h"
 
 /* Standard GEMDOS program flags.  */
