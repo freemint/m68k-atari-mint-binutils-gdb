@@ -291,6 +291,11 @@ m68*-*-linux*)
 			glibc-tdep.o symfile-mem.o"
 	build_gdbserver=yes
 	;;
+m68*-*-mint*)
+	# Target: Motorola m68k running MiNT
+	gdb_target_obs="m68k-tdep.o"
+	#build_gdbserver=yes
+	;;
 m68*-*-netbsd* | m68*-*-knetbsd*-gnu)
 	# Target: NetBSD/m68k
 	gdb_target_obs="m68k-tdep.o m68kbsd-tdep.o \

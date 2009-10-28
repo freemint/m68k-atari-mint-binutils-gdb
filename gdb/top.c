@@ -1114,7 +1114,7 @@ print_gdb_version (struct ui_file *stream)
      program to parse, and is just canonical program name and version
      number, which starts after last space. */
 
-  fprintf_filtered (stream, "GNU gdb %s%s\n", PKGVERSION, version);
+  fprintf_filtered (stream, "GNU gdb %s%s (MiNT 20091028)\n", PKGVERSION, version);
 
   /* Second line is a copyright notice. */
 

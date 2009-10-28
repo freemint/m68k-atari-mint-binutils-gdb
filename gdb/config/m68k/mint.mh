@@ -1,0 +1,4 @@
+# Host: Motorola m68k running FreeMiNT
+
+NAT_FILE= nm-mint.h
+NATDEPFILES= inf-ptrace.o fork-child.o m68kmint-nat.o
