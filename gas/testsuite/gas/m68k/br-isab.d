@@ -1,7 +1,7 @@
 #name: br-isab.d
 #objdump: -dr
 #as: -march=isab -pcrel
-#not-target: *-*-*aout m68k-*-netbsd m68k-*-openbsd*
+#not-target: *-*-*aout m68k-*-netbsd m68k-*-openbsd* m68k-*-mint*
 
 .*:     file format .*
 
