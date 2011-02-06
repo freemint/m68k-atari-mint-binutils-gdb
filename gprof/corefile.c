@@ -678,7 +678,7 @@ core_create_function_syms (void)
 	  }
       }
 
-      symtab.limit->is_func = (core_syms[i]->flags & BSF_FUNCTION) != 0; 
+      symtab.limit->is_func = TRUE; 
       symtab.limit->is_bb_head = TRUE;
 
       if (cxxclass == 't')
