@@ -18,14 +18,6 @@
    Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#define PTRACE_ARG3_TYPE void*
-
-#define FETCH_INFERIOR_REGISTERS
-#define ATTACH_DETACH
-
-#define CHILD_POST_STARTUP_INFERIOR
-#define CHILD_POST_ATTACH
-
 struct target_ops;
 extern void mint_post_unpush_target (struct target_ops *t);
 #define TARGET_POST_UNPUSH_TARGET_HOOK(t) mint_post_unpush_target (t)

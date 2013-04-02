@@ -58,6 +58,7 @@ static const char * const gdb_osabi_names[] =
   "GNU/Linux",
   "FreeBSD a.out",
   "FreeBSD ELF",
+  "MiNT",
   "NetBSD a.out",
   "NetBSD ELF",
   "OpenBSD ELF",

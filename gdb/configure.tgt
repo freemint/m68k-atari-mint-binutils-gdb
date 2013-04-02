@@ -293,7 +293,7 @@ m68*-*-linux*)
 	;;
 m68*-*-mint*)
 	# Target: Motorola m68k running MiNT
-	gdb_target_obs="m68k-tdep.o"
+	gdb_target_obs="m68k-tdep.o m68kmint-tdep.o"
 	#build_gdbserver=yes
 	;;
 m68*-*-netbsd* | m68*-*-knetbsd*-gnu)
@@ -601,6 +601,7 @@ esac
 case "${targ}" in
 *-*-freebsd*)	gdb_osabi=GDB_OSABI_FREEBSD_ELF ;;
 *-*-linux*)	gdb_osabi=GDB_OSABI_LINUX ;;
+*-*-mint*)	gdb_osabi=GDB_OSABI_MINT ;;
 *-*-nto*)	gdb_osabi=GDB_OSABI_QNXNTO ;;
 m68*-*-openbsd* | m88*-*-openbsd* | vax-*-openbsd*) ;;
 *-*-openbsd*)	gdb_osabi=GDB_OSABI_OPENBSD_ELF ;;

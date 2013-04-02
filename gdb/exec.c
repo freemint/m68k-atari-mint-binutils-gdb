@@ -657,7 +657,8 @@ print_section_info (struct target_section_table *t, bfd *abfd)
   printf_filtered (_("file type %s.\n"), bfd_get_target (abfd));
   if (abfd == exec_bfd)
     printf_filtered (_("\tEntry point: %s\n"),
-                     paddress (gdbarch, bfd_get_start_address (abfd)));
+                     /*paddress (gdbarch, bfd_get_start_address (abfd)));*/
+                     hex_string_custom (symfile_objfile->ei.entry_point, wid));
   for (p = t->sections; p < t->sections_end; p++)
     {
       printf_filtered ("\t%s", hex_string_custom (p->addr, wid));

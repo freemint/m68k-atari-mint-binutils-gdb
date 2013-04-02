@@ -5261,6 +5261,7 @@ aout_link_input_bfd (struct aout_final_link_info *finfo, bfd *input_bfd)
     return FALSE;
 
   sym_count = obj_aout_external_sym_count (input_bfd);
+  (void)sym_count;
 
   /* Write out the symbols and get a map of the new indices.  The map
      is placed into finfo->symbol_map.  */

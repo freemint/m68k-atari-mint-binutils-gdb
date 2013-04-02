@@ -229,6 +229,7 @@ verilog_write_section (bfd *abfd,
 	octets_this_chunk = 16;
 
       address = list->where + octets_written / bfd_octets_per_byte (abfd);
+      (void)address;
 
       if (! verilog_write_record (abfd,
 				  location,
