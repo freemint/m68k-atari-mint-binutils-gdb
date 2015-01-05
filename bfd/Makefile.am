@@ -423,6 +423,7 @@ BFD32_BACKENDS = \
 	peigen.lo \
 	plugin.lo \
 	ppcboot.lo \
+	prg-mint.lo \
 	reloc16.lo \
 	riscix.lo \
 	som.lo \
@@ -609,6 +610,7 @@ BFD32_BACKENDS_CFILES = \
 	pei-sh.c \
 	plugin.c \
 	ppcboot.c \
+	prg-mint.c \
 	reloc16.c \
 	riscix.c \
 	som.c \
