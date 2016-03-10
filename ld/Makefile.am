@@ -759,9 +759,9 @@ eelf32_spu.c: $(srcdir)/emulparams/elf32_spu.sh $(srcdir)/emultempl/spuelf.em \
 $(srcdir)/emultempl/spu_ovl.o_c: @MAINT@ $(srcdir)/emultempl/spu_ovl.S
 	if ../gas/as-new --version \
 		| grep 'target.*spu' >/dev/null 2>/dev/null; then \
-	  cpp -DOVLY_IRQ_SAVE $(srcdir)/emultempl/spu_ovl.S spu_ovl.s
+	  cpp -DOVLY_IRQ_SAVE $(srcdir)/emultempl/spu_ovl.S spu_ovl.s; \
 	  ../gas/as-new -o spu_ovl.o spu_ovl.s; \
-	  ../binutils/bin2c <spu_ovl.o >$@
+	  ../binutils/bin2c <spu_ovl.o >$@; \
 	fi
 eelf32_i860.c: $(srcdir)/emulparams/elf32_i860.sh \
   $(ELF_GEN_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
@@ -1919,7 +1919,8 @@ install-data-local: install-info
 
 # Stuff that should be included in a distribution.  The diststuff
 # target is run by the taz target in ../Makefile.in.
-EXTRA_DIST = ldgram.c ldgram.h ldlex.c emultempl/spu_ovl.o_c $(man_MANS)
+EXTRA_DIST = ldgram.c ldgram.h ldlex.c emultempl/spu_ovl.o_c \
+           deffilep.c deffilep.h $(man_MANS)
 diststuff: info $(EXTRA_DIST)
 all: info ld.1
 

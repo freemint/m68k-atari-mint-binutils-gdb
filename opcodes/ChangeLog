@@ -1,3 +1,20 @@
+2008-11-27  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc-opc.c (extract_sprg): Correct operand range check.
+
+2008-11-26  Andreas Schwab  <schwab@suse.de>
+
+	* m68k-dis.c (NEXTBYTE, NEXTWORD, NEXTLONG, NEXTULONG, NEXTSINGLE)
+	(NEXTDOUBLE, NEXTEXTEND, NEXTPACKED): Fix error handling.
+	(save_printer, save_print_address): Remove.
+	(fetch_data): Don't use them.
+	(match_insn_m68k): Always restore printing functions.
+	(print_insn_m68k): Don't save/restore printing functions.
+
+2008-11-25  Nick Clifton  <nickc@redhat.com>
+
+	* m68k-dis.c: Rewrite to remove use of setjmp/longjmp.
+
 2008-09-29  Nick Clifton  <nickc@redhat.com>
 
 	* po/vi.po: Updated Vietnamese translation.

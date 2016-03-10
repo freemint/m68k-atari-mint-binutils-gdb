@@ -1,3 +1,48 @@
+2009-02-03  Tristan Gingold  <gingold@adacore.com>
+
+	* Makefile.am (RELEASE): Unset.
+	* Makefile.in: Regenerated.
+
+2009-02-02  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.19.1
+	* Makefile.am (RELEASE): Set.
+	* configure, Makefile.in: Regenerated.
+
+2009-01-14  Joseph Myers  <joseph@codesourcery.com>
+
+	* elf32-arm.c (elf32_arm_final_link_relocate): Do not turn
+	branches to undefine weak symbols into branches to the next
+	instruction if creating PLT entries for those symbols.
+
+2008-12-23  Nick Clifton  <nickc@redhat.com>
+
+	* Import this patch from the mainline:
+	2008-11-10  Andreas Schwab  <schwab@suse.de>
+
+	PR 7011
+	* elf.c (assign_file_positions_for_non_load_sections): Handle
+	PT_GNU_RELRO specially.
+
+2008-11-20  Alan Modra  <amodra@bigpond.net.au>
+
+	* elf32-ppc.c (allocate_dynrelocs): Always use tlsld_got for
+	TLS_LD even when symbol is used with other TLS reloc types.
+	(ppc_elf_relocate_section): Bypass symbol checks when using tlsld_got.
+	Leave addend zero on LD DTPMOD dynamic reloc.
+
+2008-11-17  Eric B. Weddington  <eric.weddington@atmel.com>
+
+	PR 7022
+	* elf32-avr.c (bfd_elf_avr_final_write_processing):
+	Add missing break statements.
+
+2008-10-28  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.19.0
+	* Makefile.am (RELEASE): Unset.
+	* configure, Makefile.in: Regenerated.
+
 2008-10-16  Tristan Gingold  <gingold@adacore.com>
 
 	* configure.in: Bump version to 2.19

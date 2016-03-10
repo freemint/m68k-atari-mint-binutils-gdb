@@ -1206,7 +1206,7 @@ run (const char *what, char *args)
 
   if (pid == -1)
     {
-      inform (strerror (errno));
+      inform ("%s", strerror (errno));
 
       fatal (errmsg_fmt, errmsg_arg);
     }
@@ -1980,7 +1980,7 @@ gen_exp_file (void)
       int addr;
       long need[PAGE_SIZE];
       long page_addr;
-      int numbytes;
+      bfd_size_type numbytes;
       int num_entries;
       long *copy;
       int j;
@@ -1992,9 +1992,9 @@ gen_exp_file (void)
       numbytes = ftell (base_file);
       fseek (base_file, 0, SEEK_SET);
       copy = xmalloc (numbytes);
-      fread (copy, 1, numbytes, base_file);
+      if (fread (copy, 1, numbytes, base_file) < numbytes)
+	fatal (_("failed to read the number of entries from base file"));
       num_entries = numbytes / sizeof (long);
-
 
       fprintf (f, "\t.section\t.reloc\n");
       if (num_entries)
