@@ -1,3 +1,156 @@
+2011-06-17  Ian Lance Taylor  <iant@google.com>
+
+	* object.cc (Sized_relobj::do_layout): Keep warning sections when
+	making a shared library.
+
+2011-06-09  Ian Lance Taylor  <iant@google.com>
+
+	* script-sections.cc
+	(Orphan_output_section::set_section_addresses): For a relocatable
+	link set address to 0.
+
+2011-05-29  Ian Lance Taylor  <iant@google.com>
+
+	* binary.cc (Binary_to_elf::sized_convert): Don't crash if the
+	binary input file is empty.
+
+2011-05-06  Ian Lance Taylor  <iant@google.com>
+
+	* layout.cc (Layout::layout): If the output section flags change,
+	update the ordering.
+
+2011-03-14  Ian Lance Taylor  <iant@google.com>
+
+	* script-sections.cc (Sort_output_sections::script_compare):
+	Rename from is_before, change return type.
+	(Sort_output_sections::operator()): Adjust accordingly.
+
+2011-03-08  Ian Lance Taylor  <iant@google.com>
+
+	PR gold/12525
+	* fileread.cc: #include <climits>.
+	(GOLD_IOV_MAX): Define.
+	(File_read::read_multiple): Limit number of entries by iov_max.
+	* fileread.h (class File_read): Always set max_readv_entries to
+	128.
+
+2011-03-07  Ian Lance Taylor  <iant@google.com>
+
+	PR gold/12525
+	* options.h (class General_options): Add -dy and -dn.
+
+2011-03-02  Simon Baldwin  <simonb@google.com>
+
+	* configure.ac: Add check for gnu_indirect_function support in
+	the toolchain building binutils.
+	* configure: Rebuild.
+
+2011-03-01  Ian Lance Taylor  <iant@google.com>
+
+	Backport from mainline:
+	2011-01-04  Cary Coutant  <ccoutant@google.com>
+	* script-sections.cc (Sort_output_sections::operator()): Sort TLS
+	sections before NOBITS sections.
+
+2011-02-27  Ian Lance Taylor  <iant@google.com>
+
+	Backport from mainline:
+	2010-11-05  Cary Coutant  <ccoutant@google.com>
+	PR gold/10708
+	* copy-relocs.cc (Copy_relocs::emit_copy_reloc): Hold a lock on the
+	object when reading from the file.
+	* gold.cc (queue_middle_tasks): Hold a lock on the object when doing
+	second layout pass.
+	* icf.cc (preprocess_for_unique_sections): Hold a lock on the object
+	when reading section contents.
+	(get_section_contents): Likewise.
+	(icf::find_identical_sections): Likewise.
+	* mapfile.cc (Mapfile::print_discarded_sections): Hold a lock on the
+	object when reading from the file.
+	* plugin.cc (Plugin_manager::layout_deferred_objects): Hold a lock on
+	the object when doing deferred section layout.
+
+2011-02-09  Ian Lance Taylor  <iant@google.com>
+
+	PR gold/12316
+	* object.h (class Sized_relobj): Remove clear_local_symbols.
+	* reloc.cc (Sized_relobj::do_relocate): Don't call
+	clear_local_symbols.
+
+2011-02-04  Jeffrey Yasskin  <jyasskin@google.com>
+
+	* symtab.cc (Odr_violation_compare::operator()): Sort by just the
+	filename.
+
+2011-02-02  Sriraman Tallam  <tmsriram@google.com>
+
+	* icf.h (is_section_foldable_candidate): Change type of parameter
+        to std::string.
+	* icf.cc (Icf::find_identical_sections): Change type of local variable
+        section_name to be std::string.
+	(is_function_ctor_or_dtor): Change type of parameter to std::string.
+
+2011-02-01  Ian Lance Taylor  <iant@google.com>
+
+	Backport from mainline:
+	2011-01-25  Ian Lance Taylor  <iant@google.com>
+	* script.cc (script_add_extern): Rewrite to use
+	add_symbol_reference.
+
+2011-02-01  Alan Modra  <amodra@gmail.com>
+
+	Backport from mainline
+	2011-01-01  H.J. Lu  <hongjiu.lu@intel.com>
+	* version.cc (print_version): Update copyright to 2011.
+
+2011-01-24  Ian Lance Taylor  <iant@google.com>
+
+	* version.cc (version_string): Bump to 1.11.
+
+2011-01-24  Ian Lance Taylor  <iant@google.com>
+
+	* plugin.cc (class Plugin_rescan): Define new class.
+	(Plugin_manager::claim_file): Set any_claimed_.
+	(Plugin_manager::save_archive): New function.
+	(Plugin_manager::save_input_group): New function.
+	(Plugin_manager::all_symbols_read): Create Plugin_rescan task if
+	necessary.
+	(Plugin_manager::new_undefined_symbol): New function.
+	(Plugin_manager::rescan): New function.
+	(Plugin_manager::rescannable_defines): New function.
+	(Plugin_manager::add_input_file): Set any_added_.
+	* plugin.h (class Plugin_manager): define new fields rescannable_,
+	undefined_symbols_, any_claimed_, and any_added_.  Declare
+	Plugin_rescan as friend.  Declare new functions.
+	(Plugin_manager::Rescannable): Define type.
+	(Plugin_manager::Rescannable_list): Define type.
+	(Plugin_manager::Undefined_symbol_list): Define type.
+	(Plugin_manager::Plugin_manager): Initialize new fields.
+	* archive.cc (Archive::defines_symbol): New function.
+	(Add_archive_symbols::run): Pass archive to plugins if any.
+	* archive.h (class Archive): Declare defines_symbol.
+	* readsyms.cc (Input_group::~Input_group): New function.
+	(Finish_group::run): Pass input_group to plugins if any.
+	* readsyms.h (class Input_group): Declare destructor.
+	* symtab.cc (add_from_object): Pass undefined symbol to plugins if
+	any.
+
+2011-01-10  Ian Lance Taylor  <iant@google.com>
+
+	* layout.cc (Layout::layout_eh_frame): Mark a writable .eh_frame
+	section as relro.
+	(Layout::set_segment_offsets): Reset increase_relro before calling
+	set_section_addresses a second time.
+
+2010-12-23  Cary Coutant  <ccoutant@google.com>
+
+	* output.h (Output_data_reloc::add_output_section): Pass OD instead
+	of OS to this->add.  Add OD parameter to second form of the function.
+
+2010-12-21  Alan Modra  <amodra@gmail.com>
+
+	* po/ja.po: New translation.
+
 2010-12-01  Ian Lance Taylor  <iant@google.com>
 
 	* testsuite/icf_virtual_function_folding_test.cc (class Bar): Add

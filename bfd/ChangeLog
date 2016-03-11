@@ -1,3 +1,397 @@
+2011-06-27  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.21.1
+	* Makefile.am (RELEASE): Set.
+	* configure, Makefile.in: Regenerate.
+
+2011-06-24  Alan Modra  <amodra@gmail.com>
+
+	PR ld/12921
+	* elf.c (assign_file_positions_for_load_sections): Don't align
+	sh_offset for all SHT_NOBITS sections here, just .tbss sections
+	that don't get a PT_LOAD.
+
+2011-06-22  Alan Modra  <amodra@gmail.com>
+
+	* elflink.c (_bfd_elf_merge_symbol): Allow type changes for
+	plugin symbols.  Fix segfault on linker scrip defined syms.
+
+2011-05-29  Alan Modra  <amodra@gmail.com>
+
+	Apply from mainline
+	2011-05-26  Alan Modra  <amodra@gmail.com>
+	* elf-bfd.h (SYMBOL_REFERENCES_LOCAL): Remove most of comment.
+	* elflink.c (_bfd_elf_symbol_refs_local_p): Expand
+	local_protected comment.
+
+	2011-05-23  Alan Modra  <amodra@gmail.com>
+	PR 12763
+	* elf.c (assign_file_positions_for_load_sections): Set sh_offset for
+	.tbss, and page align same for all SHT_NOBITS sections.
+
+	2011-05-23  Nick Clifton  <nickc@redhat.com>
+	* elf-m10300.c (mn10300_elf_mkobject): New function.
+	(bfd_elf32_mkobject): Define.
+
+	2011-05-21  Alan Modra  <amodra@gmail.com>
+	PR 12763
+	* elf.c (_bfd_elf_make_section_from_shdr): Set up TLS section LMAs
+	from PT_TLS header.
+	(_bfd_elf_map_sections_to_segments): Don't create a final PT_LOAD
+	segment if just for .tbss.
+	(assign_file_positions_for_load_sections): Don't report "can't
+	allocate in segment" errors for .tbss.
+	(assign_file_positions_for_non_load_sections): Don't set p_filesz
+	from SHT_NOBITS section filepos.
+
+	2011-05-17  Alan Modra  <amodra@gmail.com>
+	PR ld/12760
+	* coff-aux.c (coff_m68k_aux_link_add_one_symbol): Adjust "notice" call.
+	* elflink.c (elf_link_add_object_symbols): Likewise.
+	* linker.c (_bfd_generic_link_add_one_symbol): Likewise.
+
+	2011-05-16  Alan Modra  <amodra@gmail.com>
+	* linker.c (_bfd_generic_link_add_one_symbol): Don't init u.undef.weak.
+
+	2011-05-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	* config.in: Regenerated.
+	* configure: Regenerated.
+	* configure.in: New tests for HAVE_PRPSINFO_T_PR_PID,
+	HAVE_PRPSINFO32_T_PR_PID, HAVE_PSINFO_T_PR_PID and
+	HAVE_PSINFO32_T_PR_PID.
+	* elf.c (elfcore_grok_psinfo): Protect reading psinfo.pr_pid by
+	HAVE_PRPSINFO_T_PR_PID, HAVE_PRPSINFO32_T_PR_PID, HAVE_PSINFO_T_PR_PID
+	and HAVE_PSINFO32_T_PR_PID.
+	* hosts/x86-64linux.h (HAVE_PRPSINFO32_T_PR_PID): New redefinition.
+
+	2011-05-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	* elf.c (elfcore_grok_psinfo): Initialize CORE_PID for both native and
+	32bit psinfo.
+	* elf32-ppc.c (ppc_elf_grok_psinfo): Initialize core_pid.
+	* elf64-ppc.c (ppc64_elf_grok_psinfo): Likewise.
+
+	2011-05-07  Dave Korn  <dave.korn.cygwin@gmail.com>
+	PR ld/12365
+	* cofflink.c (bfd_coff_link_input_bfd): Check for and warn about
+	references to symbols defined in discarded sections.
+
+	2011-05-07  Dave Korn  <dave.korn.cygwin@gmail.com>
+	PR ld/12365
+	* coffgen.c (coff_write_symbol): Assume input section is its own
+	output section if output_section member not set.
+	(coff_write_alien_symbol): Likewise.
+
+	2011-05-07  Anders Kaseorg  <andersk@ksplice.com>
+	PR 12739
+	* libbfd.c (bfd_get_8, bfd_get_signed_8): Use const cast.
+	* bfd-in2.h: Regenerate.
+
+	2011-04-28  Tom Tromey  <tromey@redhat.com>
+	* bfdio.c (memory_bstat): Pass correct size to memset.
+
+	2011-04-20  Alan Modra  <amodra@gmail.com>
+	* libbfd.c (bfd_log2): Do return rounded up value.
+	* elflink.c (bfd_elf_size_dynsym_hash_dynstr): Replace bfd_log2
+	call with expanded old round down version of the function.
+	* archive.c (_bfd_get_elt_at_filepos): Don't release n_nfd.
+	* elflink.c (elf_link_add_object_symbols): Delete redundant code.
+
+	2011-04-09  Kai Tietz  <ktietz@redhat.com>
+	* peXXigen.c (_bfd_XXi_final_link_postscripte): Sort pdata in temporary
+	buffer and use rawsize for sorting.
+	* coffcode.h (coff_compute_section_file_positions): Set rawsize
+	before doing alignment.
+
+	2011-04-07  Cary Coutant  <ccoutant@google.com>
+	* dwarf2.c (scan_unit_for_symbols): Check for DW_AT_specification.
+
+	2011-03-03  Michael Snyder  <msnyder@vmware.com>
+	* aoutx.h (aout_final_link): Use sizeof int not sizeof int*.
+	(aout_link_write_other_symbol): Missing break statement.
+
+	2011-02-14  Mike Frysinger  <vapier@gentoo.org>
+	* elflink.c (bfd_elf_size_dynamic_sections): Add
+	bfd_get_symbol_leading_char to the start of newname.
+
+	2011-01-18  Pierre Muller  <muller@ics.u-strasbg.fr>
+	Fix compilation for mingw64.
+	* coffcode.h (coff_slurp_symbol_table): Add intptr_t intermediate
+	typecast to avoid warning.
+	* elf32-rx.c: Add "bfd_stdint.h" include required for int32_t type
+	usage.
+	* elfxx-ia64.c (elfNN_ia64_relax_br): Use intptr_t typeacast instead
+	of long for pointer to avoid warning.
+	(elfNN_ia64_relax_brl): Idem.
+	(elfNN_ia64_install_value): Idem.
+	* vms-alpha.c (_bfd_vms_slurp_etir): Idem.
+
+2012-05-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from mainline
+	2012-01-06  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/12366
+	PR ld/12371
+	* elf-ifunc.c (_bfd_elf_allocate_ifunc_dyn_relocs): Properly
+	handle symbols marked with regular reference, but not non-GOT
+	reference when building shared library.
+
+	* elf32-i386.c (elf_i386_gc_sweep_hook): Properly handle
+	local and global STT_GNU_IFUNC symols when building shared
+	library.
+	* elf64-x86-64.c (elf_x86_64_gc_sweep_hook): Likewise.
+
+2011-05-23  DJ Delorie  <dj@redhat.com>
+
+	* elf32-rx.c (rx_elf_object_p): When reading an RX object in, undo
+	the vma/lma swapping done in elf32_rx_modify_program_headers.
+
+2011-05-15  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	* elfxx-mips.c (_bfd_mips_elf_check_relocs): Record both local and
+	global GOT entries for GOT_PAGE relocations against global symbols.
+
+2011-05-15  Richard Sandiford  <rdsandiford@googlemail.com>
+
+	PR ld/12637
+	* elfxx-mips.c (mips_elf_merge_got_with): Use arg->global_count
+	as the number of global entries when merging with the primary GOT.
+
+2011-05-13  Alan Modra  <amodra@gmail.com>
+
+	Apply 2011-04-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	* elf64-ppc.c (ppc64_elf_get_synthetic_symtab): Do not check for
+	SEC_LOAD.
+
+2011-05-06  Richard Sandiford  <richard.sandiford@linaro.org>
+
+	* elf32-arm.c (cortex_a8_erratum_scan): If the stub is a Thumb
+	branch to a PLT entry, redirect it to the PLT's Thumb entry point.
+
+2011-05-04  Alan Modra  <amodra@gmail.com>
+
+	PR ld/12727
+	* elf64-ppc.c (ppc_build_one_stub <ppc_sub_plt_call>): Clear
+	was_undefined on dot-symbols.
+
+2011-04-27  Alan Modra  <amodra@gmail.com>
+
+	Backport from mainline
+	2011-04-24  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	PR ld/12696
+	* coff-aux.c (coff_m68k_aux_link_add_one_symbol): Update "notice" call.
+	* linker.c (_bfd_link_hash_newfunc): Clear bitfields.
+	(_bfd_generic_link_add_one_symbol): Update "notice" call.
+	* elflink.c (_bfd_elf_merge_symbol): Don't skip weak redefs when
+	it is a redef of an IR symbol in a real BFD.
+
+	2011-04-20  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	* elfcode.h (elf_slurp_symbol_table): Put common plugin IR symbols
+	in their own common section.
+	* elflink.c (elf_link_add_object_symbols): Likewise.
+	* linker.c (generic_link_check_archive_element): Don't lose flags
+	if common section is pre-existing.
+	(_bfd_generic_link_add_one_symbol): Likewise.
+
+	2011-04-20  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	* elflink.c (_bfd_elf_merge_symbol): Update multiple_common calls.
+	* linker.c (_bfd_generic_link_add_one_symbol): Likewise.  Call
+	multiple_definition regardless of allow_multiple_definition.
+	* simple.c (simple_dummy_multiple_definition): Update.
+	* xcofflink.c (xcoff_link_add_symbols): Update multiple_definition
+	calls.
+
+	2011-04-18  Alan Modra  <amodra@gmail.com>
+	PR ld/12365
+	PR ld/12672
+	* bfd.c (BFD_PLUGIN): Define.
+	(BFD_FLAGS_SAVED, BFD_FLAGS_FOR_BFD_USE_MASK): Add BFD_PLUGIN.
+	* bfd-in2.h: Regenerate.
+	* elflink.c (elf_link_output_extsym): Strip undefined plugin syms.
+	* opncls.c (bfd_make_readable): Don't lose original bfd flags.
+
+	2011-04-11  Mark Wielaard  <mjw@redhat.com>
+	PR 10549
+	* elf-bfd.h (has_ifunc_symbols): Renamed to has_gnu_symbols.
+	(has_gnu_symbols): Renamed from has_ifunc_symbols.
+	* elf.c (_bfd_elf_set_osabi): Use new has_gnu_symbols name.
+	* elf32-i386.c (elf_i386_add_symbol_hook): Likewise.
+	* elf32-ppc.c (ppc_elf_add_symbol_hook): Likewise.
+	* elf32-sparc.c (elf32_sparc_add_symbol_hook): Likewise.
+	* elf64-ppc.c (ppc64_elf_add_symbol_hook): Likewise.
+	* elf64-sparc.c (elf64_sparc_add_symbol_hook): Likewise.
+	* elf64-x86-64.c (elf_x86_64_add_symbol_hook): Likewise.
+
+	2011-02-25  Rafael Ávila de Espíndola <respindola@mozilla.com>
+	* plugin.c (bfd_plugin_object_p): Correctly set the filesize
+	and handle claim_file seeking. Only try to load the plugin once.
+
+	2010-12-12  H.J. Lu  <hongjiu.lu@intel.com>
+	* elf.c (special_sections_g): Add ".gnu.lto_".
+
+2011-04-20  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* elf-bfd.h (RELOC_AGAINST_DISCARDED_SECTION): Fix +1 overrun of
+	memmove elements.
+
+2011-03-26  John Marino  <binutils@marino.st>
+
+	* config.bfd: Add x86_64-*-dragonfly*, fix i386-*-dragonfly*.
+	* configure.in: Delete unused bfd_elf32_i386_dragonfly_vec.
+	* configure: Regenerate.
+
+2011-03-24  Alan Modra  <amodra@gmail.com>
+
+	* elf32-ppc.c (ppc_elf_tls_optimize): Catch more cases where
+	old-style __tls_get_addr calls without marker relocs don't match
+	their arg setup insn one for one.  If such mismatches are found
+	report the reloc and don't do any tls optimization.
+	* elf64-ppc.c (ppc64_elf_tls_optimize): Likewise.
+
+2011-03-10  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c (ppc64_elf_relocate_section): Provide section/offset
+	for LO_DS error message and correct multiple.
+
+2011-03-10  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c (bfd_elf64_bfd_link_just_syms): Define.
+	(ppc64_elf_link_just_syms): New function.
+	(opd_entry_value): Don't assume big-endian host.
+	(get_r2off): New function.
+	(ppc_build_one_stub, ppc_size_one_stub): Use it here.
+
+2011-03-04  Alan Modra  <amodra@gmail.com>
+
+	* archive.c (bsd_write_armap): Don't call stat in deterministic
+	mode, and don't use st_mtime if stat returns error.
+
+2011-02-28  Alan Modra  <amodra@gmail.com>
+
+	PR 12513
+	* archive.c (bfd_slurp_bsd_armap_f2): Sanity check parsed_size and
+	stringsize.  Properly sanity check symdef_count.  Remove redundant
+	bfd_release.
+
+2011-02-01  Alan Modra  <amodra@gmail.com>
+
+	Backport from mainline
+	2011-01-22  Richard Sandiford  <rdsandiford@googlemail.com>
+	* elfxx-mips.c (_bfd_mips_elf_merge_private_bfd_data): Ignore
+	common sections too.
+
+	2011-01-14  Alan Modra  <amodra@gmail.com>
+	* bfd.c (bfd_perror): Flush stdout before and stderr after printing
+	error.
+	(_bfd_default_error_handler): Likewise.
+	* elf.c (print_segment_map): Likewise.
+	* libbfd.c (warn_deprecated): Likewise.
+	* som.c (som_sizeof_headers): No need to do so here.
+	* coff-i860.c: Replace use of printf for error messages with
+	_bfd_error_handler.
+	* coff-ppc.c: Likewise.
+	* coff-sh.c: Likewise.
+	* elf32-bfin.c: Likewise.
+	* elf32-dlx.c: Likewise.
+	* elf32-mep.c: Likewise.
+	* elf32-v850.c: Likewise.
+	* mach-o.c: Likewise.
+	* pef.c: Likewise.
+
+	2010-12-24  Alan Modra  <amodra@gmail.com>
+	* compress.c (decompress_contents): Style.
+	(bfd_get_full_section_contents): Do not decompress directly into
+	caller buffer or directly return cached section contents.
+	Check malloc return for compressed_buffer.
+
+	2010-12-13  Alan Modra  <amodra@gmail.com>
+	* aoutx.h (aout_link_check_ar_symbols): Formatting.
+	* cofflink.c (coff_link_check_ar_symbols): Likewise.
+	* elflink.c (elf_link_add_archive_symbols): Likewise.
+	* pdp11.c (aout_link_check_ar_symbols): Likewise.
+	* xcofflink.c (xcoff_link_check_dynamic_ar_symbols,
+	xcoff_link_check_dynamic_ar_symbols): Likewise.
+	* aoutx.h (aout_link_check_archive_element): Simplify code dealing
+	with add_archive_element substitute BFD.
+	* cofflink.c (coff_link_check_archive_element): Likewise.
+	* ecoff.c (ecoff_link_check_archive_element): Likewise.
+	(ecoff_link_add_archive_symbols): Likewise.
+	* linker.c (generic_link_check_archive_element): Likewise.
+	* pdp11.c (aout_link_check_archive_element): Likewise.
+	* vms-alpha.c (alpha_vms_link_add_archive_symbols): Likewise.
+	* xcofflink.c (xcoff_link_check_archive_element): Likewise.
+	* aoutx.h (aout_link_check_archive_element): Free symbols from old
+	bfd if !keep_memory.
+	* cofflink.c (coff_link_check_archive_element): Likewise.
+	* pdp11.c (aout_link_check_archive_element): Likewise.
+	* xcofflink.c (xcoff_link_check_archive_element): Likewise.
+
+	2010-12-12  H.J. Lu  <hongjiu.lu@intel.com>
+	* elflink.c (elf_link_add_archive_symbols): Remove subsbfd.
+
+	2010-12-06  Dmitry Gorbachev  <d.g.gorbachev@gmail.com>
+	PR ld/12288
+	* plugin.c (message): Add putchar for the trailing `\n'.
+
+	2010-12-04  Alan Modra  <amodra@gmail.com>
+	PR ld/12277
+	* elflink.c (elf_link_output_extsym): Set bfd_error on symbol
+	and section errors.  Allow better translation of error messages.
+
+	2010-11-24  Joel Brobecker  <brobecker@adacore.com>
+	* Makefile.am (OPTIONAL_BACKENDS): Add rs6000-core.lo.
+	(OPTIONAL_BACKENDS_CFILES): Add rs6000-core.c.
+	* Makefile.in: Regenerate.
+
+	2010-11-24  Alan Modra  <amodra@gmail.com>
+	PR ld/12253
+	* elf-eh-frame.c (_bfd_elf_write_section_eh_frame): Correct
+	DW_EH_PE_datarel handling.  Truncate .eh_frame_hdr address to
+	ptr_size.
+
+	2010-11-08  Alan Modra  <amodra@gmail.com>
+	* hash.c (bfd_hash_hash): Extract from..
+	(bfd_hash_lookup): ..here.
+	(bfd_hash_rename): New function.
+	* section.c (bfd_rename_section): New function.
+	* bfd-in.h (bfd_hash_rename): Declare.
+	* bfd-in2.h: Regenerate.
+	* elf.c (_bfd_elf_make_section_from_shdr): Rename input sections
+	when compressing or decompressing.  Don't assert name match.
+	* elf64-hppa.c (get_reloc_section): Don't assert name match.
+	* elfxx-ia64.c (get_reloc_section): Likewise.
+
+	2010-11-05  Joseph Myers  <joseph@codesourcery.com>
+	* elf-attrs.c (_bfd_elf_merge_unknown_attribute_low,
+	_bfd_elf_merge_unknown_attribute_list): Correct test for matching
+	string attributes.
+
+2011-02-01  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c (ppc64_elf_next_input_section): Use elf_gp value
+	for toc pointer on any section having makes_toc_func_call set.
+	(check_pasted_section): Ensure pasted .init/.fini fragments use
+	the same toc if any has makes_toc_func_call set.
+
+2011-01-28  Joseph Myers  <joseph@codesourcery.com>
+
+	* elf32-ppc.c (ppc_elf_link_hash_newfunc): Initialize has_sda_refs
+	field.
+
+2010-12-10  Alan Modra  <amodra@gmail.com>
+
+	* config.bfd: Configure rs6000-*-aix* as for powerpc-*-aix*.
+	Add aix5coff64_vec to powerpc ELF entries.
+
+2010-12-08  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.21.0
+	* Makefile.am (RELEASE): Unset.
+	* configure, Makefile.in: Regenerate.
+
 2010-12-08  Tristan Gingold  <gingold@adacore.com>
 
 	* configure.in: Bump version to 2.21

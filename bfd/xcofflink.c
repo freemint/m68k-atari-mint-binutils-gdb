@@ -1996,11 +1996,7 @@ xcoff_link_add_symbols (bfd *abfd, struct bfd_link_info *info)
 		     handle them, and that would only be a warning,
 		     not an error.  */
 		  if (! ((*info->callbacks->multiple_definition)
-			 (info, (*sym_hash)->root.root.string,
-			  NULL, NULL, (bfd_vma) 0,
-			  (*sym_hash)->root.u.def.section->owner,
-			  (*sym_hash)->root.u.def.section,
-			  (*sym_hash)->root.u.def.value)))
+			 (info, &(*sym_hash)->root, NULL, NULL, (bfd_vma) 0)))
 		    goto error_return;
 		  /* Try not to give this error too many times.  */
 		  (*sym_hash)->flags &= ~XCOFF_MULTIPLY_DEFINED;
@@ -2292,8 +2288,8 @@ xcoff_link_check_dynamic_ar_symbols (bfd *abfd,
 	  && (((struct xcoff_link_hash_entry *) h)->flags
 	      & XCOFF_DEF_DYNAMIC) == 0)
 	{
-	  if (! (*info->callbacks->add_archive_element)
-					(info, abfd, name, subsbfd))
+	  if (!(*info->callbacks
+		->add_archive_element) (info, abfd, name, subsbfd))
 	    return FALSE;
 	  *pneeded = TRUE;
 	  return TRUE;
@@ -2364,8 +2360,8 @@ xcoff_link_check_ar_symbols (bfd *abfd,
 		  || (((struct xcoff_link_hash_entry *) h)->flags
 		      & XCOFF_DEF_DYNAMIC) == 0))
 	    {
-	      if (! (*info->callbacks->add_archive_element)
-					(info, abfd, name, subsbfd))
+	      if (!(*info->callbacks
+		    ->add_archive_element) (info, abfd, name, subsbfd))
 		return FALSE;
 	      *pneeded = TRUE;
 	      return TRUE;
@@ -2390,22 +2386,30 @@ xcoff_link_check_archive_element (bfd *abfd,
 				  bfd_boolean *pneeded)
 {
   bfd_boolean keep_syms_p;
-  bfd *subsbfd = NULL;
+  bfd *oldbfd;
 
   keep_syms_p = (obj_coff_external_syms (abfd) != NULL);
-  if (! _bfd_coff_get_external_symbols (abfd))
+  if (!_bfd_coff_get_external_symbols (abfd))
     return FALSE;
 
-  if (! xcoff_link_check_ar_symbols (abfd, info, pneeded, &subsbfd))
+  oldbfd = abfd;
+  if (!xcoff_link_check_ar_symbols (abfd, info, pneeded, &abfd))
     return FALSE;
 
   if (*pneeded)
     {
       /* Potentially, the add_archive_element hook may have set a
 	 substitute BFD for us.  */
-      if (subsbfd && !_bfd_coff_get_external_symbols (subsbfd))
-	return FALSE;
-      if (! xcoff_link_add_symbols (subsbfd ? subsbfd : abfd, info))
+      if (abfd != oldbfd)
+	{
+	  if (!keep_syms_p
+	      && !_bfd_coff_free_symbols (oldbfd))
+	    return FALSE;
+	  keep_syms_p = (obj_coff_external_syms (abfd) != NULL);
+	  if (!_bfd_coff_get_external_symbols (abfd))
+	    return FALSE;
+	}
+      if (!xcoff_link_add_symbols (abfd, info))
 	return FALSE;
       if (info->keep_memory)
 	keep_syms_p = TRUE;
@@ -2413,7 +2417,7 @@ xcoff_link_check_archive_element (bfd *abfd,
 
   if (!keep_syms_p)
     {
-      if (! _bfd_coff_free_symbols (abfd))
+      if (!_bfd_coff_free_symbols (abfd))
 	return FALSE;
     }
 
@@ -3111,9 +3115,7 @@ bfd_xcoff_import_symbol (bfd *output_bfd,
 	      || h->root.u.def.value != val))
 	{
 	  if (! ((*info->callbacks->multiple_definition)
-		 (info, h->root.root.string, h->root.u.def.section->owner,
-		  h->root.u.def.section, h->root.u.def.value,
-		  output_bfd, bfd_abs_section_ptr, val)))
+		 (info, &h->root, output_bfd, bfd_abs_section_ptr, val)))
 	    return FALSE;
 	}
 

@@ -1,6 +1,6 @@
 /* Assorted BFD support routines, only used internally.
    Copyright 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009
+   2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2010, 2011
    Free Software Foundation, Inc.
    Written by Cygnus Support.
 
@@ -431,9 +431,9 @@ DESCRIPTION
 .#define bfd_put_signed_8 \
 .  bfd_put_8
 .#define bfd_get_8(abfd, ptr) \
-.  (*(unsigned char *) (ptr) & 0xff)
+.  (*(const unsigned char *) (ptr) & 0xff)
 .#define bfd_get_signed_8(abfd, ptr) \
-.  (((*(unsigned char *) (ptr) & 0xff) ^ 0x80) - 0x80)
+.  (((*(const unsigned char *) (ptr) & 0xff) ^ 0x80) - 0x80)
 .
 .#define bfd_put_16(abfd, val, ptr) \
 .  BFD_SEND (abfd, bfd_putx16, ((val),(ptr)))
@@ -968,8 +968,12 @@ bfd_log2 (bfd_vma x)
 {
   unsigned int result = 0;
 
-  while ((x = (x >> 1)) != 0)
+  if (x <= 1)
+    return result;
+  --x;
+  do
     ++result;
+  while ((x >>= 1) != 0);
   return result;
 }
 
@@ -1021,6 +1025,7 @@ warn_deprecated (const char *what,
 
   if (~(size_t) func & ~mask)
     {
+      fflush (stdout);
       /* Note: separate sentences in order to allow
 	 for translation into other languages.  */
       if (func)
@@ -1028,6 +1033,7 @@ warn_deprecated (const char *what,
 		 what, file, line, func);
       else
 	fprintf (stderr, _("Deprecated %s called\n"), what);
+      fflush (stderr);
       mask |= ~(size_t) func;
     }
 }

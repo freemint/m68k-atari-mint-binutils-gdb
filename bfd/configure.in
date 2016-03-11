@@ -8,7 +8,7 @@ AC_CONFIG_SRCDIR([libbfd.c])
 AC_CANONICAL_TARGET
 AC_ISC_POSIX
 
-AM_INIT_AUTOMAKE(bfd, 2.21)
+AM_INIT_AUTOMAKE(bfd, 2.21.1)
 
 dnl These must be called before LT_INIT, because it may want
 dnl to call AC_CHECK_PROG.
@@ -488,9 +488,13 @@ changequote([,])dnl
     BFD_HAVE_SYS_PROCFS_TYPE(pxstatus_t)
     BFD_HAVE_SYS_PROCFS_TYPE(pstatus32_t)
     BFD_HAVE_SYS_PROCFS_TYPE(prpsinfo_t)
+    BFD_HAVE_SYS_PROCFS_TYPE_MEMBER(prpsinfo_t, pr_pid)
     BFD_HAVE_SYS_PROCFS_TYPE(prpsinfo32_t)
+    BFD_HAVE_SYS_PROCFS_TYPE_MEMBER(prpsinfo32_t, pr_pid)
     BFD_HAVE_SYS_PROCFS_TYPE(psinfo_t)
+    BFD_HAVE_SYS_PROCFS_TYPE_MEMBER(psinfo_t, pr_pid)
     BFD_HAVE_SYS_PROCFS_TYPE(psinfo32_t)
+    BFD_HAVE_SYS_PROCFS_TYPE_MEMBER(psinfo32_t, pr_pid)
     BFD_HAVE_SYS_PROCFS_TYPE(lwpstatus_t)
     BFD_HAVE_SYS_PROCFS_TYPE(lwpxstatus_t)
     BFD_HAVE_SYS_PROCFS_TYPE_MEMBER(lwpstatus_t, pr_context)
@@ -703,8 +707,6 @@ do
     bfd_elf32_hppa_nbsd_vec)	tb="$tb elf32-hppa.lo elf32.lo $elf" ;;
     bfd_elf32_hppa_vec)		tb="$tb elf32-hppa.lo elf32.lo $elf" ;;
     bfd_elf32_i370_vec)		tb="$tb elf32-i370.lo elf32.lo $elf" ;;
-    bfd_elf32_i386_dragonfly_vec)
-				tb="$tb elf32-i386.lo elf-ifunc.lo elf-vxworks.lo elf32.lo $elf" ;;
     bfd_elf32_i386_sol2_vec)	tb="$tb elf32-i386.lo elf-ifunc.lo elf-vxworks.lo elf32.lo $elf" ;;
     bfd_elf32_i386_freebsd_vec)	tb="$tb elf32-i386.lo elf-ifunc.lo elf-vxworks.lo elf32.lo $elf" ;;
     bfd_elf32_i386_vxworks_vec)	tb="$tb elf32-i386.lo elf-ifunc.lo elf-vxworks.lo elf32.lo $elf" ;;

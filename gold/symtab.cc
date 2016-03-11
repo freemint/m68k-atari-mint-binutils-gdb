@@ -1,6 +1,6 @@
 // symtab.cc -- the gold symbol table
 
-// Copyright 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright 2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 // Written by Ian Lance Taylor <iant@google.com>.
 
 // This file is part of gold.
@@ -1002,7 +1002,11 @@ Symbol_table::add_from_object(Object* object,
   // Record every time we see a new undefined symbol, to speed up
   // archive groups.
   if (!was_undefined && ret->is_undefined())
-    ++this->saw_undefined_;
+    {
+      ++this->saw_undefined_;
+      if (parameters->options().has_plugins())
+	parameters->options().plugins()->new_undefined_symbol(ret);
+    }
 
   // Keep track of common symbols, to speed up common symbol
   // allocation.
@@ -3008,11 +3012,12 @@ Symbol_table::print_stats() const
 // We check for ODR violations by looking for symbols with the same
 // name for which the debugging information reports that they were
 // defined in different source locations.  When comparing the source
-// location, we consider instances with the same base filename and
-// line number to be the same.  This is because different object
-// files/shared libraries can include the same header file using
-// different paths, and we don't want to report an ODR violation in
-// that case.
+// location, we consider instances with the same base filename to be
+// the same.  This is because different object files/shared libraries
+// can include the same header file using different paths, and
+// different optimization settings can make the line number appear to
+// be a couple lines off, and we don't want to report an ODR violation
+// in those cases.
 
 // This struct is used to compare line information, as returned by
 // Dwarf_line_info::one_addr2line.  It implements a < comparison
@@ -3023,13 +3028,28 @@ struct Odr_violation_compare
   bool
   operator()(const std::string& s1, const std::string& s2) const
   {
-    std::string::size_type pos1 = s1.rfind('/');
-    std::string::size_type pos2 = s2.rfind('/');
-    if (pos1 == std::string::npos
-	|| pos2 == std::string::npos)
-      return s1 < s2;
-    return s1.compare(pos1, std::string::npos,
-		      s2, pos2, std::string::npos) < 0;
+    // Inputs should be of the form "dirname/filename:linenum" where
+    // "dirname/" is optional.  We want to compare just the filename.
+
+    // Find the last '/' and ':' in each string.
+    std::string::size_type s1begin = s1.rfind('/');
+    std::string::size_type s2begin = s2.rfind('/');
+    std::string::size_type s1end = s1.rfind(':');
+    std::string::size_type s2end = s2.rfind(':');
+    // If there was no '/' in a string, start at the beginning.
+    if (s1begin == std::string::npos)
+      s1begin = 0;
+    if (s2begin == std::string::npos)
+      s2begin = 0;
+    // If the ':' appeared in the directory name, compare to the end
+    // of the string.
+    if (s1end < s1begin)
+      s1end = s1.size();
+    if (s2end < s2begin)
+      s2end = s2.size();
+    // Compare takes lengths, not end indices.
+    return s1.compare(s1begin, s1end - s1begin,
+		      s2, s2begin, s2end - s2begin) < 0;
   }
 };
 

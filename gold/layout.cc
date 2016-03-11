@@ -1,6 +1,6 @@
 // layout.cc -- lay out output file sections for gold
 
-// Copyright 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+// Copyright 2006, 2007, 2008, 2009, 2010, 2011 Free Software Foundation, Inc.
 // Written by Ian Lance Taylor <iant@google.com>.
 
 // This file is part of gold.
@@ -674,8 +674,21 @@ Layout::layout(Sized_relobj<size, big_endian>* object, unsigned int shndx,
 
   // FIXME: Handle SHF_LINK_ORDER somewhere.
 
+  elfcpp::Elf_Xword orig_flags = os->flags();
+
   *off = os->add_input_section(this, object, shndx, name, shdr, reloc_shndx,
 			       this->script_options_->saw_sections_clause());
+
+  // If the flags changed, we may have to change the order.
+  if ((orig_flags & elfcpp::SHF_ALLOC) != 0)
+    {
+      orig_flags &= (elfcpp::SHF_WRITE | elfcpp::SHF_EXECINSTR);
+      elfcpp::Elf_Xword new_flags =
+	os->flags() & (elfcpp::SHF_WRITE | elfcpp::SHF_EXECINSTR);
+      if (orig_flags != new_flags)
+	os->set_order(this->default_section_order(os, false));
+    }
+
   this->have_added_input_section_ = true;
 
   return os;
@@ -870,6 +883,10 @@ Layout::layout_eh_frame(Sized_relobj<size, big_endian>* object,
 						      reloc_type))
     {
       os->update_flags_for_input_section(shdr.get_sh_flags());
+
+      // A writable .eh_frame section is a RELRO section.
+      if ((shdr.get_sh_flags() & elfcpp::SHF_WRITE) != 0)
+	os->set_is_relro();
 
       // We found a .eh_frame section we are going to optimize, so now
       // we can add the set of optimized sections to the output
@@ -2691,6 +2708,12 @@ Layout::set_segment_offsets(const Target* target, Output_segment* load_seg,
 		  addr = align_address(addr, (*p)->maximum_alignment());
 		  off = orig_off + ((addr - orig_addr) & (abi_pagesize - 1));
 		  off = align_file_offset(off, addr, abi_pagesize);
+
+		  increase_relro = this->increase_relro_;
+		  if (this->script_options_->saw_sections_clause())
+		    increase_relro = 0;
+		  has_relro = false;
+
 		  new_addr = (*p)->set_section_addresses(this, true, addr,
 							 &increase_relro,
 							 &has_relro,

@@ -1,3 +1,88 @@
+2011-05-29  Alan Modra  <amodra@gmail.com>
+
+	Apply from mainline
+	2011-03-18  Alan Modra  <amodra@gmail.com>
+	* gas/i386/inval-equ-2.l: Adjust expected error.
+	* gas/symver/symver2.l: Likewise.
+
+2011-05-18  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	Backported from mainline
+	2011-04-14  Andreas Krebbel  <Andreas.Krebbel@de.ibm.com>
+
+	* gas/s390/zarch-machine.s: New testcase.
+	* gas/s390/zarch-machine.d: New testcase output.
+	* gas/s390/s390.exp: Execute the new testcase.
+
+2011-05-13  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	Apply from mainline.
+	2011-05-12  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	PR gas/12715
+	* gas/arm/neon-const.s: Add testcase for 64-bit Neon constants.
+	* gas/arm/neon-const.d: Likewise.
+
+2011-04-27  Alan Modra  <amodra@gmail.com>
+
+	Apply from mainline.
+	2010-12-12  H.J. Lu  <hongjiu.lu@intel.com>
+	* gas/elf/elf.exp: Run section9.
+	* gas/elf/section9.d: New.
+	* gas/elf/section9.s: Likewise.
+
+2011-02-10  Vincent Rivière  <vincent.riviere@freesbee.fr>
+
+	PR gas/6957
+	* gas/i386/nops-1-i686.d: Updated.
+	* gas/i386/nops-3-i686.d: Likewise.
+	* gas/i386/nops-4-i686.d: Likewise.
+
+2011-02-08  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* gas/m68k/cpu32.d: Set explicit architecture for objdump.
+	* gas/m68k/mcf-coproc.d: Likewise.
+	* gas/m68k/mcf-wdebug.d: Likewise.
+
+2011-02-10  Alan Modra  <amodra@gmail.com>
+
+	Apply from mainline
+	2010-11-20  Richard Sandiford  <rdsandiford@googlemail.com>
+	* lib/gas-defs.exp (regexp_diff): Delete.
+	(run_dump_test): Remove final "" argument in call to regexp_diff.
+	(run_list_test): Likewise.
+	(run_list_test_stdin): Likewise.
+	* gas/all/gas.exp (test_cond): Likewise.
+	* gas/elf/elf.exp (run_elf_list_test): Likewise.
+	* gas/m68k/all.exp: Likewise.
+	* gas/mep/complex-relocs.exp (regexp_test): Likewise.
+	* gas/mt/relocs.exp (regexp_test): Likewise.
+	* gas/symver/symver.exp (run_error_test): Likewise.
+
+	2010-11-20  Richard Sandiford  <rdsandiford@googlemail.com>
+	* lib/gas-defs.exp (load_common_lib): New function.  Load
+	binutils-common.exp.
+	(is_elf_format, is_aout_format, is_pecoff_format): Delete.
+
+	2010-11-08  Thomas Schwinge  <thomas@schwinge.name>
+	* lib/gas-defs.exp (is_elf_format): Consider for *-*-gnu*, too.
+	* gas/elf/elf.exp: Likewise.
+	* gas/symver/symver.exp: Likewise.
+
+2011-02-07  Vincent Riviere  <vincent.riviere@freesbee.fr>
+
+	PR gas/3041
+	* gas/m68k/p3041pcrel.s, * gas/m68k/p3041pcrel.d: New test.
+	* gas/m68k/all.exp: Add "p3041pcrel" and enable p3041 tests for
+	all m68k-aout targets.
+
+2011-02-01  Alan Modra  <amodra@gmail.com>
+
+	Backport from mainline
+	2010-12-02  Richard Sandiford  <richard.sandiford@linaro.org>
+	* gas/i386/ifunc-2.s, gas/i386/ifunc-2.l: New test.
+	* gas/i386/ifunc-3.s, gas/i386/ifunc-3.d: Likeise.
+	* gas/i386/i386.exp: Run them.
+
 2010-11-15  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	* gas/mips/elf-rel28.s, gas/mips/elf-rel28-n32.d,

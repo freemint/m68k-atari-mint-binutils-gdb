@@ -60,7 +60,9 @@ const char *lex_string = NULL;
 #undef YY_INPUT
 #define YY_INPUT(buf,result,max_size) result = yy_input (buf, max_size)
 
+#ifndef YY_NO_UNPUT
 #define YY_NO_UNPUT
+#endif
 
 #define MAX_INCLUDE_DEPTH 10
 static YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
@@ -241,6 +243,7 @@ V_IDENTIFIER [*?.$_a-zA-Z\[\]\-\!\^\\]([*?.$_a-zA-Z0-9\[\]\-\!\^\\]|::)*
 <BOTH,SCRIPT,EXPRESSION,MRI>";"		{ RTOKEN(';');}
 <BOTH,SCRIPT>"MEMORY"			{ RTOKEN(MEMORY);}
 <BOTH,SCRIPT>"REGION_ALIAS"		{ RTOKEN(REGION_ALIAS);}
+<BOTH,SCRIPT>"LD_FEATURE"		{ RTOKEN(LD_FEATURE);}
 <BOTH,SCRIPT,EXPRESSION>"ORIGIN"	{ RTOKEN(ORIGIN);}
 <BOTH,SCRIPT>"VERSION"			{ RTOKEN(VERSIONK);}
 <EXPRESSION,BOTH,SCRIPT>"BLOCK"		{ RTOKEN(BLOCK);}
@@ -685,7 +688,7 @@ lex_warn_invalid (char *where, char *what)
 
   if (! ISPRINT (*what))
     {
-      sprintf (buf, "\\%03o", (unsigned int) *what);
+      sprintf (buf, "\\%03o", *(unsigned char *) what);
       what = buf;
     }
 

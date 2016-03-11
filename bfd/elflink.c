@@ -1,6 +1,6 @@
 /* ELF linking support for BFD.
    Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-   2005, 2006, 2007, 2008, 2009, 2010
+   2005, 2006, 2007, 2008, 2009, 2010, 2011
    Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -1085,11 +1085,15 @@ _bfd_elf_merge_symbol (bfd *abfd,
       return TRUE;
     }
 
+  /* Plugin symbol type isn't currently set.  Stop bogus errors.  */
+  if (oldbfd != NULL && (oldbfd->flags & BFD_PLUGIN) != 0)
+    *type_change_ok = TRUE;
+
   /* Check TLS symbol.  We don't check undefined symbol introduced by
      "ld -u".  */
-  if ((ELF_ST_TYPE (sym->st_info) == STT_TLS || h->type == STT_TLS)
-      && ELF_ST_TYPE (sym->st_info) != h->type
-      && oldbfd != NULL)
+  else if (oldbfd != NULL
+	   && ELF_ST_TYPE (sym->st_info) != h->type
+	   && (ELF_ST_TYPE (sym->st_info) == STT_TLS || h->type == STT_TLS))
     {
       bfd *ntbfd, *tbfd;
       bfd_boolean ntdef, tdef;
@@ -1361,8 +1365,7 @@ _bfd_elf_merge_symbol (bfd *abfd,
 	 symbols defined in dynamic objects.  */
 
       if (! ((*info->callbacks->multiple_common)
-	     (info, h->root.root.string, oldbfd, bfd_link_hash_common,
-	      h->size, abfd, bfd_link_hash_common, sym->st_size)))
+	     (info, &h->root, abfd, bfd_link_hash_common, sym->st_size)))
 	return FALSE;
 
       if (sym->st_size > h->size)
@@ -1428,7 +1431,11 @@ _bfd_elf_merge_symbol (bfd *abfd,
   /* Skip weak definitions of symbols that are already defined.  */
   if (newdef && olddef && newweak)
     {
-      *skip = TRUE;
+      /* Don't skip new non-IR weak syms.  */
+      if (!(oldbfd != NULL
+	    && (oldbfd->flags & BFD_PLUGIN) != 0
+	    && (abfd->flags & BFD_PLUGIN) == 0))
+	*skip = TRUE;
 
       /* Merge st_other.  If the symbol already has a dynamic index,
 	 but visibility says it should not be visible, turn it into a
@@ -1513,8 +1520,7 @@ _bfd_elf_merge_symbol (bfd *abfd,
 	 common symbol, but we don't know what to use for the section
 	 or the alignment.  */
       if (! ((*info->callbacks->multiple_common)
-	     (info, h->root.root.string, oldbfd, bfd_link_hash_common,
-	      h->size, abfd, bfd_link_hash_common, sym->st_size)))
+	     (info, &h->root, abfd, bfd_link_hash_common, sym->st_size)))
 	return FALSE;
 
       /* If the presumed common symbol in the dynamic object is
@@ -2880,8 +2886,10 @@ _bfd_elf_symbol_refs_local_p (struct elf_link_hash_entry *h,
     return TRUE;
 
   /* Function pointer equality tests may require that STV_PROTECTED
-     symbols be treated as dynamic symbols, even when we know that the
-     dynamic linker will resolve them locally.  */
+     symbols be treated as dynamic symbols.  If the address of a
+     function not defined in an executable is set to that function's
+     plt entry in the executable, then the address of the function in
+     a shared library must also be the plt entry in the executable.  */
   return local_protected;
 }
 
@@ -3813,7 +3821,7 @@ error_free_dyn:
       /* Make a special call to the linker "notice" function to
 	 tell it that we are about to handle an as-needed lib.  */
       if (!(*info->callbacks->notice) (info, NULL, abfd, NULL,
-				       notice_as_needed))
+				       notice_as_needed, 0, NULL))
 	goto error_free_vers;
 
       /* Clone the symbol table and sym hashes.  Remember some
@@ -3939,18 +3947,31 @@ error_free_dyn:
 	goto error_free_vers;
 
       if (isym->st_shndx == SHN_COMMON
-	  && ELF_ST_TYPE (isym->st_info) == STT_TLS
-	  && !info->relocatable)
+	  && (abfd->flags & BFD_PLUGIN) != 0)
+	{
+	  asection *xc = bfd_get_section_by_name (abfd, "COMMON");
+
+	  if (xc == NULL)
+	    {
+	      flagword sflags = (SEC_ALLOC | SEC_IS_COMMON | SEC_KEEP
+				 | SEC_EXCLUDE);
+	      xc = bfd_make_section_with_flags (abfd, "COMMON", sflags);
+	      if (xc == NULL)
+		goto error_free_vers;
+	    }
+	  sec = xc;
+	}
+      else if (isym->st_shndx == SHN_COMMON
+	       && ELF_ST_TYPE (isym->st_info) == STT_TLS
+	       && !info->relocatable)
 	{
 	  asection *tcomm = bfd_get_section_by_name (abfd, ".tcommon");
 
 	  if (tcomm == NULL)
 	    {
-	      tcomm = bfd_make_section_with_flags (abfd, ".tcommon",
-						   (SEC_ALLOC
-						    | SEC_IS_COMMON
-						    | SEC_LINKER_CREATED
-						    | SEC_THREAD_LOCAL));
+	      flagword sflags = (SEC_ALLOC | SEC_THREAD_LOCAL | SEC_IS_COMMON
+				 | SEC_LINKER_CREATED);
+	      tcomm = bfd_make_section_with_flags (abfd, ".tcommon", sflags);
 	      if (tcomm == NULL)
 		goto error_free_vers;
 	    }
@@ -4226,10 +4247,7 @@ error_free_dyn:
 		 We need to get the alignment from the section.  */
 	      align = new_sec->alignment_power;
 	    }
-	  if (align > old_alignment
-	      /* Permit an alignment power of zero if an alignment of one
-		 is specified and no other alignments have been specified.  */
-	      || (isym->st_value == 1 && old_alignment == 0))
+	  if (align > old_alignment)
 	    h->root.u.c.p->alignment_power = align;
 	  else
 	    h->root.u.c.p->alignment_power = old_alignment;
@@ -4547,7 +4565,7 @@ error_free_dyn:
       /* Make a special call to the linker "notice" function to
 	 tell it that symbols added for crefs may need to be removed.  */
       if (!(*info->callbacks->notice) (info, NULL, abfd, NULL,
-				       notice_not_needed))
+				       notice_not_needed, 0, NULL))
 	goto error_free_vers;
 
       free (old_tab);
@@ -4561,7 +4579,7 @@ error_free_dyn:
   if (old_tab != NULL)
     {
       if (!(*info->callbacks->notice) (info, NULL, abfd, NULL,
-				       notice_needed))
+				       notice_needed, 0, NULL))
 	goto error_free_vers;
       free (old_tab);
       old_tab = NULL;
@@ -5011,7 +5029,6 @@ elf_link_add_archive_symbols (bfd *abfd, struct bfd_link_info *info)
 	{
 	  struct elf_link_hash_entry *h;
 	  bfd *element;
-	  bfd *subsbfd = NULL;
 	  struct bfd_link_hash_entry *undefs_tail;
 	  symindex mark;
 
@@ -5074,12 +5091,10 @@ elf_link_add_archive_symbols (bfd *abfd, struct bfd_link_info *info)
 
 	  undefs_tail = info->hash->undefs_tail;
 
-	  if (! (*info->callbacks->add_archive_element)
-				(info, element, symdef->name, &subsbfd))
+	  if (!(*info->callbacks
+		->add_archive_element) (info, element, symdef->name, &element))
 	    goto error_return;
-	  /* Potentially, the add_archive_element hook may have set a
-	     substitute BFD for us.  */
-	  if (! bfd_link_add_symbols (subsbfd ? subsbfd : element, info))
+	  if (!bfd_link_add_symbols (element, info))
 	    goto error_return;
 
 	  /* If there are any new undefined symbols, we need to make
@@ -5713,11 +5728,12 @@ bfd_elf_size_dynamic_sections (bfd *output_bfd,
 	    {
 	      const char *verstr, *name;
 	      size_t namelen, verlen, newlen;
-	      char *newname, *p;
+	      char *newname, *p, leading_char;
 	      struct elf_link_hash_entry *newh;
 
+	      leading_char = bfd_get_symbol_leading_char (output_bfd);
 	      name = d->pattern;
-	      namelen = strlen (name);
+	      namelen = strlen (name) + (leading_char != '\0');
 	      verstr = t->name;
 	      verlen = strlen (verstr);
 	      newlen = namelen + verlen + 3;
@@ -5725,7 +5741,8 @@ bfd_elf_size_dynamic_sections (bfd *output_bfd,
 	      newname = (char *) bfd_malloc (newlen);
 	      if (newname == NULL)
 		return FALSE;
-	      memcpy (newname, name, namelen);
+	      newname[0] = leading_char;
+	      memcpy (newname + (leading_char != '\0'), name, namelen);
 
 	      /* Check the hidden versioned definition.  */
 	      p = newname + namelen;
@@ -6527,10 +6544,13 @@ bfd_elf_size_dynsym_hash_dynstr (bfd *output_bfd, struct bfd_link_info *info)
 	    }
 	  else
 	    {
-	      unsigned long int maskwords, maskbitslog2;
+	      unsigned long int maskwords, maskbitslog2, x;
 	      BFD_ASSERT (cinfo.min_dynindx != -1);
 
-	      maskbitslog2 = bfd_log2 (cinfo.nsyms) + 1;
+	      x = cinfo.nsyms;
+	      maskbitslog2 = 1;
+	      while ((x >>= 1) != 0)
+		++maskbitslog2;
 	      if (maskbitslog2 < 3)
 		maskbitslog2 = 5;
 	      else if ((1 << (maskbitslog2 - 2)) & cinfo.nsyms)
@@ -8643,6 +8663,7 @@ elf_link_output_extsym (struct elf_link_hash_entry *h, void *data)
 		  h->ref_regular ? NULL : h->root.u.undef.abfd,
 		  NULL, 0, finfo->info->unresolved_syms_in_shared_libs == RM_GENERATE_ERROR)))
 	    {
+	      bfd_set_error (bfd_error_bad_value);
 	      eoinfo->failed = TRUE;
 	      return FALSE;
 	    }
@@ -8659,16 +8680,21 @@ elf_link_output_extsym (struct elf_link_hash_entry *h, void *data)
       && !h->dynamic_weak
       && ! elf_link_check_versioned_symbol (finfo->info, bed, h))
     {
-      (*_bfd_error_handler)
-	(_("%B: %s symbol `%s' in %B is referenced by DSO"),
-	 finfo->output_bfd,
-	 h->root.u.def.section == bfd_abs_section_ptr
-	 ? finfo->output_bfd : h->root.u.def.section->owner,
-	 ELF_ST_VISIBILITY (h->other) == STV_INTERNAL
-	 ? "internal"
-	 : ELF_ST_VISIBILITY (h->other) == STV_HIDDEN
-	 ? "hidden" : "local",
-	 h->root.root.string);
+      bfd *def_bfd;
+      const char *msg;
+
+      if (ELF_ST_VISIBILITY (h->other) == STV_INTERNAL)
+	msg = _("%B: internal symbol `%s' in %B is referenced by DSO");
+      else if (ELF_ST_VISIBILITY (h->other) == STV_HIDDEN)
+	msg = _("%B: hidden symbol `%s' in %B is referenced by DSO");
+      else
+	msg = _("%B: local symbol `%s' in %B is referenced by DSO");
+      def_bfd = finfo->output_bfd;
+      if (h->root.u.def.section != bfd_abs_section_ptr)
+	def_bfd = h->root.u.def.section->owner;
+      (*_bfd_error_handler) (msg, finfo->output_bfd, def_bfd,
+			     h->root.root.string);
+      bfd_set_error (bfd_error_bad_value);
       eoinfo->failed = TRUE;
       return FALSE;
     }
@@ -8695,6 +8721,11 @@ elf_link_output_extsym (struct elf_link_hash_entry *h, void *data)
 	   && (h->root.type == bfd_link_hash_defined
 	       || h->root.type == bfd_link_hash_defweak)
 	   && elf_discarded_section (h->root.u.def.section))
+    strip = TRUE;
+  else if ((h->root.type == bfd_link_hash_undefined
+	    || h->root.type == bfd_link_hash_undefweak)
+	   && h->root.u.undef.abfd != NULL
+	   && (h->root.u.undef.abfd->flags & BFD_PLUGIN) != 0)
     strip = TRUE;
   else
     strip = FALSE;
@@ -8753,6 +8784,7 @@ elf_link_output_extsym (struct elf_link_hash_entry *h, void *data)
 		(*_bfd_error_handler)
 		  (_("%B: could not find output section %A for input section %A"),
 		   finfo->output_bfd, input_sec->output_section, input_sec);
+		bfd_set_error (bfd_error_nonrepresentable_section);
 		eoinfo->failed = TRUE;
 		return FALSE;
 	      }
@@ -8870,14 +8902,16 @@ elf_link_output_extsym (struct elf_link_hash_entry *h, void *data)
       && h->root.type == bfd_link_hash_undefined
       && !h->def_regular)
     {
-      (*_bfd_error_handler)
-	(_("%B: %s symbol `%s' isn't defined"),
-	 finfo->output_bfd,
-	 ELF_ST_VISIBILITY (sym.st_other) == STV_PROTECTED
-	 ? "protected"
-	 : ELF_ST_VISIBILITY (sym.st_other) == STV_INTERNAL
-	 ? "internal" : "hidden",
-	 h->root.root.string);
+      const char *msg;
+
+      if (ELF_ST_VISIBILITY (sym.st_other) == STV_PROTECTED)
+	msg = _("%B: protected symbol `%s' isn't defined");
+      else if (ELF_ST_VISIBILITY (sym.st_other) == STV_INTERNAL)
+	msg = _("%B: internal symbol `%s' isn't defined");
+      else
+	msg = _("%B: hidden symbol `%s' isn't defined");
+      (*_bfd_error_handler) (msg, finfo->output_bfd, h->root.root.string);
+      bfd_set_error (bfd_error_bad_value);
       eoinfo->failed = TRUE;
       return FALSE;
     }

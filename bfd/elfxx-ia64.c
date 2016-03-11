@@ -636,7 +636,7 @@ elfNN_ia64_relax_br (bfd_byte *contents, bfd_vma off)
   bfd_byte *hit_addr;
 
   hit_addr = (bfd_byte *) (contents + off);
-  br_slot = (long) hit_addr & 0x3;
+  br_slot = (intptr_t) hit_addr & 0x3;
   hit_addr -= br_slot;
   t0 = bfd_getl64 (hit_addr + 0);
   t1 = bfd_getl64 (hit_addr + 8);
@@ -738,7 +738,7 @@ elfNN_ia64_relax_brl (bfd_byte *contents, bfd_vma off)
   bfd_vma t0, t1, i0, i1, i2;
 
   hit_addr = (bfd_byte *) (contents + off);
-  hit_addr -= (long) hit_addr & 0x3;
+  hit_addr -= (intptr_t) hit_addr & 0x3;
   t0 = bfd_getl64 (hit_addr);
   t1 = bfd_getl64 (hit_addr + 8);
 
@@ -2602,13 +2602,6 @@ get_reloc_section (bfd *abfd,
   if (srel_name == NULL)
     return NULL;
 
-  BFD_ASSERT ((CONST_STRNEQ (srel_name, ".rela")
-	       && strcmp (bfd_get_section_name (abfd, sec),
-			  srel_name+5) == 0)
-	      || (CONST_STRNEQ (srel_name, ".rel")
-		  && strcmp (bfd_get_section_name (abfd, sec),
-			     srel_name+4) == 0));
-
   dynobj = ia64_info->root.dynobj;
   if (!dynobj)
     ia64_info->root.dynobj = dynobj = abfd;
@@ -3881,7 +3874,7 @@ elfNN_ia64_install_value (bfd_byte *hit_addr, bfd_vma v,
   switch (opnd)
     {
     case IA64_OPND_IMMU64:
-      hit_addr -= (long) hit_addr & 0x3;
+      hit_addr -= (intptr_t) hit_addr & 0x3;
       t0 = bfd_getl64 (hit_addr);
       t1 = bfd_getl64 (hit_addr + 8);
 
@@ -3910,7 +3903,7 @@ elfNN_ia64_install_value (bfd_byte *hit_addr, bfd_vma v,
       break;
 
     case IA64_OPND_TGT64:
-      hit_addr -= (long) hit_addr & 0x3;
+      hit_addr -= (intptr_t) hit_addr & 0x3;
       t0 = bfd_getl64 (hit_addr);
       t1 = bfd_getl64 (hit_addr + 8);
 
@@ -3935,7 +3928,7 @@ elfNN_ia64_install_value (bfd_byte *hit_addr, bfd_vma v,
       break;
 
     default:
-      switch ((long) hit_addr & 0x3)
+      switch ((intptr_t) hit_addr & 0x3)
 	{
 	case 0: shift =  5; break;
 	case 1: shift = 14; hit_addr += 3; break;

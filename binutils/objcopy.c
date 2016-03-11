@@ -1,6 +1,6 @@
 /* objcopy.c -- copy object file from input to output, optionally massaging it.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010
+   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011
    Free Software Foundation, Inc.
 
    This file is part of GNU Binutils.
@@ -1399,7 +1399,9 @@ copy_unknown_object (bfd *ibfd, bfd *obfd)
       ncopied += tocopy;
     }
 
-  chmod (bfd_get_filename (obfd), buf.st_mode);
+  /* We should at least to be able to read it back when copying an
+     unknown object in an archive.  */
+  chmod (bfd_get_filename (obfd), buf.st_mode | S_IRUSR);
   free (cbuf);
   return TRUE;
 }
@@ -2022,6 +2024,7 @@ copy_archive (bfd *ibfd, bfd *obfd, const char *output_target,
       struct stat buf;
       int stat_status = 0;
       bfd_boolean del = TRUE;
+      bfd_boolean ok_object;
 
       /* Create an output file for this member.  */
       output_name = concat (dir, "/",
@@ -2059,44 +2062,42 @@ copy_archive (bfd *ibfd, bfd *obfd, const char *output_target,
       l->obfd = NULL;
       list = l;
 
-      if (bfd_check_format (this_element, bfd_object))
-	{
-	  /* PR binutils/3110: Cope with archives
-	     containing multiple target types.  */
-	  if (force_output_target)
-	    output_bfd = bfd_openw (output_name, output_target);
-	  else
-	    output_bfd = bfd_openw (output_name, bfd_get_target (this_element));
+      ok_object = bfd_check_format (this_element, bfd_object);
+      if (!ok_object)
+	bfd_nonfatal_message (NULL, this_element, NULL,
+			      _("Unable to recognise the format of file"));
 
-	  if (output_bfd == NULL)
+      /* PR binutils/3110: Cope with archives
+	 containing multiple target types.  */
+      if (force_output_target || !ok_object)
+	output_bfd = bfd_openw (output_name, output_target);
+      else
+	output_bfd = bfd_openw (output_name, bfd_get_target (this_element));
+
+      if (output_bfd == NULL)
+	{
+	  bfd_nonfatal_message (output_name, NULL, NULL, NULL);
+	  status = 1;
+	  return;
+	}
+
+      if (ok_object)
+	{
+	  del = !copy_object (this_element, output_bfd, input_arch);
+
+	  if (del && bfd_get_arch (this_element) == bfd_arch_unknown)
+	    /* Try again as an unknown object file.  */
+	    ok_object = FALSE;
+	  else if (!bfd_close (output_bfd))
 	    {
 	      bfd_nonfatal_message (output_name, NULL, NULL, NULL);
+	      /* Error in new object file. Don't change archive.  */
 	      status = 1;
-	      return;
 	    }
-
- 	  del = ! copy_object (this_element, output_bfd, input_arch);
-
-	  if (! del
-	      || bfd_get_arch (this_element) != bfd_arch_unknown)
-	    {
-	      if (!bfd_close (output_bfd))
-		{
-		  bfd_nonfatal_message (output_name, NULL, NULL, NULL);
-		  /* Error in new object file. Don't change archive.  */
-		  status = 1;
-		}
-	    }
-	  else
-	    goto copy_unknown_element;
 	}
-      else
-	{
-	  bfd_nonfatal_message (NULL, this_element, NULL,
-				_("Unable to recognise the format of file"));
 
-	  output_bfd = bfd_openw (output_name, output_target);
-copy_unknown_element:
+      if (!ok_object)
+	{
 	  del = !copy_unknown_object (this_element, output_bfd);
 	  if (!bfd_close_all_done (output_bfd))
 	    {
@@ -3196,7 +3197,6 @@ copy_main (int argc, char *argv[])
   struct section_list *p;
   struct stat statbuf;
   const bfd_arch_info_type *input_arch = NULL;
-  struct dwarf_debug_section *d;
 
   while ((c = getopt_long (argc, argv, "b:B:i:I:j:K:N:s:O:d:F:L:G:R:SpgxXHhVvW:w",
 			   copy_options, (int *) 0)) != EOF)
@@ -3911,22 +3911,6 @@ copy_main (int argc, char *argv[])
   if (tmpname == NULL)
     fatal (_("warning: could not create temporary file whilst copying '%s', (error: %s)"),
 	   input_filename, strerror (errno));
-
-  switch (do_debug_sections)
-    {
-    case compress:
-      for (d = dwarf_debug_sections; d->uncompressed_name; d++)
-	add_section_rename (d->uncompressed_name, d->compressed_name,
-			    (flagword) -1);
-      break;
-    case decompress:
-      for (d = dwarf_debug_sections; d->uncompressed_name; d++)
-	add_section_rename (d->compressed_name, d->uncompressed_name,
-			    (flagword) -1);
-      break;
-    default:
-      break;
-    }
 
   copy_file (input_filename, tmpname, input_target, output_target, input_arch);
   if (status == 0)
