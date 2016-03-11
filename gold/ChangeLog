@@ -1,3 +1,128 @@
+2010-01-13  Ian Lance Taylor  <iant@google.com>
+
+	Bring over from mainline:
+	2010-01-04  Ian Lance Taylor  <iant@google.com>
+
+	PR 10980
+	* options.h (class General_options): Add --add-needed and
+	--copy-dt-needed-entries.  Tweak --as-needed help entry.
+	* object.cc (Input_objects::check_dynamic_dependencies): Give an
+	error if --copy-dt-needed-entries aka --add-needed is used and
+	would cause a change in behaviour.
+
+2010-01-13  Ian Lance Taylor  <iant@google.com>
+
+	Bring over from mainline:
+	2010-01-07  Ian Lance Taylor  <iant@google.com>
+
+	PR 11042
+	* copy-relocs.cc (Copy_relocs::emit_copy_reloc): Mark the dynamic
+	object as needed.
+
+2010-01-13  Ian Lance Taylor  <iant@google.com>
+
+	Bring over from mainline:
+	2010-01-08  Ian Lance Taylor  <iant@google.com>
+
+	PR 11072
+	* layout.cc (Layout::include_section): Remove .gnu_debuglink
+	sections.
+
+2009-11-06  Ian Lance Taylor  <iant@google.com>
+
+	Bring over from mainline:
+	2009-10-16  Doug Kwan  <dougkwan@google.com>
+
+	* dynobj.cc (Versions::Versions): Initialize version_script_.
+	Only insert base version symbol definition for a shared object
+	if version script defines any version versions.
+	(Versions::define_base_version): New method definition.
+	(Versions::add_def): Check that base version is not needed.
+	(Versions::add_need): Define base version lazily.
+	* dynobj.h (Versions::define_base_version): New method declaration.
+	(Versions::needs_base_version_): New data member declaration.
+
+2009-11-06  Ian Lance Taylor  <iant@google.com>
+
+	PR 10876
+	* defstd.cc (in_segment): Set only_if_ref true for "end".
+
+2009-11-05  Ian Lance Taylor  <iant@google.com>
+
+	PR 10910
+	* output.cc (Output_segment::add_output_section): Add missing
+	return statement.
+
+2009-11-04  Ian Lance Taylor  <iant@google.com>
+
+	PR 10880
+	* object.h (class Object): Add is_needed and set_is_needed
+	methods.  Add is_needed_ field.  Make bool fields into bitfields.
+	* symtab.cc (Symbol_table::set_dynsym_indexes): If a symbol is
+	defined in a dynamic object and referenced by a regular object,
+	set is_needed for the dynamic object.
+	* layout.cc (Layout::finish_dynamic_section): Don't add DT_NEEDED
+	if the file is marked with as_needed and it is not needed.
+
+2009-11-04  Ian Lance Taylor  <iant@google.com>
+
+	PR 10887
+	* arm.cc (Target_arm::do_finalize_sections): Don't add dynamic
+	tags if data is discarded by linker script.
+	* i386.cc (Target_i386::do_finalize_sections): Likewise.
+	* powerpc.cc (Target_powerpc::do_finalize_sections): Likewise.
+	* sparc.cc (Target_sparc::do_finalize_sections): Likewise.
+	* x86_64.cc (Target_x86_64::do_finalize_sections): Likewise.
+
+2009-11-04  Ian Lance Taylor  <iant@google.com>
+
+	* layout.cc (Layout::get_output_section): Add is_interp and
+	is_dynamic_linker_section parameters.  Change all callers.
+	(Layout::choose_output_section): Likewise.
+	(Layout::make_output_section): Likewise.
+	(Layout::add_output_section_data): Add is_dynamic_linker_section
+	parameter.  Change all callers.
+	* layout.h (class Layout): Update declarations.
+	* output.h (class Output_section): Add is_interp, set_is_interp,
+	is_dynamic_linker_section, set_is_dynamic_linker_section methods.
+	Add is_interp_, is_dynamic_linker_section_ fields.  Change
+	generate_code_fills_at_write_ to a bitfield.
+	* output.cc (Output_section::Output_sections): Initialize new
+	fields.
+	(Output_segment::add_output_section): Add do_sort parameter.
+	Change all callers.
+
+2009-11-03  Ian Lance Taylor  <iant@google.com>
+
+	PR 10860
+	* options.h (class General_options): Add --warn-common.
+	* resolve.cc (Symbol_table::resolve): Handle --warn-common when
+	merging two common symbols.
+	(Symbol_table::should_override): Handle --warn-common when merging
+	a common symbol with a defined symbol.  Use report_resolve_problem
+	for multiple definitions.
+	(Symbol_table::report_resolve_problem): New function.
+	* symtab.h (class Symbol_table): Declare report_resolve_problem.
+
+2009-11-03  Ian Lance Taylor  <iant@google.com>
+
+	PR 10893
+	* defstd.cc (in_section): Add entries for __rel_iplt_start,
+	__rel_iplt_end, __rela_iplt_start, __rela_iplt_end, and __stack.
+
+2009-11-03  Ian Lance Taylor  <iant@google.com>
+
+	PR 10895
+	* po/Make-in ($(srcdir)/$(PACKAGE).pot): Pass -C and
+	--msgid-bugs-address.
+	(install-pdf): New target.
+	(install-data_yes): Look up one directory to find mkinstalldirs.
+
+2009-10-16  Doug Kwan  <dougkwan@google.com>
+
+	* output.cc (Output_segment::set_section_list_address): Cast
+	expressions to unsigned long long type to avoid format warnings.
+
 2009-10-15  Ian Lance Taylor  <iant@google.com>
 
 	* script.cc (Script_options::add_symbol_assignment): Always add a

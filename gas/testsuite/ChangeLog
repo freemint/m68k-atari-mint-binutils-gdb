@@ -1,3 +1,54 @@
+2010-02-08  Christophe Lyon  <christophe.lyon@st.com>
+
+	* gas/arm/branch-reloc.s, gas/arm/branch-reloc.d,
+	gas/arm/branch-reloc.l: New tests and expected results with all
+	variants of call: ARM/Thumb, local/global, inter/intra-section,
+	using BL/BLX.
+
+2010-02-05  Christophe Lyon  <christophe.lyon@st.com>
+
+	* gas/arm/arm-it-auto.d, gas/arm/bl-local-v4t.d,
+	gas/arm/blx-local.d, gas/arm/thumb-w-good.d: Update expected
+	results.
+
+2010-01-30  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* gas/ppc/xcoff-ref-1.s, gas/ppc/xcoff-ref-1.l: New test.
+	* gas/ppc/aix.exp: Run it.
+
+2010-01-29  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	* gas/pe/section-align-1.d: Generalise to pass on more targets.
+	* gas/pe/section-align-2.d: Likewise.
+
+2010-01-27  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	Backport from trunk:
+	* gas/pe/section-align-1.s: New test source file.
+	* gas/pe/section-align-1.d: Likewise control script.
+	* gas/pe/section-align-2.s: Likewise ...
+	* gas/pe/section-align-2.d: ... and likewise.
+	* gas/pe/pe.exp: Invoke new testcases.
+
+2009-12-15  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from trunk:
+	2009-12-07  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/11037
+	* gas/i386/intelpic.s: Add testcases.
+	* gas/i386/intelpic.d: Updated.
+
+	2009-10-28  Alan Modra  <amodra@bigpond.net.au>
+
+	* gas/i386/intelpic.d: Correct.
+
+	2009-10-08  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/10704
+	* gas/i386/intelpic.s: Add 2 new tests.
+	* gas/i386/intelpic.d: Updated.
+
 2009-10-02  Peter Bergner  <bergner@vnet.ibm.com>
 
 	* gas/ppc/476.s: New test.

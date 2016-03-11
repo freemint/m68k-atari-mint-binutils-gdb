@@ -1,3 +1,95 @@
+2010-03-01  Tristan Gingold  <gingold@adacore.com>
+
+	* config/tc-score7.c (s7_frag_check): Add ATTRIBUTE_UNUSED.
+
+2010-02-08  Christophe Lyon  <christophe.lyon@st.com>
+
+	* config/tc-arm.c (md_pcrel_from_section): Keep base to zero for
+	non-local branches (BFD_RELOC_THUMB_PCREL_BRANCH23,
+	BFD_RELOC_THUMB_PCREL_BLX, BFD_RELOC_ARM_PCREL_BLX,
+	BFD_RELOC_ARM_PCREL_CALL)
+
+2010-02-10  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* config/tc-ppc.c (md_show_usage): Add -mpwr4, -mpwr5, -mpwr5x,
+	-mpwr6 and -mpwr7.
+
+2010-01-30  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* write.h (fix_at_start): Declare.
+	* write.c (fix_new_internal): Add at_beginning parameter.
+	Use it instead of REVERSE_SORT_RELOCS.  Fix the handling of
+	seg_fix_tailP for the at_beginning/REVERSE_SORT_RELOCS case.
+	(fix_new, fix_new_exp): Update accordingly.
+	(fix_at_start): New function.
+	* config/tc-ppc.c (md_pseudo_table): Add .ref to the OBJ_XCOFF section.
+	(ppc_ref): New function, for OBJ_XCOFF.
+	(md_apply_fix): Handle BFD_RELOC_NONE for OBJ_XCOFF.
+	* config/te-i386aix.h (REVERSE_SORT_RELOCS): Remove #undef.
+
+2010-01-27  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	Backport from trunk:
+	* NEWS: Mention new feature.
+	* config/obj-coff.c (obj_coff_section): Accept digits and use
+	to override default section alignment power if specified.
+	* doc/as.texinfo (.section directive): Update documentation.
+
+2010-01-21  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* config/te-solaris.h (DWARF2_EH_FRAME_READ_ONLY): Make read-only
+	on 64-bit Solaris/x86.
+	Include obj-format.h earlier.
+
+2010-01-12  Alan Modra  <amodra@gmail.com>
+
+	PR 11122
+	* listing.c (print_source): Add one to line number.
+
+2009-12-24  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+
+        Backport from trunk:
+	2009-12-21  Ramana Radhakrishnan  <ramana.radhakrishnan@arm.com>
+	            Richard Earnshaw  <richard.earnshaw@arm.com>
+
+        * config/tc-arm.c (encode_thumb2_b_bl_offset): New. Refactored
+        from md_apply_fix.
+        (md_apply_fix): Fixup range checks for Thumb2 version
+        of unconditional calls. Call encode_thumb2_b_bl_offset for
+        unconditional branches / function calls.
+
+2009-12-15  H.J. Lu  <hongjiu.lu@intel.com>
+
+	Backport from trunk:
+	2009-12-07  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR gas/11037
+	* expr.c (resolve_expression): Call symbol_same_p to check
+	if 2 symbols are the same.
+
+	* symbols.c (symbol_same_p): New.
+	* symbols.h (symbol_same_p): Likewise.
+
+2009-12-03  Nick Clifton  <nickc@redhat.com>
+
+	PR gas/11011
+	Import this patch from the mainline:
+	2009-10-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* as.h (know): Don't define as empty.
+
+2009-10-28  Alan Modra  <amodra@bigpond.net.au>
+
+	PR gas/10856
+	* expr.c (resolve_expression): Only add "left" value to O_symbol
+	expression when the symbol is undefined and different from the
+	original symbol.  Simplify negative logic.
+
+2009-10-18  Matthias Klose  <doko@ubuntu.com>
+
+	* config/tc-arm.c (make_mapping_symbol): Add braces to avoid empty body
+	in release builds.
+
 2009-10-13  Alan Modra  <amodra@bigpond.net.au>
 	    H.J. Lu  <hongjiu.lu@intel.com>
 

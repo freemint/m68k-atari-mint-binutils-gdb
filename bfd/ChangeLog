@@ -1,3 +1,151 @@
+2010-03-03  Tristan Gingold  <gingold@adacore.com>
+
+	* Makefile.am (RELEASE): Unset.
+	* Makefile.in: Regenerate.
+
+2010-03-01  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.20.1
+	* Makefile.am (RELEASE): Set.
+	* configure, Makefile.in: Regenerate.
+
+2010-02-19  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+
+	2010-01-19  Matthew Gretton-Dann  <matthew.gretton-dann@arm.com>
+	* elf32-arm.c (elf32_arm_howto_table_1): Correct bitsize of
+	R_ARM_THM_CALL entry.
+	(elf32_arm_final_link_relocate): Correct calculation of
+	reloc_signed_max when doing a R_ARM_THM_CALL, R_ARM_THM_XPC22,
+	or R_ARM_THM_JUMP24 relocation.
+
+2010-02-17  Dave Korn  <dave.korn.cygwin@gmail.com>
+
+	PR binutils/11280
+	* configure.host (*-*-solaris2.11):  Add host define to select
+	valid default code page for windres/windmc on solaris.
+
+2010-01-30  Richard Sandiford  <r.sandiford@uk.ibm.com>
+
+	* coff-rs6000.c (xcoff_howto_table): Change size to 0 and bitsize to 1.
+	(_bfd_xcoff_reloc_type_lookup): Handle BFD_RELOC_NONE.
+	* coff64-rs6000.c (xcoff64_howto_table): Change size to 0 and
+	bitsize to 1.
+	(xcoff64_reloc_type_lookup): Handle BFD_RELOC_NONE.
+
+2010-01-27  Alan Modra  <amodra@gmail.com>
+
+	PR ld/11217
+	* elf64-ppc.c (struct ppc_link_hash_table): Add toc_bfd, toc_first_sec.
+	(ppc64_elf_setup_section_lists): Init them.
+	(ppc64_elf_next_toc_section): Don't partition multi-toc between .got
+	and .toc on the same input file.
+	(ppc64_elf_relocate_section): Correct GOT entry offset.
+
+2010-01-25  Alan Modra  <amodra@gmail.com>
+
+	PR ld/11217
+	* elf64-ppc.c (ppc64_elf_tls_optimize): Optimize tls sequences
+	with relocations against undefined weak symbols.
+	(ppc64_elf_relocate_section): Don't optimize calls to undefined
+	weak functions if the symbol is dynamic.
+	(ppc64_elf_relocate_section): Edit tprel tls sequences.
+	* elf32-ppc.c (ppc_elf_relocate_section): Likewise.
+	(_bfd_elf_ppc_at_tprel_transform): New function.
+	* bfd-in.h (_bfd_elf_ppc_at_tprel_transform): Declare.
+	* bfd-in2.h: Regenerate.
+
+2010-01-25  Alan Modra  <amodra@gmail.com>
+
+	2009-12-11  Nick Clifton  <nickc@redhat.com>
+	* elf32-ppc.c: Fix shadowed variable warnings.
+	* elf64-ppc.c: Likewise.
+
+	2009-11-18  Alan Modra  <amodra@bigpond.net.au>
+	* bfd-in.h (_bfd_elf_ppc_at_tls_transform): Declare.
+	* bfd-in2.h: Regenerate.
+	* elf64-ppc.c (ppc64_elf_relocate_section): Move code for R_PPC64_TLS
+	insn optimisation to..
+	* elf32-ppc.c (_bfd_elf_ppc_at_tls_transform): ..here.  New function.
+	(ppc_elf_relocate_section): Use it.
+
+2010-01-11  Alan Modra  <amodra@gmail.com>
+
+	PR 11103
+	* dwarf1.c (parse_die): Correct FORM_STRING data pointer increment.
+
+2010-01-11  Alan Modra  <amodra@gmail.com>
+
+	PR 6832
+	* dwarf2.c (struct comp_unit): Add sec_info_ptr.
+	(find_abstract_instance_name): Use it.
+	(parse_comp_unit): Set it.
+
+2009-12-21  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c: Delete my email address.
+
+2009-12-17  Alan Modra  <amodra@bigpond.net.au>
+
+	PR ld/11088
+	* elf32-ppc.c (update_plt_info): Clear sec here when addend is
+	less than 32768..
+	(ppc_elf_check_relocs): ..rather than doing so here.  Ignore new
+	relax relocs.
+	(ppc_elf_gc_sweep_hook): Don't segfault when symbol hiding has
+	removed plt_entry records.
+	(ppc_elf_tls_setup): Handle PIE calls to __tls_get_addr correctly.
+	(ppc_elf_tls_optimize): Likewise.  Also dec __tls_get_addr refcount
+	when optimizing code using new tlsgd and tlsld marker relocs.
+	(ppc_elf_relax_section): Differentiate relaxed PLTREL24 relocs
+	from ADDR24 relocs using plt or glink.  Don't clear the addend
+	for R_PPC_RELAX_PLTREL24.
+	(ppc_elf_relocate_section): Correctly handle addends on relaxed
+	PLTREL24 relocs.
+
+2009-12-17  Alan Modra  <amodra@bigpond.net.au>
+
+	PR ld/11088
+	* elf64-ppc.c (ppc64_elf_gc_sweep_hook): Don't abort if symbol
+	hiding has nulled out plt.plist.
+
+2009-12-03  Alan Modra  <amodra@bigpond.net.au>
+
+	PR ld/11047
+	* elf32-ppc.c (ppc_elf_relocate_section): Delete __tls_get_addr
+	symbol reference from relocs belonging to calls that are
+	optimized away.
+	* elf64-ppc.c (ppc64_elf_relocate_section): Likewise.
+
+2009-11-17  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* elf32-spu.c (struct spu_link_hash_table): Remove overlay_fixed,
+	reserved, and extra_stack_space members.
+	(spu_elf_auto_overlay): Use auto_overlay_fixed, auto_overlay_reserved,
+	and extra_stack_space members of htab->params instead.
+
+2009-11-03  Alan Modra  <amodra@bigpond.net.au>
+	    Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* elf32-spu.c (mark_functions_via_relocs): Handle non-branch relocs
+	(jump tables or other references to code labels) as well.
+
+2009-10-20  Alan Modra  <amodra@bigpond.net.au>
+
+	PR binutils/10802
+	* opncls.c (_maybe_make_executable): Make DYNAMIC files executable.
+
+2009-10-19  Hans-Peter Nilsson  <hp@axis.com>
+
+	* elf32-cris.c (cris_elf_relocate_section) <case R_CRIS_32_DTPREL>:
+	Don't subtract the size of the TLS block for non-shared objects
+	from the relocation.
+
+2009-10-16  Tristan Gingold  <gingold@adacore.com>
+
+	* configure.in: Bump version to 2.20.0
+	* Makefile.am (RELEASE): Unset.
+	* configure, Makefile.in: Regenerate.
+
 2009-10-16  Tristan Gingold  <gingold@adacore.com>
 
 	* configure.in: Bump version to 2.20
