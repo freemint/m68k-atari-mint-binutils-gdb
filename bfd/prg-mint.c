@@ -494,7 +494,7 @@ link_write_traditional_syms (bfd *abfd, struct bfd_link_info *info)
 
   myinfo->dri_symtab_size = 0;
 
-  for (input_bfd = info->input_bfds; input_bfd != NULL; input_bfd = input_bfd->link_next)
+  for (input_bfd = info->input_bfds; input_bfd != NULL; input_bfd = input_bfd->link.next)
     {
       bfd_size_type sym_count = obj_aout_external_sym_count (input_bfd);
       char *strings = obj_aout_external_strings (input_bfd);
@@ -966,7 +966,7 @@ MY (bfd_final_link) (bfd *abfd, struct bfd_link_info *info)
   struct bfd_link_hash_table *hash = info->hash;
   enum bfd_link_strip original_strip = info->strip;
 
-  if (info->relocatable)
+  if (bfd_link_relocatable (info))
     {
       _bfd_error_handler ("%B: relocatable output is not supported by format %s",
 	abfd, bfd_get_target (abfd));
