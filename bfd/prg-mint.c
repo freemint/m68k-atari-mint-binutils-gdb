@@ -237,16 +237,16 @@ struct dri_symbol
    It will be used int aoutx.h.  */
 
 static bfd_reloc_status_type
-m68kmint_prg_final_link_relocate_rel (reloc_howto_type *howto,
-				      bfd *input_bfd,
-				      asection *input_section,
-				      bfd_byte *contents,
-				      bfd_vma address,
-				      bfd_vma value,
-				      bfd_vma addend,
-				      struct reloc_std_external *rel);
+MY (final_link_relocate_rel) (reloc_howto_type *howto,
+			      bfd *input_bfd,
+			      asection *input_section,
+			      bfd_byte *contents,
+			      bfd_vma address,
+			      bfd_vma value,
+			      bfd_vma addend,
+			      struct reloc_std_external *rel);
 
-#define MY_final_link_relocate_rel m68kmint_prg_final_link_relocate_rel
+#define MY_final_link_relocate_rel MY (final_link_relocate_rel)
 
 /* The following include contains the definitions for the NAME(...) functions.  */
 
@@ -297,7 +297,7 @@ struct mint_internal_info
    defined later in aout-target.h.  */
 
 static const bfd_target *
-m68kmint_prg_callback (bfd *abfd);
+MY (callback) (bfd *abfd);
 
 static void
 MY_final_link_callback (bfd *abfd,
@@ -305,14 +305,14 @@ MY_final_link_callback (bfd *abfd,
 			file_ptr *pdreloff,
 			file_ptr *psymoff);
 
-extern const bfd_target m68kmint_prg_vec;
+extern const bfd_target MY (vec);
 
 /* Initialize a new BFD using our file format.  */
 
-#define MY_mkobject m68kmint_prg_mkobject
+#define MY_mkobject MY (mkobject)
 
 static bfd_boolean
-m68kmint_prg_mkobject (bfd *abfd)
+MY (mkobject) (bfd *abfd)
 {
   struct mint_internal_info *myinfo;
 
@@ -330,10 +330,10 @@ m68kmint_prg_mkobject (bfd *abfd)
 
 /* Finish up the reading of an a.out file header.  */
 
-#define MY_object_p m68kmint_prg_object_p
+#define MY_object_p MY (object_p)
 
 static const bfd_target *
-m68kmint_prg_object_p (bfd *abfd)
+MY (object_p) (bfd *abfd)
 {
   struct external_exec exec_bytes;	/* Raw exec header from file.  */
   struct internal_exec exec;		/* Cleaned-up exec header.  */
@@ -372,7 +372,7 @@ m68kmint_prg_object_p (bfd *abfd)
     }
 
   /* Initialize this BFD with the exec values.  */
-  target = NAME (aout, some_aout_object_p) (abfd, &exec, m68kmint_prg_callback);
+  target = NAME (aout, some_aout_object_p) (abfd, &exec, MY (callback));
 
   /* Allocate our private BFD data.  */
   myinfo = bfd_zalloc (abfd, sizeof (*myinfo));
@@ -420,10 +420,10 @@ m68kmint_prg_object_p (bfd *abfd)
 /* Free all information we have cached for this BFD.  We can always
    read it again later if we need it.  */
 
-#define MY_bfd_free_cached_info m68kmint_prg_bfd_free_cached_info
+#define MY_bfd_free_cached_info MY (bfd_free_cached_info)
 
 static bfd_boolean
-m68kmint_prg_bfd_free_cached_info (bfd *abfd)
+MY (bfd_free_cached_info) (bfd *abfd)
 {
   struct mint_internal_info *myinfo = obj_aout_ext (abfd);
 
@@ -957,10 +957,10 @@ fill_tparel (bfd *abfd)
    offsets in the output file.  And we need to malloc some internal
    buffers.  */
 
-#define MY_bfd_final_link m68kmint_prg_bfd_final_link
+#define MY_bfd_final_link MY (bfd_final_link)
 
 static bfd_boolean
-m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
+MY (bfd_final_link) (bfd *abfd, struct bfd_link_info *info)
 {
   struct mint_internal_info *myinfo = obj_aout_ext (abfd);
   struct bfd_link_hash_table *hash = info->hash;
@@ -1073,15 +1073,15 @@ m68kmint_prg_bfd_final_link (bfd *abfd, struct bfd_link_info *info)
 
 /* Copy private BFD header information from the input BFD.  */
 
-#define MY_bfd_copy_private_header_data m68kmint_prg_bfd_copy_private_header_data
+#define MY_bfd_copy_private_header_data MY (bfd_copy_private_header_data)
 
 static bfd_boolean
-m68kmint_prg_bfd_copy_private_header_data (bfd *ibfd, bfd *obfd)
+MY (bfd_copy_private_header_data) (bfd *ibfd, bfd *obfd)
 {
   (void)obfd; /* Unused.  */
 
   /* We can only copy BFD files using our own file format.  */
-  if (ibfd->xvec != &m68kmint_prg_vec)
+  if (ibfd->xvec != &MY (vec))
     {
       _bfd_error_handler ("%B: cannot convert from format %s to format %s",
 	ibfd, bfd_get_target (ibfd), bfd_get_target (obfd));
@@ -1095,16 +1095,16 @@ m68kmint_prg_bfd_copy_private_header_data (bfd *ibfd, bfd *obfd)
 /* Copy backend specific data from one object module to another.
    This function is used by objcopy and strip.  */
 
-#define MY_bfd_copy_private_bfd_data m68kmint_prg_bfd_copy_private_bfd_data
+#define MY_bfd_copy_private_bfd_data MY (bfd_copy_private_bfd_data)
 
 static bfd_boolean
-m68kmint_prg_bfd_copy_private_bfd_data (bfd *ibfd, bfd *obfd)
+MY (bfd_copy_private_bfd_data) (bfd *ibfd, bfd *obfd)
 {
   struct mint_internal_info *myinfo_in;
   struct mint_internal_info *myinfo_out;
 
   /* obfd uses our file format, ibfd may be foreign.  */
-  if (ibfd->xvec != &m68kmint_prg_vec)
+  if (ibfd->xvec != &MY (vec))
     return TRUE;
 
   myinfo_in = obj_aout_ext (ibfd);
@@ -1131,15 +1131,15 @@ m68kmint_prg_bfd_copy_private_bfd_data (bfd *ibfd, bfd *obfd)
 
 /* Merge private BFD information from an input BFD to the output BFD when linking.  */
 
-#define MY_bfd_merge_private_bfd_data m68kmint_prg_merge_private_bfd_data
+#define MY_bfd_merge_private_bfd_data MY (merge_private_bfd_data)
 
 static bfd_boolean
-m68kmint_prg_merge_private_bfd_data (bfd *ibfd, bfd *obfd)
+MY (merge_private_bfd_data) (bfd *ibfd, bfd *obfd)
 {
   (void)obfd; /* Unused.  */
 
   /* Our file format cannot be used as linker input.  */
-  if (ibfd->xvec == &m68kmint_prg_vec)
+  if (ibfd->xvec == &MY (vec))
     {
       _bfd_error_handler ("%B: file format %s cannot be used as linker input",
 	ibfd, bfd_get_target (ibfd));
@@ -1271,14 +1271,14 @@ find_symbol_name (reloc_howto_type *howto, bfd *input_bfd,
    the relocated offset in myinfo->relocs[] for further processing.  */
 
 static bfd_reloc_status_type
-m68kmint_prg_final_link_relocate_rel (reloc_howto_type *howto,
-				      bfd *input_bfd,
-				      asection *input_section,
-				      bfd_byte *contents,
-				      bfd_vma address,
-				      bfd_vma value,
-				      bfd_vma addend,
-				      struct reloc_std_external *rel)
+MY (final_link_relocate_rel) (reloc_howto_type *howto,
+			      bfd *input_bfd,
+			      asection *input_section,
+			      bfd_byte *contents,
+			      bfd_vma address,
+			      bfd_vma value,
+			      bfd_vma addend,
+			      struct reloc_std_external *rel)
 {
   bfd_vma relocation;
   bfd *output_bfd = input_section->output_section->owner;
@@ -1547,10 +1547,10 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
    Section contents have already been written.  We write the
    file header, symbols, and relocation.  */
 
-#define MY_write_object_contents m68kmint_prg_write_object_contents
+#define MY_write_object_contents MY (write_object_contents)
 
 static bfd_boolean
-m68kmint_prg_write_object_contents (bfd *abfd)
+MY (write_object_contents) (bfd *abfd)
 {
   struct external_exec exec_bytes;
   struct internal_exec *execp = exec_hdr (abfd);
@@ -1608,10 +1608,10 @@ m68kmint_prg_write_object_contents (bfd *abfd)
 
 /* Print private BFD data. Used by objdump -p.  */
 
-#define MY_bfd_print_private_bfd_data m68kmint_prg_print_private_bfd_data
+#define MY_bfd_print_private_bfd_data MY (print_private_bfd_data)
 
 static bfd_boolean
-m68kmint_prg_print_private_bfd_data (bfd *abfd, void *ptr)
+MY (print_private_bfd_data) (bfd *abfd, void *ptr)
 {
   FILE *file = (FILE *) ptr;
   struct mint_internal_info *myinfo = obj_aout_ext (abfd);
@@ -1654,7 +1654,7 @@ m68kmint_prg_print_private_bfd_data (bfd *abfd, void *ptr)
 
 #define MY_get_section_contents aout_32_get_section_contents
 
-/* The following include will define m68kmint_prg_vec
+/* The following include will define MY (vec)
    and a default implementation for all the MY_ functions
    not overriden here.  */
 
@@ -1668,7 +1668,7 @@ bfd_m68kmint_set_extended_flags (bfd *abfd, flagword prg_flags)
 {
   struct mint_internal_info *myinfo;
 
-  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
+  BFD_ASSERT(abfd->xvec == &MY (vec));
   myinfo = obj_aout_ext (abfd);
   BFD_ASSERT(myinfo != NULL);
 
@@ -1685,7 +1685,7 @@ bfd_m68kmint_set_stack_size (bfd *abfd, bfd_signed_vma stack_size)
 {
   struct mint_internal_info *myinfo;
 
-  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
+  BFD_ASSERT(abfd->xvec == &MY (vec));
   myinfo = obj_aout_ext (abfd);
   BFD_ASSERT(myinfo != NULL);
 
@@ -1705,7 +1705,7 @@ bfd_m68kmint_add_tpa_relocation_entry (bfd *abfd, bfd_vma address)
 {
   struct mint_internal_info *myinfo;
 
-  BFD_ASSERT(abfd->xvec == &m68kmint_prg_vec);
+  BFD_ASSERT(abfd->xvec == &MY (vec));
   myinfo = obj_aout_ext (abfd);
   BFD_ASSERT(myinfo != NULL);
 
