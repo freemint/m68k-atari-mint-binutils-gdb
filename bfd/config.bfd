@@ -903,7 +903,7 @@ case "${targ}" in
     # targ_cflags=-DSTAT_FOR_EXEC
     ;;
   m68*-*-mint*)
-    targ_defvec=aout0_big_vec
+    targ_defvec=aout0_be_vec
     targ_selvecs=m68kmint_prg_vec
     targ_underscore=yes
     ;;
