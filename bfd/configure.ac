@@ -123,7 +123,7 @@ if test $want_elf_stt_common = true; then
     [Define if we may generate symbols with ELF's STT_COMMON type])
 fi
 
-ACX_PKGVERSION([GNU Binutils for MiNT 20141017])
+ACX_PKGVERSION([GNU Binutils for MiNT 20160320])
 ACX_BUGURL([http://www.sourceware.org/bugzilla/])
 
 AM_BINUTILS_WARNINGS
