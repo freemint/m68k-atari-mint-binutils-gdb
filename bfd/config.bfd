@@ -993,6 +993,11 @@ case "${targ}" in
     # targ_selvecs=m68kmach3_vec
     # targ_cflags=-DSTAT_FOR_EXEC
     ;;
+  m68*-*-mint*)
+    targ_defvec=aout0_be_vec
+    targ_selvecs=m68k_aout_mintprg_vec
+    targ_underscore=yes
+    ;;
   m68*-hp*-netbsd*)
     targ_defvec=m68k_aout_4knbsd_vec
     targ_selvecs="m68k_aout_nbsd_vec m68k_aout_hp300bsd_vec sparc_aout_sunos_be_vec"

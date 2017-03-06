@@ -1849,6 +1849,11 @@ emit_stringtab (bfd *abfd, struct bfd_strtab_hash *tab)
   bfd_byte buffer[BYTES_IN_WORD];
   bfd_size_type amt = BYTES_IN_WORD;
 
+  /* The MiNT backend writes past the string table.  It therefore has to
+     know about the table size.  */
+  obj_aout_external_string_size (abfd) = _bfd_stringtab_size (tab) +
+    BYTES_IN_WORD;
+
   /* The string table starts with the size.  */
   PUT_WORD (abfd, _bfd_stringtab_size (tab) + BYTES_IN_WORD, buffer);
   if (bfd_bwrite ((void *) buffer, amt, abfd) != amt)
@@ -4275,10 +4280,17 @@ aout_link_input_section_std (struct aout_final_link_info *flaginfo,
 		(flaginfo->info, name, input_bfd, input_section, r_addr, TRUE);
 	    }
 
+#ifdef MY_final_link_relocate_rel
+	  r = MY_final_link_relocate_rel (howto,
+					  input_bfd, input_section,
+					  contents, r_addr, relocation,
+					  (bfd_vma) 0, rel);
+#else
 	  r = MY_final_link_relocate (howto,
 				      input_bfd, input_section,
 				      contents, r_addr, relocation,
 				      (bfd_vma) 0);
+#endif
 	}
 
       if (r != bfd_reloc_ok)

@@ -728,6 +728,7 @@ ALL_EMULATION_SOURCES = \
 	em68kelf.c \
 	em68kelfnbsd.c \
 	em68klinux.c \
+	em68kmint.c \
 	em68knbsd.c \
 	em68kpsos.c \
 	em88kbcs.c \
@@ -1399,6 +1400,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kelfnbsd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68klinux.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kmint.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68knbsd.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em68kpsos.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/em88kbcs.Po@am__quote@
@@ -3139,6 +3141,10 @@ em68kelfnbsd.c: $(srcdir)/emulparams/m68kelfnbsd.sh \
 
 em68klinux.c: $(srcdir)/emulparams/m68klinux.sh \
   $(srcdir)/emultempl/linux.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
+
+em68kmint.c: $(srcdir)/emulparams/m68kmint.sh \
+  $(srcdir)/emultempl/generic.em $(srcdir)/emultempl/mint.em \
+  $(srcdir)/scripttempl/m68kmint.sc ${GEN_DEPENDS}
 
 em68knbsd.c:	$(srcdir)/emulparams/m68knbsd.sh \
   $(srcdir)/emultempl/generic.em $(srcdir)/scripttempl/aout.sc ${GEN_DEPENDS}
