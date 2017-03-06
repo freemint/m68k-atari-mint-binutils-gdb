@@ -365,7 +365,7 @@ MY (object_p) (bfd *abfd)
   NAME (aout, swap_exec_header_in) (abfd, &exec_bytes, &exec);
 
   /* Check a.out magic value.  */
-  if (N_BADMAG (exec))
+  if (N_BADMAG (&exec))
     {
       bfd_set_error (bfd_error_wrong_format);
       return NULL;
@@ -1134,9 +1134,9 @@ MY (bfd_copy_private_bfd_data) (bfd *ibfd, bfd *obfd)
 #define MY_bfd_merge_private_bfd_data MY (merge_private_bfd_data)
 
 static bfd_boolean
-MY (merge_private_bfd_data) (bfd *ibfd, bfd *obfd)
+MY (merge_private_bfd_data) (bfd *ibfd, struct bfd_link_info *info)
 {
-  (void)obfd; /* Unused.  */
+  (void)info; /* Unused.  */
 
   /* Our file format cannot be used as linker input.  */
   if (ibfd->xvec == &MY (vec))
@@ -1147,7 +1147,7 @@ MY (merge_private_bfd_data) (bfd *ibfd, bfd *obfd)
       return FALSE;
     }
 
-  return TRUE; /* _bfd_generic_bfd_merge_private_bfd_data (ibfd, obfd); */
+  return TRUE; /* _bfd_generic_bfd_merge_private_bfd_data (ibfd, info); */
 }
 
 /* Find out the symbol name.  */
@@ -1432,10 +1432,10 @@ write_tparel (bfd *abfd, struct internal_exec *execp)
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
 
   if (myinfo->dri_symtab_size == 0)
-    myinfo->tparel_pos = N_STROFF (*execp)
+    myinfo->tparel_pos = N_STROFF (execp)
       + obj_aout_external_string_size (abfd);
   else
-    myinfo->tparel_pos = N_SYMOFF (*execp)
+    myinfo->tparel_pos = N_SYMOFF (execp)
       + myinfo->dri_symtab_size;
 
   if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0)
@@ -1474,7 +1474,7 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
   if (myinfo->dri_symtab_size != 0)
     symtab_size = myinfo->dri_symtab_size;
   else
-    symtab_size = myinfo->tparel_pos - N_SYMOFF (*execp);
+    symtab_size = myinfo->tparel_pos - N_SYMOFF (execp);
 
   bfd_h_put_32 (abfd, symtab_size, exec_bytes->g_syms);
 
@@ -1554,8 +1554,6 @@ MY (write_object_contents) (bfd *abfd)
 {
   struct external_exec exec_bytes;
   struct internal_exec *execp = exec_hdr (abfd);
-  bfd_size_type text_size;
-  file_ptr text_end;
 
   BFD_ASSERT (obj_aout_ext (abfd) != NULL);
 
@@ -1565,7 +1563,7 @@ MY (write_object_contents) (bfd *abfd)
      found in libaout.h.  */
 
   if (adata(abfd).magic == undecided_magic)
-    NAME (aout, adjust_sizes_and_vmas) (abfd, & text_size, & text_end);
+    NAME (aout, adjust_sizes_and_vmas) (abfd);
 
   execp->a_syms = bfd_get_symcount (abfd) * EXTERNAL_NLIST_SIZE;
   execp->a_entry = bfd_get_start_address (abfd);
@@ -1580,19 +1578,19 @@ MY (write_object_contents) (bfd *abfd)
   if (bfd_get_outsymbols (abfd) != NULL
       && bfd_get_symcount (abfd) != 0)
     {
-      if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(*execp)), SEEK_SET) != 0)
+      if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(execp)), SEEK_SET) != 0)
 	return FALSE;
 
       if (! NAME (aout, write_syms) (abfd))
 	return FALSE;
     }
 
-  if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (*execp)), SEEK_SET) != 0)
+  if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (execp)), SEEK_SET) != 0)
     return FALSE;
   if (!NAME (aout, squirt_out_relocs) (abfd, obj_textsec (abfd)))
     return FALSE;
 
-  if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (*execp)), SEEK_SET) != 0)
+  if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (execp)), SEEK_SET) != 0)
     return FALSE;
   if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))
     return FALSE;
