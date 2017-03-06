@@ -706,6 +706,7 @@ extern const bfd_target m68k_aout_4knbsd_vec;
 extern const bfd_target m68k_aout_hp300bsd_vec;
 extern const bfd_target m68k_aout_hp300hpux_vec;
 extern const bfd_target m68k_aout_linux_vec;
+extern const bfd_target m68k_aout_mintprg_vec;
 extern const bfd_target m68k_aout_nbsd_vec;
 extern const bfd_target m68k_aout_newsos3_vec;
 extern const bfd_target m68k_coff_vec;
@@ -1168,6 +1169,7 @@ static const bfd_target * const _bfd_target_vector[] =
 	   which kind of a.out file it is.  */
 	&m68k_aout_linux_vec,
 #endif
+	&m68k_aout_mintprg_vec,
 	&m68k_aout_nbsd_vec,
 	&m68k_aout_newsos3_vec,
 	&m68k_coff_vec,
