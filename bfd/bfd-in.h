@@ -756,6 +756,15 @@ extern bfd_boolean bfd_m68klinux_size_dynamic_sections
 extern bfd_boolean bfd_sparclinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
 
+/* MiNT executable support routines for the linker.  */
+
+extern bfd_boolean bfd_m68kmint_set_extended_flags
+  (bfd *, flagword);
+extern bfd_boolean bfd_m68kmint_set_stack_size
+  (bfd *, bfd_signed_vma);
+extern bfd_boolean bfd_m68kmint_add_tpa_relocation_entry
+  (bfd *, bfd_vma);
+
 /* mmap hacks */
 
 struct _bfd_window_internal;

@@ -4442,7 +4442,7 @@ deduce_name (const char *prog_name)
       if (*cp == '-')
 	dash = cp;
       if (
-#if defined(__DJGPP__) || defined (__CYGWIN__) || defined(__WIN32__)
+#if defined(__DJGPP__) || defined (__CYGWIN__) || defined(__WIN32__) || defined(__MINT__)
 	  *cp == ':' || *cp == '\\' ||
 #endif
 	  *cp == '/')

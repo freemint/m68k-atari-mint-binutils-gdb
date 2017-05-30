@@ -16915,7 +16915,7 @@ fi
 
 
 case "${host}" in
-*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
+*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows* | *-*-mint*)
 
 $as_echo "#define USE_BINARY_FOPEN 1" >>confdefs.h
  ;;
