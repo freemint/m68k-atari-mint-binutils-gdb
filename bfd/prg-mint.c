@@ -1,5 +1,5 @@
 /* BFD backend for traditional MiNT executables.
-   Copyright (C) 1998-2016 Free Software Foundation, Inc.
+   Copyright (C) 1998-2017 Free Software Foundation, Inc.
    Originally written by Guido Flohr (guido@freemint.de).
    Modified by Vincent Riviere (vincent.riviere@freesbee.fr).
 
