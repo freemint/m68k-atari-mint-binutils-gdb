@@ -365,7 +365,7 @@ MY (object_p) (bfd *abfd)
   NAME (aout, swap_exec_header_in) (abfd, &exec_bytes, &exec);
 
   /* Check a.out magic value.  */
-  if (N_BADMAG (exec))
+  if (N_BADMAG (&exec))
     {
       bfd_set_error (bfd_error_wrong_format);
       return NULL;
@@ -1432,10 +1432,10 @@ write_tparel (bfd *abfd, struct internal_exec *execp)
   struct mint_internal_info* myinfo = obj_aout_ext (abfd);
 
   if (myinfo->dri_symtab_size == 0)
-    myinfo->tparel_pos = N_STROFF (*execp)
+    myinfo->tparel_pos = N_STROFF (execp)
       + obj_aout_external_string_size (abfd);
   else
-    myinfo->tparel_pos = N_SYMOFF (*execp)
+    myinfo->tparel_pos = N_SYMOFF (execp)
       + myinfo->dri_symtab_size;
 
   if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0)
@@ -1474,7 +1474,7 @@ write_exec_header (bfd *abfd, struct internal_exec *execp, struct external_exec 
   if (myinfo->dri_symtab_size != 0)
     symtab_size = myinfo->dri_symtab_size;
   else
-    symtab_size = myinfo->tparel_pos - N_SYMOFF (*execp);
+    symtab_size = myinfo->tparel_pos - N_SYMOFF (execp);
 
   bfd_h_put_32 (abfd, symtab_size, exec_bytes->g_syms);
 
@@ -1580,19 +1580,19 @@ MY (write_object_contents) (bfd *abfd)
   if (bfd_get_outsymbols (abfd) != NULL
       && bfd_get_symcount (abfd) != 0)
     {
-      if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(*execp)), SEEK_SET) != 0)
+      if (bfd_seek (abfd, (file_ptr) (N_SYMOFF(execp)), SEEK_SET) != 0)
 	return FALSE;
 
       if (! NAME (aout, write_syms) (abfd))
 	return FALSE;
     }
 
-  if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (*execp)), SEEK_SET) != 0)
+  if (bfd_seek (abfd, (file_ptr) (N_TRELOFF (execp)), SEEK_SET) != 0)
     return FALSE;
   if (!NAME (aout, squirt_out_relocs) (abfd, obj_textsec (abfd)))
     return FALSE;
 
-  if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (*execp)), SEEK_SET) != 0)
+  if (bfd_seek (abfd, (file_ptr) (N_DRELOFF (execp)), SEEK_SET) != 0)
     return FALSE;
   if (!NAME (aout, squirt_out_relocs) (abfd, obj_datasec (abfd)))
     return FALSE;
