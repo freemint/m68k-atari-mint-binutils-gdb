@@ -12924,7 +12924,11 @@ dump_section_as_strings (Elf_Internal_Shdr * section, FILE * file)
 #ifndef __MSVCRT__
 	  /* PR 11128: Use two separate invocations in order to work
              around bugs in the Solaris 8 implementation of printf.  */
+#if GCC_VERSION < 3000
+	  printf ("  [%6lx]  ", (unsigned long) (data - start));
+#else
 	  printf ("  [%6tx]  ", data - start);
+#endif
 #else
 	  printf ("  [%6Ix]  ", (size_t) (data - start));
 #endif
