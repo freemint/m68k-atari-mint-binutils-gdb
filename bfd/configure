@@ -12201,7 +12201,7 @@ if test "${with_pkgversion+set}" = set; then :
       *)   PKGVERSION="($withval) " ;;
      esac
 else
-  PKGVERSION="(GNU Binutils for MiNT 20170530) "
+  PKGVERSION="(GNU Binutils for MiNT 20170531) "
 
 fi
 
