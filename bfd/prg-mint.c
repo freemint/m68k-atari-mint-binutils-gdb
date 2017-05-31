@@ -1134,9 +1134,9 @@ MY (bfd_copy_private_bfd_data) (bfd *ibfd, bfd *obfd)
 #define MY_bfd_merge_private_bfd_data MY (merge_private_bfd_data)
 
 static bfd_boolean
-MY (merge_private_bfd_data) (bfd *ibfd, bfd *obfd)
+MY (merge_private_bfd_data) (bfd *ibfd, struct bfd_link_info *info)
 {
-  (void)obfd; /* Unused.  */
+  (void)info; /* Unused.  */
 
   /* Our file format cannot be used as linker input.  */
   if (ibfd->xvec == &MY (vec))
@@ -1147,7 +1147,7 @@ MY (merge_private_bfd_data) (bfd *ibfd, bfd *obfd)
       return FALSE;
     }
 
-  return TRUE; /* _bfd_generic_bfd_merge_private_bfd_data (ibfd, obfd); */
+  return TRUE; /* _bfd_generic_bfd_merge_private_bfd_data (ibfd, info); */
 }
 
 /* Find out the symbol name.  */
