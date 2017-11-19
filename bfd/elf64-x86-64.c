@@ -1227,7 +1227,8 @@ struct elf_x86_64_link_hash_table
 /* Get the x86-64 ELF linker hash table from a link_info structure.  */
 
 #define elf_x86_64_hash_table(p) \
-  (elf_hash_table_id ((struct elf_link_hash_table *) ((p)->hash)) \
+  (is_elf_hash_table ((p)->hash) \
+   && elf_hash_table_id ((struct elf_link_hash_table *) ((p)->hash))	\
   == X86_64_ELF_DATA ? ((struct elf_x86_64_link_hash_table *) ((p)->hash)) : NULL)
 
 #define elf_x86_64_compute_jump_table_size(htab) \
@@ -6181,7 +6182,7 @@ elf_x86_64_finish_dynamic_symbol (bfd *output_bfd,
       else if (bfd_link_pic (info)
 	       && SYMBOL_REFERENCES_LOCAL (info, h))
 	{
-	  if (!h->def_regular)
+	  if (!(h->def_regular || ELF_COMMON_DEF_P (h)))
 	    return FALSE;
 	  BFD_ASSERT((h->got.offset & 1) != 0);
 	  rela.r_info = htab->r_info (0, R_X86_64_RELATIVE);
@@ -6751,7 +6752,7 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
   for (j = 0; plts[j].name != NULL; j++)
     {
       plt = bfd_get_section_by_name (abfd, plts[j].name);
-      if (plt == NULL)
+      if (plt == NULL || plt->size == 0)
 	continue;
 
       /* Get the PLT section contents.  */
@@ -6767,7 +6768,9 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
 
       /* Check what kind of PLT it is.  */
       plt_type = plt_unknown;
-      if (plts[j].type == plt_unknown)
+      if (plts[j].type == plt_unknown
+	  && (plt->size >= (lazy_plt->plt_entry_size
+			    + lazy_plt->plt_entry_size)))
 	{
 	  /* Match lazy PLT first.  Need to check the first two
 	     instructions.   */
@@ -6795,7 +6798,8 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
 	}
 
       if (non_lazy_plt != NULL
-	  && (plt_type == plt_unknown || plt_type == plt_non_lazy))
+	  && (plt_type == plt_unknown || plt_type == plt_non_lazy)
+	  && plt->size >= non_lazy_plt->plt_entry_size)
 	{
 	  /* Match non-lazy PLT.  */
 	  if (memcmp (plt_contents, non_lazy_plt->plt_entry,
@@ -6806,6 +6810,7 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
       if (plt_type == plt_unknown || plt_type == plt_second)
 	{
 	  if (non_lazy_bnd_plt != NULL
+	      && plt->size >= non_lazy_bnd_plt->plt_entry_size
 	      && (memcmp (plt_contents, non_lazy_bnd_plt->plt_entry,
 			  non_lazy_bnd_plt->plt_got_offset) == 0))
 	    {
@@ -6814,6 +6819,7 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
 	      non_lazy_plt = non_lazy_bnd_plt;
 	    }
 	  else if (non_lazy_ibt_plt != NULL
+		   && plt->size >= non_lazy_ibt_plt->plt_entry_size
 		   && (memcmp (plt_contents,
 			       non_lazy_ibt_plt->plt_entry,
 			       non_lazy_ibt_plt->plt_got_offset) == 0))
@@ -6858,6 +6864,9 @@ elf_x86_64_get_synthetic_symtab (bfd *abfd,
 
       plts[j].contents = plt_contents;
     }
+
+  if (count == 0)
+    return -1;
 
   size = count * sizeof (asymbol);
   s = *ret = (asymbol *) bfd_zmalloc (size);
@@ -7466,8 +7475,9 @@ error_alignment:
 	  for (abfd = info->input_bfds;
 	       abfd != NULL;
 	       abfd = abfd->link.next)
-	    if ((abfd->flags
-		 & (DYNAMIC | BFD_LINKER_CREATED | BFD_PLUGIN)) == 0)
+	    if (bfd_get_flavour (abfd) == bfd_target_elf_flavour
+		&& (abfd->flags
+		    & (DYNAMIC | BFD_LINKER_CREATED | BFD_PLUGIN)) == 0)
 	      {
 		htab->elf.dynobj = abfd;
 		dynobj = abfd;
@@ -7708,9 +7718,10 @@ error_alignment:
 							".eh_frame",
 							flags);
 	      if (sec == NULL)
-		info->callbacks->einfo (_("%F: failed to create BND PLT .eh_frame section\n"));
+		info->callbacks->einfo (_("%F: failed to create the second PLT .eh_frame section\n"));
 
-	      if (!bfd_set_section_alignment (dynobj, sec, 3))
+	      if (!bfd_set_section_alignment (dynobj, sec,
+					      ABI_64_P (dynobj) ? 3 : 2))
 		goto error_alignment;
 
 	      htab->plt_second_eh_frame = sec;

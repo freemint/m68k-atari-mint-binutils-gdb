@@ -12338,7 +12338,7 @@ bfd_elf_final_link (bfd *abfd, struct bfd_link_info *info)
 	    get_vma:
 	      o = bfd_get_linker_section (dynobj, name);
 	    do_vma:
-	      if (o == NULL)
+	      if (o == NULL || bfd_is_abs_section (o->output_section))
 		{
 		  _bfd_error_handler
 		    (_("could not find section %s"), name);
@@ -13831,6 +13831,7 @@ bfd_elf_discard_info (bfd *output_bfd, struct bfd_link_info *info)
     {
       asection *i;
       int eh_changed = 0;
+      unsigned int eh_alignment;
 
       for (i = o->map_head.s; i != NULL; i = i->map_head.s)
 	{
@@ -13856,6 +13857,37 @@ bfd_elf_discard_info (bfd *output_bfd, struct bfd_link_info *info)
 
 	  fini_reloc_cookie_for_section (&cookie, i);
 	}
+
+      eh_alignment = 1 << o->alignment_power;
+      /* Skip over zero terminator, and prevent empty sections from
+	 adding alignment padding at the end.  */
+      for (i = o->map_tail.s; i != NULL; i = i->map_tail.s)
+	if (i->size == 0)
+	  i->flags |= SEC_EXCLUDE;
+	else if (i->size > 4)
+	  break;
+      /* The last non-empty eh_frame section doesn't need padding.  */
+      if (i != NULL)
+	i = i->map_tail.s;
+      /* Any prior sections must pad the last FDE out to the output
+	 section alignment.  Otherwise we might have zero padding
+	 between sections, which would be seen as a terminator.  */
+      for (; i != NULL; i = i->map_tail.s)
+	if (i->size == 4)
+	  /* All but the last zero terminator should have been removed.  */
+	  BFD_FAIL ();
+	else
+	  {
+	    bfd_size_type size
+	      = (i->size + eh_alignment - 1) & -eh_alignment;
+	    if (i->size != size)
+	      {
+		i->size = size;
+		changed = 1;
+		eh_changed = 1;
+	      }
+	  }
+
       if (eh_changed)
 	elf_link_hash_traverse (elf_hash_table (info),
 				_bfd_elf_adjust_eh_frame_global_symbol, NULL);
@@ -14226,18 +14258,30 @@ struct bfd_link_hash_entry *
 bfd_elf_define_start_stop (struct bfd_link_info *info,
 			   const char *symbol, asection *sec)
 {
-  struct bfd_link_hash_entry *h;
+  struct elf_link_hash_entry *h;
 
-  h = bfd_generic_define_start_stop (info, symbol, sec);
-  if (h != NULL)
+  h = elf_link_hash_lookup (elf_hash_table (info), symbol,
+			    FALSE, FALSE, TRUE);
+  if (h != NULL
+      && (h->root.type == bfd_link_hash_undefined
+	  || h->root.type == bfd_link_hash_undefweak
+	  || (h->ref_regular && !h->def_regular)))
     {
-      struct elf_link_hash_entry *eh = (struct elf_link_hash_entry *) h;
-      eh->start_stop = 1;
-      eh->u2.start_stop_section = sec;
-      _bfd_elf_link_hash_hide_symbol (info, eh, TRUE);
-      if (ELF_ST_VISIBILITY (eh->other) != STV_INTERNAL)
-	eh->other = ((eh->other & ~ELF_ST_VISIBILITY (-1))
-		     | STV_HIDDEN);
+      h->root.type = bfd_link_hash_defined;
+      h->root.u.def.section = sec;
+      h->root.u.def.value = 0;
+      h->def_regular = 1;
+      h->def_dynamic = 0;
+      h->start_stop = 1;
+      h->u2.start_stop_section = sec;
+      if (symbol[0] == '.')
+	{
+	  /* .startof. and .sizeof. symbols are local.  */
+	  _bfd_elf_link_hash_hide_symbol (info, h, TRUE);
+	}
+      else if (ELF_ST_VISIBILITY (h->other) == STV_DEFAULT)
+	h->other = (h->other & ~ELF_ST_VISIBILITY (-1)) | STV_PROTECTED;
+      return &h->root;
     }
-  return h;
+  return NULL;
 }

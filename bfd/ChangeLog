@@ -1,3 +1,302 @@
+2017-09-15  Nick Clifton  <nickc@redhat.com>
+
+	2.29.1 Release
+
+	* version.m4: Bump version to 2.29.1
+	* configure: Regenerate.
+	* po/bfd.pot: Regenerate.
+
+2017-09-14  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR binutils/22113
+	* peXXigen.c (pe_print_idata): Extend check for HintName vector
+	entries.
+
+2017-08-21  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	Import from mainline:
+
+	PR ld/20125
+	* elf64-mmix.c (mmix_elf_relax_section): Correct handling of
+	undefined weak symbols.
+
+2017-09-10  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR 22047
+	* dwarf2.c (read_section): If necessary add a terminating NUL byte
+	to dwarf string sections.
+
+2017-09-10  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppp.c (plt_stub_pad): Handle positive and negative
+	plt_stub_align.
+
+2017-09-09  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR binutils/22018
+	* elf32-i386.c (elf_i386_get_synthetic_symtab): Check for valid
+	PLT section size.
+	* elf64-x86-64.c (elf_x86_64_get_synthetic_symtab): Likewise.
+
+2017-09-05  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR binutils/22032
+	* opncls.c (bfd_close_all_done): Don't call bfd_cache_close
+	before _close_and_cleanup.  Call iovec->bclose after.
+	(bfd_close): Remove code common to, and call, bfd_close_all_done.
+
+2017-09-04  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR binutils/21781
+	* coffcode.h (handle_COMDAT): Replace abort with an error message
+	and return.
+
+	PR 21786
+	* coff-rs6000.c (_bfd_strntol): New function.
+	(_bfd_strntoll): New function.
+	(GET_VALUE_IN_FIELD): New macro.
+	(EQ_VALUE_IN_FIELD): new macro.
+	(_bfd_xcoff_slurp_armap): Use new macros.
+	(_bfd_xcoff_archive_p): Likewise.
+	(_bfd_xcoff_read_ar_hdr): Likewise.
+	(_bfd_xcoff_openr_next_archived_file): Likewise.
+	(_bfd_xcoff_stat_arch_elt): Likewise.
+	* coff64-rs6000.c (_bfd_strntol): New function.
+	(_bfd_strntoll): New function.
+	(GET_VALUE_IN_FIELD): New macro.
+	(xcoff64_slurp_armap): Use new macros.
+
+	PR 21787
+	* archive.c (bfd_generic_archive_p): If the bfd does not have the
+	correct magic bytes at the start, set the error to wrong format
+	and clear the format selector before returning NULL.
+
+	PR 21813
+	* mach-o.c (bfd_mach_o_canonicalize_relocs): Pass the base address
+	of the relocs to the canonicalize_one_reloc routine.
+	* mach-o.h (struct bfd_mach_o_backend_data): Update the prototype
+	for the _bfd_mach_o_canonicalize_one_reloc field.
+	* mach-o-arm.c (bfd_mach_o_arm_canonicalize_one_reloc): Add
+	res_base parameter.  Use to check for corrupt pair relocs.
+	* mach-o-aarch64.c (bfd_mach_o_arm64_canonicalize_one_reloc):
+	Likewise.
+	* mach-o-i386.c (bfd_mach_o_i386_canonicalize_one_reloc):
+	Likewise.
+	* mach-o-x86-64.c (bfd_mach_o_x86_64_canonicalize_one_reloc):
+	Likewise.
+	* vms-alpha.c (_bfd_vms_slurp_eihd): Make sure that there is
+	enough data in the record before attempting to parse it.
+	(_bfd_vms_slurp_eeom): Likewise.
+	(_bfd_vms_slurp_egsd): Check for an invalid section index.
+	(image_set_ptr): Likewise.
+	(alpha_vms_slurp_relocs): Likewise.
+	(alpha_vms_object_p): Check for a truncated record.
+
+	PR 21824
+	* elf32-msp430.c (msp430_elf_relax_section): Allow conversion of
+	16-bit absolute branches into 10-bit pc-relative branches on the
+	MSP430 as well as the MSP430X.
+
+	PR 21916
+	* elf-attrs.c (_bfd_elf_parse_attributes): Complain about very
+	small section lengths.
+	* elf.c (_bfd_elf_setup_sections): Skip empty entries in the group
+	table.
+	(elfcore_grok_freebsd_prstatus): Add checks to make sure that
+	there is enough data present in the note.
+
+	PR 21441
+	* elf-eh-frame.c (_bfd_elf_discard_section_eh_frame): Don't add
+	alignment padding here.
+	* elflink.c (bfd_elf_discard_info): Add .eh_frame padding here
+	in a reverse pass over sections.
+
+2017-09-04  Alan Modra  <amodra@gmail.com>
+
+	PR 22067
+	* elf32-i386.c (elf_i386_hash_table): Check is_elf_hash_table first.
+	* elf64-x86-64.c (elf_x86_64_hash_table): Likewise.
+
+2017-09-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/22064
+	* elf64-x86-64.c (elf_x86_64_finish_dynamic_symbol): Check
+	ELF_COMMON_DEF_P for common symbols.
+
+2017-09-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/22061
+	* elf32-i386.c (elf_i386_link_setup_gnu_properties): Create
+	.eh_frame section for the second PLT.
+	* elf64-x86-64.c (elf_x86_64_link_setup_gnu_properties): Correct
+	alignment of .eh_frame section for the second PLT.
+
+2017-09-01  Nick Clifton  <nickc@redhat.com>
+
+	PR 22059
+	* dwarf2.c (decode_line_info): Fix test for an overlong line info
+	structure.
+
+2017-09-01  Nick Clifton  <nickc@redhat.com>
+
+	PR 21933
+	PR 22060
+	* elf.c (elf_read_notes): Check for a note size of -1.
+
+2017-09-01  Nick Clifton  <nickc@redhat.com>
+
+	PR 22058
+	* elf-attrs.c (_bfd_elf_parse_attributes): Ensure that the
+	attribute buffer is NUL terminated.
+
+2017-08-30  Maciej W. Rozycki  <macro@imgtec.com>
+
+	* elfxx-mips.c (mips_elf_perform_relocation): Correct microMIPS
+	branch offset interpretation.
+
+2017-08-29  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR 21840
+	* mach-o.c (bfd_mach_o_read_symtab_strtab): Fail if the symtab
+	size is -1.
+	* nlmcode.h (nlm_swap_auxiliary_headers_in): Replace assertion
+	with error return.
+	* section.c (bfd_make_section_with_flags): Fail if the name or bfd
+	are NULL.
+	* vms-alpha.c (bfd_make_section_with_flags): Correct computation
+	of end pointer.
+	(evax_bfd_print_emh): Check for invalid string lengths.
+
+2017-08-23  Alan Modra  <amodra@gmail.com>
+
+	PR 21988
+	* elf64-ppc.c (ensure_undef_dynamic): Rename from
+	ensure_undefweak_dynamic.  Handle undefined too.
+	* elf32-ppc.c (ensure_undef_dynamic): Likewise.
+	* elf32-hppa.c (ensure_undef_dynamic): Likewise.
+	(allocate_dynrelocs): Discard undefined non-default visibility
+	relocs first.  Make undefined syms dynamic.  Tidy goto.
+
+2017-08-21  Alan Modra  <amodra@gmail.com>
+	    H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/21964
+	* elf-bfd.h (SYMBOLIC_BIND): Return TRUE for __start/__stop symbols.
+	* elflink.c (bfd_elf_define_start_stop): Rewrite.
+
+2017-08-07  Alan Modra  <amodra@gmail.com>
+
+	PR 21910
+	* elflink.c (bfd_elf_final_link): Don't segfault when sections
+	needed to define various dynamic tags have been discarded.
+
+2017-08-05  Alan Modra  <amodra@gmail.com>
+
+	* elf32-hppa.c (elf32_hppa_set_gp): Don't require an
+	hppa_link_hash_table.
+
+2017-07-25  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c (struct map_stub): Add tls_get_addr_opt_bctrl.
+	(stub_eh_frame_size): New function.
+	(ppc_size_one_stub): Set group tls_get_addr_opt_bctrl.
+	(group_sections): Init group tls_get_addr_opt_bctrl.
+	(ppc64_elf_size_stubs): Update sizing and initialization of
+	.eh_frame.  Iteration over stubs via group list.
+	(ppc64_elf_build_stubs): Iterate over stubs via group list.
+	(ppc64_elf_finish_dynamic_sections): Update finalization of
+	.eh_frame.
+
+2017-08-18  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	PR binutils/21962
+	* tekhex.c (getsym): Fix check for source pointer walking off the
+	end of the input buffer.
+
+2017-08-17  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	PR ld/18808
+	* elfnn-aarch64.c (elfNN_aarch64_final_link_relocate): Skip IFUNC
+	relocations in debug sections, change abort to _bfd_error_handler.
+
+2017-08-17  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	PR ld/18841
+	* elfnn-aarch64.c (elfNN_aarch64_reloc_type_class): Return
+	reloc_class_ifunc for ifunc symbols.
+
+2017-08-11  Nick Clifton  <nickc@redhat.com>
+
+	PR 21884
+	* elf32-i386.c (elf_i386_link_setup_gnu_properties): If the dynobj
+	has not been set then use the bfd returned by
+	_bfd_elf_link_setup_gnu_properties.  If that is null then search
+	through all the input bfds selecting the first normal, ELF format
+	one.
+	* elf64-x86-64.c (elf_x86_64_link_setup_gnu_properties): Likewise.
+
+2017-08-08  Alan Modra  <amodra@gmail.com>
+
+	PR 21017
+	* elf32-microblaze.c (microblaze_elf_check_relocs): Don't bump
+	got.refcount for GOTOFF relocs, just create .got section.
+
+2017-08-01  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+
+	Backport from mainline
+	2017-08-01  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+
+	* elf32-s390.c (elf_s390_finish_dynamic_sections): Skip if it
+	isn't the S/390 specific elf data.
+	* elf64-s390.c (elf_s390_finish_dynamic_sections): Likewise.
+
+2017-08-01  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+
+	Backport from mainline
+	2017-07-28  Andreas Krebbel  <krebbel@linux.vnet.ibm.com>
+
+	* elf32-s390.c (elf_s390_finish_dynamic_sections): Add NULL
+	pointer check for htab->elf.irelplt.
+	* elf64-s390.c (elf_s390_finish_dynamic_sections): Likewise.
+
+2017-07-31  Alan Modra  <amodra@gmail.com>
+
+	* elf64-ppc.c (ppc64_elf_tls_setup): Warn on --plt-localentry
+	without ld.so checks.
+
+2017-07-29  Alan Modra  <amodra@gmail.com>
+
+	PR 21847
+	* elf64-ppc.c (struct ppc_link_hash_entry): Add non_zero_localentry.
+	(ppc64_elf_merge_symbol): Set non_zero_localentry.
+	(is_elfv2_localentry0): Test non_zero_localentry.
+	(ppc64_elf_tls_setup): Default to --no-plt-localentry.
+
+2017-07-25  Nick Clifton  <nickc@redhat.com>
+
+	* po/fr.po: Updated French translation.
+
+2017-07-24  Tristan Gingold  <gingold@adacore.com>
+
+	* version.m4: Bump version to 2.29.0
+	* configure: Regenerate.
+
+2017-07-24  Tristan Gingold  <gingold@adacore.com>
+
+	* development.sh: Set development to true.
+
 2017-07-24  Tristan Gingold  <gingold@adacore.com>
 
 	* version.m4: Bump version to 2.29

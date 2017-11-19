@@ -1,3 +1,264 @@
+2017-09-15  Nick Clifton  <nickc@redhat.com>
+
+	2.29.1 Release
+
+	* configure: Regenerate.
+	* po/ld.pot: Regenerate.
+
+2017-08-21  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	Import from mainline:
+
+	PR ld/20125
+	* testsuite/ld-mmix/pr20125.d, testsuite/ld-mmix/pr20125.s: New
+	test.
+
+2017-09-10  Alan Modra  <amodra@gmail.com>
+
+	* ld.texinfo (--plt-align): Describe new behaviour of option.
+	* emultempl/ppc64elf.em (params): Default plt_stub_align to 5.
+	* testsuite/ld-powerpc/powerpc.exp: Pass --no-plt-align for
+	selected tests.
+	* testsuite/ld-powerpc/relbrlt.d: Pass --no-plt-align.
+	* testsuite/ld-powerpc/elfv2so.d: Adjust expected output.
+
+2017-09-04  Nick Clifton  <nickc@redhat.com>
+
+	Import from mainline:
+
+	* testsuite/ld-elf/eh3.d: Update.
+	* testsuite/ld-elf/eh4.d: Update.
+
+	PR 21441
+	* testsuite/ld-x86-64/pr21038a.d: Adjust.
+	* testsuite/ld-x86-64/pr21038a-now.d: Adjust.
+
+2017-09-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/22064
+	* testsuite/ld-x86-64/pr22064a.S: New file.
+	* testsuite/ld-x86-64/pr22064b.c: Likewise.
+	* testsuite/ld-x86-64/x86-64.exp: Run PR ld/22064 test.
+
+2017-09-01  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/22061
+	* testsuite/ld-i386/ibt-plt-1.d: Pass --hash-style=sysv to ld.
+	Updated.
+	* testsuite/ld-i386/ibt-plt-2a.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-2c.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-3a.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-3c.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-1-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2a-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2c-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3a-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3c-x32.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-2b.d: Pass --hash-style=sysv to ld
+	and dump unwind information.
+	* testsuite/ld-i386/ibt-plt-2d.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-3b.d: Likewise.
+	* testsuite/ld-i386/ibt-plt-3d.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2b-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2b.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2d-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2d.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3b-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3b.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3d-x32.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3d.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-1.d: Pass --hash-style=sysv to ld.
+	* testsuite/ld-x86-64/ibt-plt-2a.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-2c.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3a.d: Likewise.
+	* testsuite/ld-x86-64/ibt-plt-3c.d: Likewise.
+
+2017-08-30  Maciej W. Rozycki  <macro@imgtec.com>
+
+	* testsuite/ld-mips-elf/bal-jalx-addend-micromips.d: New test.
+	* testsuite/ld-mips-elf/bal-jalx-addend-micromips-n32.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-addend-micromips-n64.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-local-micromips.d: New test.
+	* testsuite/ld-mips-elf/bal-jalx-local-micromips-n32.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-local-micromips-n64.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-micromips.d: New test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-micromips-n32.d: New test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-micromips-n64.d: New test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-ignore-micromips.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-ignore-micromips-n32.d: New
+	test.
+	* testsuite/ld-mips-elf/bal-jalx-pic-ignore-micromips-n64.d: New
+	test.
+	* testsuite/ld-mips-elf/mips-elf.exp: Run the new tests.
+
+2017-08-17  Andrew Burgess  <andrew.burgess@embecosm.com>
+
+	PR 21961
+	* ldlang.c (lang_discard_section_p): New function.
+	(lang_add_section): Checks moved out into new function, which is
+	now called.
+	(lang_place_orphans): Call lang_discard_section_p instead of
+	duplicating some of the checks from lang_add_section.
+	* testsuite/ld-elf/orphan-11.d: New file.
+	* testsuite/ld-elf/orphan-11.ld: New file.
+	* testsuite/ld-elf/orphan-11.s: New file.
+	* testsuite/ld-elf/orphan-12.d: New file.
+	* testsuite/ld-elf/orphan-12.s: New file.
+
+2017-08-23  Alan Modra  <amodra@gmail.com>
+
+	* testsuite/ld-gc/pr19161.d: Don't xfail hppa.
+
+2017-08-21  H.J. Lu  <hongjiu.lu@intel.com>
+	    Alan Modra  <amodra@gmail.com>
+
+	PR ld/21964
+	* testsuite/ld-elf/pr21562a.d: Update for changed start/stop symbols.
+	* testsuite/ld-elf/pr21562b.d: Likewise.
+	* testsuite/ld-elf/pr21562c.d: Likewise.
+	* testsuite/ld-elf/pr21562d.d: Likewise.
+	* testsuite/ld-elf/pr21562e.d: Likewise.
+	* testsuite/ld-elf/pr21562f.d: Likewise.
+	* testsuite/ld-elf/pr21562g.d: Likewise.
+	* testsuite/ld-elf/pr21562h.d: Likewise.
+	* testsuite/ld-elf/pr21562i.d: Likewise.
+	* testsuite/ld-elf/pr21562j.d: Likewise.
+	* testsuite/ld-elf/pr21562k.d: Likewise.
+	* testsuite/ld-elf/pr21562l.d: Likewise.
+	* testsuite/ld-elf/pr21562m.d: Likewise.
+	* testsuite/ld-elf/pr21562n.d: Likewise.
+	* testsuite/ld-elf/sizeofa.d: Likewise.
+	* testsuite/ld-elf/sizeofb.d: Likewise.
+	* testsuite/ld-elf/startofa.d: Likewise.
+	* testsuite/ld-elf/startofb.d: Likewise.
+	* testsuite/ld-gc/pr20022.d: Likewise.
+	* testsuite/ld-gc/start.d: Likewise.
+	* testsuite/ld-elf/pr21964-1a.c: New file.
+	* testsuite/ld-elf/pr21964-1b.c: New file.
+	* testsuite/ld-elf/pr21964-2a.c: New file.
+	* testsuite/ld-elf/pr21964-2b.c: New file.
+	* testsuite/ld-elf/shared.exp: Run PR ld/21964 tests.
+
+2017-08-05  Alan Modra  <amodra@gmail.com>
+
+	* testsuite/ld-unique/pr21529.d: Don't xfail hppa.
+
+2017-08-03  Nick Clifton  <nickc@redhat.com>
+
+	PR ld/21884
+	* testsuite/ld-elf/pr21884.d: Add AVR, HPPA, IA64, M68HC1x and
+	SCORE to list of targets not supporting file format changes during
+	linking.
+	* testsuite/ld-unique/pr21529.d: Likewise.
+	* emultempl/avrelf.em (_before_allocation): Skip for non-ELF
+	output formats.
+	(avr_elf_create_output_section_statements): Fail if the output
+	format is not ELF.
+	(avr_finish): Do not access the ELF header in non-ELF format
+	output bfds.
+	* emultempl/m68hc1xelf.em (_before_allocation): Skip for non-ELF
+	output formats.
+	(m68hc11elf_create_output_section_statements): Fail if the putput
+	format is not ELF.
+	(m68hc11elf_after_allocation): Skip for non-ELF output formats.
+
+2017-07-25  Alan Modra  <amodra@gmail.com>
+
+	* testsuite/ld-powerpc/tlsopt5.s: Add cfi.
+	* testsuite/ld-powerpc/tlsopt5.d: Update.
+	* testsuite/ld-powerpc/tlsopt5.wf: New file.
+	* testsuite/ld-powerpc/powerpc.exp: Perform new tlsopt5 test.
+
+2017-07-14  Alan Modra  <amodra@gmail.com>
+
+	* testsuite/ld-powerpc/powerpc.exp: Add -shared to tlsop5 tests.
+	* testsuite/ld-powerpc/tlsopt5.d: Adjust.
+	* testsuite/ld-powerpc/tlsopt1_32.s: Use r30 as GOT pointer.
+	* testsuite/ld-powerpc/tlsopt2_32.s: Likewise.
+	* testsuite/ld-powerpc/tlsopt3_32.s: Likewise.
+	* testsuite/ld-powerpc/tlsopt4_32.s: Likewise.
+	* testsuite/ld-powerpc/tlsopt5_32.s: Rewrite.
+	* testsuite/ld-powerpc/tlsopt1_32.d: Adjust.
+	* testsuite/ld-powerpc/tlsopt2_32.d: Adjust.
+	* testsuite/ld-powerpc/tlsopt3_32.d: Adjust.
+	* testsuite/ld-powerpc/tlsopt5_32.d: Adjust.
+
+2017-08-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/21923
+	* configure.ac (TESTBFDLIB): Replace --rpath with -Wl,--rpath,
+	for --disable-static.
+	* configure: Regenerated.
+
+2017-08-13  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* testsuite/ld-i386/i386.exp: Run pr21884-nacl.
+	* testsuite/ld-x86-64/x86-64.exp: Likewise.
+	* testsuite/ld-i386/pr21884.d: Don't run on nacl targets.
+	* testsuite/ld-x86-64/pr21884.d: Likewise.
+	* testsuite/ld-i386/pr21884.t: Revert the last change.
+	* testsuite/ld-x86-64/pr21884.t: Likewise.
+	* testsuite/ld-i386/pr21884-nacl.d: New file.
+	* testsuite/ld-i386/pr21884-nacl.t: Likewise.
+	* testsuite/ld-x86-64/pr21884-nacl.d: Likewise.
+	* testsuite/ld-x86-64/pr21884-nacl.t: Likewise.
+
+2017-08-13  Alan Modra  <amodra@gmail.com>
+
+	* testsuite/ld-i386/pr21884.t: Remove unneeded format, arch and entry.
+	* testsuite/ld-x86-64/pr21884.t: Likewise.
+
+2017-08-11  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/21884
+	* testsuite/ld-i386/i386.exp: Run pr21884.
+	* testsuite/ld-x86-64/x86-64.exp: Likewise.
+	* testsuite/ld-i386/pr21884.d: New file.
+	* testsuite/ld-i386/pr21884.t: Likewise.
+	* testsuite/ld-x86-64/pr21884.d: Likewise.
+	* testsuite/ld-x86-64/pr21884.t: Likewise.
+
+2017-08-03  Alan Modra  <amodra@gmail.com>
+
+	PR ld/21884
+	* emultempl/elf32.em (gld${EMULATION_NAME}_place_orphan): Revert
+	last change.  Rename iself to elfinput.  Expand comments.  Condition
+	ELF checks on having both input and output ELF files.  Extract..
+	(elf_orphan_compatible): ..this new function.
+
+2017-08-02  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR ld/21884
+	* emultempl/elf32.em (gld${EMULATION_NAME}_place_orphan): Check
+	ELF section header only for ELF output.
+	* testsuite/ld-elf/pr21884.d: New test.
+	* testsuite/ld-elf/pr21884.t: Likewise.
+	* testsuite/ld-elf/pr21884a.s: Likewise.
+	* testsuite/ld-elf/pr21884b.s: Likewise.
+
+2017-07-31  Alan Modra  <amodra@gmail.com>
+
+	* ld.texinfo (plt-localentry): Revise.
+
+2017-07-29  Alan Modra  <amodra@gmail.com>
+
+	* ld.texinfo (plt-localentry): Document.
+
+2017-07-27  Georg-Johann Lay  <gjl@gcc.gnu.org>
+
+	PR ld/21849
+	* scripttempl/avr.sc: Split .progmemx.* from .progmem.* and locate
+	former at a higher address.
+
+2017-07-24  Tristan Gingold  <gingold@adacore.com>
+
+	* configure: Regenerate.
+
 2017-07-24  Tristan Gingold  <gingold@adacore.com>
 
 	* configure: Regenerate.

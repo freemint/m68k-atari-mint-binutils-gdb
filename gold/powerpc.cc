@@ -1026,7 +1026,8 @@ class Target_powerpc : public Sized_target<size, big_endian>
 	    && this->plt_localentry0()
 	    && gsym->type() == elfcpp::STT_FUNC
 	    && gsym->is_defined()
-	    && gsym->nonvis() >> 3 == 0);
+	    && gsym->nonvis() >> 3 == 0
+	    && !gsym->non_zero_localentry());
   }
 
   bool
@@ -1048,6 +1049,22 @@ class Target_powerpc : public Sized_target<size, big_endian>
 	    && is_ordinary)
 	  return true;
       }
+    return false;
+  }
+
+  // Remember any symbols seen with non-zero localentry, even those
+  // not providing a definition
+  bool
+  resolve(Symbol* to, const elfcpp::Sym<size, big_endian>& sym, Object*,
+	  const char*)
+  {
+    if (size == 64)
+      {
+	unsigned char st_other = sym.get_st_other();
+	if ((st_other & elfcpp::STO_PPC64_LOCAL_MASK) != 0)
+	  to->set_non_zero_localentry();
+      }
+    // We haven't resolved anything, continue normal processing.
     return false;
   }
 
@@ -1599,7 +1616,7 @@ Target::Target_info Target_powerpc<64, true>::powerpc_info =
   true,			// is_big_endian
   elfcpp::EM_PPC64,	// machine_code
   false,		// has_make_symbol
-  false,		// has_resolve
+  true,			// has_resolve
   false,		// has_code_fill
   true,			// is_default_stack_executable
   false,		// can_icf_inline_merge_sections
@@ -1627,7 +1644,7 @@ Target::Target_info Target_powerpc<64, false>::powerpc_info =
   false,		// is_big_endian
   elfcpp::EM_PPC64,	// machine_code
   false,		// has_make_symbol
-  false,		// has_resolve
+  true,			// has_resolve
   false,		// has_code_fill
   true,			// is_default_stack_executable
   false,		// can_icf_inline_merge_sections
@@ -7660,8 +7677,10 @@ Target_powerpc<size, big_endian>::scan_relocs(
 	{
 	  if (parameters->options().user_set_plt_localentry())
 	    plt_localentry0 = parameters->options().plt_localentry();
-	  else
-	    plt_localentry0 = symtab->lookup("GLIBC_2.26", NULL) != NULL;
+	  if (plt_localentry0
+	      && symtab->lookup("GLIBC_2.26", NULL) == NULL)
+	    gold_warning(_("--plt-localentry is especially dangerous without "
+			   "ld.so support to detect ABI violations"));
 	}
       this->plt_localentry0_ = plt_localentry0;
       this->plt_localentry0_init_ = true;
