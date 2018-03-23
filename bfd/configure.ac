@@ -517,6 +517,7 @@ do
     m68k_aout_hp300bsd_vec)	 tb="$tb hp300bsd.lo aout32.lo" ;;
     m68k_aout_hp300hpux_vec)	 tb="$tb hp300hpux.lo aout32.lo" ;;
     m68k_aout_linux_vec)	 tb="$tb m68klinux.lo aout32.lo" ;;
+    m68k_aout_mintprg_vec)	 tb="$tb prg-mint.lo aout32.lo" ;;
     m68k_aout_nbsd_vec)		 tb="$tb m68knetbsd.lo aout32.lo" ;;
     m68k_aout_newsos3_vec)	 tb="$tb newsos3.lo aout32.lo" ;;
     m68k_coff_vec)		 tb="$tb coff-m68k.lo $coff" ;;

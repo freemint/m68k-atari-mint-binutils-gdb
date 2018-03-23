@@ -169,7 +169,11 @@ extern struct relax_type md_relax_table[];
 #define TARGET_USE_CFIPOP 1
 
 #define DWARF2_DEFAULT_RETURN_COLUMN 24
+#ifdef TE_MINT
+#define DWARF2_CIE_DATA_ALIGNMENT (-2)
+#else
 #define DWARF2_CIE_DATA_ALIGNMENT (-4)
+#endif
 
 #define tc_regname_to_dw2regnum tc_m68k_regname_to_dw2regnum
 extern int tc_m68k_regname_to_dw2regnum (const char *regname);

@@ -8130,7 +8130,11 @@ _bfd_elf_canonicalize_symtab (bfd *abfd, asymbol **allocation)
   long symcount = bed->s->slurp_symbol_table (abfd, allocation, FALSE);
 
   if (symcount >= 0)
-    bfd_get_symcount (abfd) = symcount;
+    {
+      bfd_get_symcount (abfd) = symcount;
+      /* Cache symbols for the generic linker.  */
+      bfd_get_outsymbols (abfd) = allocation;
+    }
   return symcount;
 }
 

@@ -67,6 +67,8 @@ static long	   sunos_get_dynamic_reloc_upper_bound	(bfd *);
 static long	   sunos_canonicalize_dynamic_reloc	(bfd *, arelent **, asymbol **);
 
 /* Include the usual a.out support.  */
+#define MY_match_priority 1
+
 #include "aoutf1.h"
 
 /* The SunOS 4.1.4 /usr/include/locale.h defines valid as a macro.  */

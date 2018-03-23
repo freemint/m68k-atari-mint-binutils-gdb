@@ -978,6 +978,17 @@ space consuming.  For each target:
       return bfd_reloc_other;
     }
 
+  extern const bfd_target m68k_aout_mintprg_vec;
+  if (flag == bfd_reloc_ok
+      && input_section->output_section->owner->xvec == &m68k_aout_mintprg_vec
+      && !howto->pc_relative && (howto->size == 2 || howto->size == -2))
+    {
+      bfd_vma tpa_address = input_section->output_section->vma
+	+ input_section->output_offset + reloc_entry->address;
+	
+      bfd_m68kmint_add_tpa_relocation_entry (input_section->output_section->owner, tpa_address);
+    }
+
   return flag;
 }
 

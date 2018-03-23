@@ -871,7 +871,7 @@ bfd_generic_archive_p (bfd *abfd)
       return NULL;
     }
 
-  if (abfd->target_defaulted && bfd_has_map (abfd))
+  if (bfd_has_map (abfd))
     {
       bfd *first;
 
@@ -892,7 +892,14 @@ bfd_generic_archive_p (bfd *abfd)
 	  first->target_defaulted = FALSE;
 	  if (bfd_check_format (first, bfd_object)
 	      && first->xvec != abfd->xvec)
-	    bfd_set_error (bfd_error_wrong_object_format);
+	    {
+	      bfd_set_error (bfd_error_wrong_object_format);
+	      if (abfd->is_linker_input)
+	        {
+	          bfd_ardata (abfd) = tdata_hold;
+	          return NULL;
+	        }
+	    }
 	  /* And we ought to close `first' here too.  */
 	}
     }

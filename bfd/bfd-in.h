@@ -23,11 +23,6 @@
 #ifndef __BFD_H_SEEN__
 #define __BFD_H_SEEN__
 
-/* PR 14072: Ensure that config.h is included first.  */
-#if !defined PACKAGE && !defined PACKAGE_VERSION
-#error config.h must be included before this header
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -764,6 +759,15 @@ extern bfd_boolean bfd_m68klinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
 extern bfd_boolean bfd_sparclinux_size_dynamic_sections
   (bfd *, struct bfd_link_info *);
+
+/* MiNT executable support routines for the linker.  */
+
+extern bfd_boolean bfd_m68kmint_set_extended_flags
+  (bfd *, flagword);
+extern bfd_boolean bfd_m68kmint_set_stack_size
+  (bfd *, bfd_signed_vma);
+extern bfd_boolean bfd_m68kmint_add_tpa_relocation_entry
+  (bfd *, bfd_vma);
 
 /* mmap hacks */
 

@@ -634,6 +634,10 @@ MY_close_and_cleanup (bfd *abfd)
 #define AR_PAD_CHAR ' '
 #endif
 
+#ifndef MY_match_priority
+#define MY_match_priority 0
+#endif
+
 #ifndef MY_BFD_TARGET
 const bfd_target MY (vec) =
 {
@@ -653,7 +657,7 @@ const bfd_target MY (vec) =
   MY_symbol_leading_char,
   AR_PAD_CHAR,			/* AR_pad_char.  */
   15,				/* AR_max_namelen.  */
-  0,				/* match priority.  */
+  MY_match_priority,				/* match priority.  */
 #ifdef TARGET_IS_BIG_ENDIAN_P
   bfd_getb64, bfd_getb_signed_64, bfd_putb64,
      bfd_getb32, bfd_getb_signed_32, bfd_putb32,
