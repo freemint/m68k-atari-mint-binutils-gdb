@@ -105,7 +105,7 @@ struct option
    to find the declaration so provide a fully prototyped one.  If it
    is 1, we found it so don't provide any declaration at all.  */
 #if !HAVE_DECL_GETOPT
-#if defined (__GNU_LIBRARY__) || defined (HAVE_DECL_GETOPT)
+#if defined (__GNU_LIBRARY__) || defined (__MINT__) || defined (HAVE_DECL_GETOPT)
 /* Many other libraries have conflicting prototypes for getopt, with
    differences in the consts, in unistd.h.  To avoid compilation
    errors, only prototype getopt for the GNU C library.  */
