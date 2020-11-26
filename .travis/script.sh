@@ -3,6 +3,11 @@
 # -u: Treat unset variables as an error when substituting.
 # -x: Display expanded script commands
 
-./configure --target=m68k-atari-mint --prefix=/usr/m68k-atari-mint --disable-nls --disable-werror --disable-gdb --disable-libdecnumber --disable-readline --disable-sim
+SRC_DIR=${PWD}
+
+cd ..
+mkdir .build && cd .build
+
+"${SRC_DIR}/configure" --target=m68k-atari-mint --prefix=/usr/m68k-atari-mint --disable-nls --disable-werror --disable-gdb --disable-libdecnumber --disable-readline --disable-sim
 make
 make install-strip DESTDIR="${INSTALL_DIR}"
