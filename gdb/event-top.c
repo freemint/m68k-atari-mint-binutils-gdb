@@ -928,7 +928,7 @@ handle_fatal_signal (int sig)
    instead, we have scoped_segv_handler_restore, which also makes it impossible
    to accidentally forget to restore it to the original value.  */
 
-static thread_local void (*thread_local_segv_handler) (int);
+static void (*thread_local_segv_handler) (int);
 
 static void handle_sigsegv (int sig);
 

@@ -4819,6 +4819,12 @@ private:
   std::vector<deferred_entry> m_deferred_entries;
 };
 
+extern "C" bool __atomic_compare_exchange_1(volatile void*, void*, unsigned char, bool, int, int);
+bool __atomic_compare_exchange_1(volatile void*, void*, unsigned char, bool, int, int)
+{
+	return 1;
+}
+
 /* Subroutine of dwarf2_build_psymtabs_hard to simplify it.
    Process compilation unit THIS_CU for a psymtab.  */
 

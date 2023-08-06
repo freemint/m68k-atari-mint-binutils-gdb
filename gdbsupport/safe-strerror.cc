@@ -45,7 +45,7 @@ select_strerror_r (char *res, char *)
 const char *
 safe_strerror (int errnum)
 {
-  static thread_local char buf[1024];
+  static char buf[1024];
 
   char *res = select_strerror_r (strerror_r (errnum, buf, sizeof (buf)), buf);
   if (res != nullptr)
