@@ -44,6 +44,7 @@ SECTION
 #include "libiberty.h"
 #include "safe-ctype.h"
 #include "elf-linux-core.h"
+#include "elf32-atariprg.h"
 
 #ifdef CORE_HEADER
 #include CORE_HEADER
@@ -5975,6 +5976,9 @@ assign_file_positions_for_load_sections (bfd *abfd,
   Elf_Internal_Phdr *phdrs;
   Elf_Internal_Phdr *p;
   file_ptr off;  /* Octets.  */
+  file_ptr vma_off = 0; /* File offset of memory start.  */
+#define VMA (off - vma_off) /* Current memory offset.  */
+  bfd_size_type sizeof_extra_header = 0; /* Size of extra header before ELF header in segment.  */
   bfd_size_type maxpagesize;
   unsigned int alloc, actual;
   unsigned int i, j;
@@ -5985,13 +5989,25 @@ assign_file_positions_for_load_sections (bfd *abfd,
       && !_bfd_elf_map_sections_to_segments (abfd, link_info, NULL))
     return false;
 
+  off = 0; /* Current file offset */
+
+  if (abfd->xvec == &m68k_elf32_atariprg_vec)
+    {
+      /* There is an extra header before the ELF file header.  */
+      bfd_elf32_atariprg_get_extra_header_info (abfd, &vma_off, &sizeof_extra_header);
+      off = vma_off + sizeof_extra_header;
+    }
+
+  /* Sections must map to file offsets past the ELF file header.  */
+  off += bed->s->sizeof_ehdr;
+
   alloc = 0;
   for (m = elf_seg_map (abfd); m != NULL; m = m->next)
     m->idx = alloc++;
 
   if (alloc)
     {
-      elf_elfheader (abfd)->e_phoff = bed->s->sizeof_ehdr;
+      elf_elfheader (abfd)->e_phoff = off;
       elf_elfheader (abfd)->e_phentsize = bed->s->sizeof_phdr;
     }
   else
@@ -6018,7 +6034,7 @@ assign_file_positions_for_load_sections (bfd *abfd,
 
   if (alloc == 0)
     {
-      elf_next_file_pos (abfd) = bed->s->sizeof_ehdr;
+      elf_next_file_pos (abfd) = off;
       return true;
     }
 
@@ -6069,8 +6085,6 @@ assign_file_positions_for_load_sections (bfd *abfd,
 	maxpagesize = bed->maxpagesize;
     }
 
-  /* Sections must map to file offsets past the ELF file header.  */
-  off = bed->s->sizeof_ehdr;
   /* And if one of the PT_LOAD headers doesn't include the program
      headers then we'll be mapping program headers in the usual
      position after the ELF file header.  */
@@ -6108,6 +6122,7 @@ assign_file_positions_for_load_sections (bfd *abfd,
       p->p_flags = m->p_flags;
       p_align = bed->p_align;
       p_align_p = false;
+      p->p_offset = vma_off;
 
       if (m->count == 0)
 	p->p_vaddr = m->p_vaddr_offset * opb;
@@ -6215,7 +6230,7 @@ assign_file_positions_for_load_sections (bfd *abfd,
 		break;
 	      }
 
-	  off_adjust = vma_page_aligned_bias (p->p_vaddr, off, align * opb);
+	  off_adjust = vma_page_aligned_bias (p->p_vaddr, VMA, align * opb);
 
 	  /* Broken hardware and/or kernel require that files do not
 	     map the same page with different permissions on some hppa
@@ -6264,15 +6279,15 @@ assign_file_positions_for_load_sections (bfd *abfd,
 	{
 	  if (!m->p_flags_valid)
 	    p->p_flags |= PF_R;
-	  p->p_filesz = bed->s->sizeof_ehdr;
-	  p->p_memsz = bed->s->sizeof_ehdr;
+	  p->p_filesz = sizeof_extra_header + bed->s->sizeof_ehdr;
+	  p->p_memsz = sizeof_extra_header + bed->s->sizeof_ehdr;
 	  if (p->p_type == PT_LOAD)
 	    {
 	      if (m->count > 0)
 		{
-		  if (p->p_vaddr < (bfd_vma) off
+		  if (p->p_vaddr < (bfd_vma) VMA
 		      || (!m->p_paddr_valid
-			  && p->p_paddr < (bfd_vma) off))
+			  && p->p_paddr < (bfd_vma) VMA))
 		    {
 		      _bfd_error_handler
 			(_("%pB: not enough room for program headers,"
@@ -6281,9 +6296,9 @@ assign_file_positions_for_load_sections (bfd *abfd,
 		      bfd_set_error (bfd_error_bad_value);
 		      return false;
 		    }
-		  p->p_vaddr -= off;
+		  p->p_vaddr -= VMA;
 		  if (!m->p_paddr_valid)
-		    p->p_paddr -= off;
+		    p->p_paddr -= VMA;
 		}
 	    }
 	  else if (sorted_seg_map[0]->includes_filehdr)
@@ -6316,9 +6331,9 @@ assign_file_positions_for_load_sections (bfd *abfd,
 	      else if (phdr_load_seg != NULL)
 		{
 		  Elf_Internal_Phdr *phdr = phdrs + phdr_load_seg->idx;
-		  bfd_vma phdr_off = 0;  /* Octets.  */
+		  bfd_vma phdr_off = sizeof_extra_header;  /* Octets.  */
 		  if (phdr_load_seg->includes_filehdr)
-		    phdr_off = bed->s->sizeof_ehdr;
+		    phdr_off += bed->s->sizeof_ehdr;
 		  p->p_vaddr = phdr->p_vaddr + phdr_off;
 		  if (!m->p_paddr_valid)
 		    p->p_paddr = phdr->p_paddr + phdr_off;
@@ -6479,7 +6494,7 @@ assign_file_positions_for_load_sections (bfd *abfd,
 		     also makes the PT_TLS header have the same
 		     p_offset value.  */
 		  bfd_vma adjust = vma_page_aligned_bias (this_hdr->sh_addr,
-							  off, align);
+							  VMA, align);
 		  this_hdr->sh_offset = sec->filepos = off + adjust;
 		}
 
@@ -6636,6 +6651,7 @@ assign_file_positions_for_load_sections (bfd *abfd,
     }
 
   return true;
+#undef VMA
 }
 
 /* Determine if a bfd is a debuginfo file.  Unfortunately there
@@ -6691,6 +6707,15 @@ assign_file_positions_for_non_load_sections (bfd *abfd,
   i_shdrpp = elf_elfsections (abfd);
   end_hdrpp = i_shdrpp + elf_numsections (abfd);
   off = elf_next_file_pos (abfd);
+
+  if (abfd->xvec == &m68k_elf32_atariprg_vec)
+    {
+      /* Align the size of the DATA segment.
+	 The first non-load section will be placed just after.  */
+      off = align_file_position (off, 1 << bed->s->log_file_align);
+      bfd_elf32_atariprg_set_nonload_pos (abfd, off);
+    }
+
   for (hdrpp = i_shdrpp + 1; hdrpp < end_hdrpp; hdrpp++)
     {
       Elf_Internal_Shdr *hdr;
@@ -7916,6 +7941,7 @@ rewrite_elf_program_header (bfd *ibfd, bfd *obfd, bfd_vma maxpagesize)
 	      && !bed->want_p_paddr_set_to_zero)
 	    {
 	      bfd_vma hdr_size = 0;
+	      BFD_ASSERT(obfd->xvec != &m68k_elf32_atariprg_vec);
 	      if (map->includes_filehdr)
 		hdr_size = iehdr->e_ehsize;
 	      if (map->includes_phdrs)
@@ -7958,6 +7984,7 @@ rewrite_elf_program_header (bfd *ibfd, bfd *obfd, bfd_vma maxpagesize)
 	  if (map->includes_filehdr)
 	    {
 	      bfd_vma align = (bfd_vma) 1 << matching_lma->alignment_power;
+	      BFD_ASSERT(obfd->xvec != &m68k_elf32_atariprg_vec);
 	      map->p_paddr -= iehdr->e_ehsize;
 	      /* We've subtracted off the size of headers from the
 		 first section lma, but there may have been some
@@ -8178,6 +8205,14 @@ copy_elf_program_header (bfd *ibfd, bfd *obfd)
   bool p_paddr_valid;
   bool p_palign_valid;
   unsigned int opb = bfd_octets_per_byte (ibfd, NULL);
+  file_ptr vma_off = 0; /* File offset of memory start.  */
+  bfd_size_type sizeof_extra_header = 0; /* Size of extra header before ELF header in segment.  */
+
+  if (obfd->xvec == &m68k_elf32_atariprg_vec)
+    {
+      /* There is an extra header before the ELF file header.  */
+      bfd_elf32_atariprg_get_extra_header_info (obfd, &vma_off, &sizeof_extra_header);
+    }
 
   iehdr = elf_elfheader (ibfd);
 
@@ -8261,7 +8296,7 @@ copy_elf_program_header (bfd *ibfd, bfd *obfd)
 
       /* Determine if this segment contains the ELF file header
 	 and if it contains the program headers themselves.  */
-      map->includes_filehdr = (segment->p_offset == 0
+      map->includes_filehdr = ((file_ptr) segment->p_offset == vma_off
 			       && segment->p_filesz >= iehdr->e_ehsize);
 
       map->includes_phdrs = 0;
@@ -8323,7 +8358,7 @@ copy_elf_program_header (bfd *ibfd, bfd *obfd)
 	  /* Account for padding before the first section in the segment.  */
 	  bfd_vma hdr_size = 0;
 	  if (map->includes_filehdr)
-	    hdr_size = iehdr->e_ehsize;
+	    hdr_size = sizeof_extra_header + iehdr->e_ehsize;
 	  if (map->includes_phdrs)
 	    hdr_size += iehdr->e_phnum * iehdr->e_phentsize;
 
@@ -8433,6 +8468,14 @@ copy_private_bfd_data (bfd *ibfd, bfd *obfd)
     }
 
  rewrite:
+  if (obfd->xvec == &m68k_elf32_atariprg_vec)
+    {
+      /* Are we going to support that some day?  */
+      _bfd_error_handler ("error: target %s doesn't support rewriting ELF program headers", obfd->xvec->name);
+       bfd_set_error (bfd_error_invalid_operation);
+       return false;
+    }
+
   maxpagesize = 0;
   if (ibfd->xvec == obfd->xvec)
     {
@@ -8896,7 +8939,7 @@ swap_out_syms (bfd *abfd,
 	  sym.st_size = value;
 	  if (type_ptr == NULL
 	      || type_ptr->internal_elf_sym.st_value == 0)
-	    sym.st_value = value >= 16 ? 16 : (1 << bfd_log2 (value));
+	    sym.st_value = value >= 2 ? 2 : (1 << bfd_log2 (value));
 	  else
 	    sym.st_value = type_ptr->internal_elf_sym.st_value;
 	  sym.st_shndx = _bfd_elf_section_from_bfd_section

@@ -297,6 +297,7 @@ BFD32_BACKENDS = \
 	elf32-am33lin.lo \
 	elf32-arc.lo \
 	elf32-arm.lo \
+	elf32-atariprg.lo \
 	elf32-avr.lo \
 	elf32-bfin.lo \
 	elf32-cr16.lo \
@@ -432,6 +433,7 @@ BFD32_BACKENDS_CFILES = \
 	elf32-am33lin.c \
 	elf32-arc.c \
 	elf32-arm.c \
+	elf32-atariprg.c \
 	elf32-avr.c \
 	elf32-bfin.c \
 	elf32-cr16.c \
@@ -695,7 +697,7 @@ SOURCE_HFILES = \
 	coff-arm.h coff-bfd.h coffcode.h coffswap.h \
 	cpu-aarch64.h cpu-arm.h cpu-h8300.h cpu-m68k.h cpu-riscv.h \
 	ecoff-bfd.h ecoffswap.h \
-	elf32-arm.h elf32-avr.h elf32-bfin.h elf32-cr16.h elf32-csky.h \
+	elf32-arm.h elf32-atariprg.h elf32-avr.h elf32-bfin.h elf32-cr16.h elf32-csky.h \
 	elf32-dlx.h elf32-hppa.h elf32-m68hc1x.h elf32-m68k.h \
 	elf32-metag.h elf32-nds32.h elf32-nios2.h elf32-ppc.h \
 	elf32-rx.h elf32-score.h elf32-sh-relocs.h elf32-spu.h \

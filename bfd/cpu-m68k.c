@@ -221,7 +221,9 @@ bfd_m68k_compatible (const bfd_arch_info_type *a,
   if (!b->mach)
     return a;
 
-  if (a->mach <= bfd_mach_m68060 && b->mach <= bfd_mach_m68060)
+  /* Allow merging 680x0 and ColdFire objects until the MiNTLib has a
+     separate crt0.o for each multilib.  */
+  if (true /*a->mach <= bfd_mach_m68060 && b->mach <= bfd_mach_m68060*/)
     /* Merge m68k machine. */
     return a->mach > b->mach ? a : b;
   else if (a->mach >= bfd_mach_cpu32 && b->mach >= bfd_mach_cpu32)

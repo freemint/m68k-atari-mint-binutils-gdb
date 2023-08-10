@@ -178,6 +178,8 @@ core_init (const char * aout_name)
   asymbol *synthsyms;
   long synth_count;
 
+  bfd_init ();
+
   core_bfd = bfd_openr (aout_name, 0);
 
   if (!core_bfd)

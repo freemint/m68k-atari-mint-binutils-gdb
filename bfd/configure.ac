@@ -168,8 +168,8 @@ AC_ARG_WITH(separate-debug-dir,
 [DEBUGDIR="${withval}"])
 AC_SUBST(DEBUGDIR)
 
-ACX_PKGVERSION([GNU Binutils])
-ACX_BUGURL([https://sourceware.org/bugzilla/])
+ACX_PKGVERSION([GNU Binutils for MiNT ELF 20230810])
+ACX_BUGURL([https://github.com/freemint/m68k-atari-mint-binutils-gdb/issues])
 
 AM_BINUTILS_WARNINGS
 
@@ -508,6 +508,7 @@ do
     m68hc11_elf32_vec)		 tb="$tb elf32-m68hc11.lo elf32-m68hc1x.lo elf32.lo $elf" ;;
     m68hc12_elf32_vec)		 tb="$tb elf32-m68hc12.lo elf32-m68hc1x.lo elf32.lo $elf" ;;
     m68k_elf32_vec)		 tb="$tb elf32-m68k.lo elf32.lo $elf" ;;
+    m68k_elf32_atariprg_vec)	 tb="$tb elf32-atariprg.lo elf32-m68k.lo elf32.lo $elf" ;;
     s12z_elf32_vec)		 tb="$tb elf32-s12z.lo elf32.lo $elf" ;;
     mach_o_be_vec)		 tb="$tb mach-o.lo dwarf2.lo" ;;
     mach_o_le_vec)		 tb="$tb mach-o.lo dwarf2.lo" ;;
