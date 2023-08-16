@@ -25475,7 +25475,7 @@ $as_echo "#define GNULIB_TEST_FSTATAT 1" >>confdefs.h
 
   gl_abort_bug=no
   case "$host_os" in
-    mingw*)
+    mingw* | mint*)
       gl_cv_func_getcwd_path_max=yes
       ;;
     *)

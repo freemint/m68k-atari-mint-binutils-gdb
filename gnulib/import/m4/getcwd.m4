@@ -114,7 +114,7 @@ AC_DEFUN([gl_FUNC_GETCWD],
 
   gl_abort_bug=no
   case "$host_os" in
-    mingw*)
+    mingw* | mint*)
       gl_cv_func_getcwd_path_max=yes
       ;;
     *)

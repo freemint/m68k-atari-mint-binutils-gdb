@@ -67,6 +67,9 @@ case ${gdb_host} in
 	HAVE_NATIVE_GCORE_HOST=1
 	LOADLIBES='-lkvm'
 	;;
+    mint*)
+	NATDEPFILES='fork-child.o nat/fork-inferior.o nat/mintelf-nat.o inf-ptrace.o mintelf-nat.o'
+	;;
     nbsd*)
 	NATDEPFILES='fork-child.o nat/fork-inferior.o nat/netbsd-nat.o inf-ptrace.o'
 	HAVE_NATIVE_GCORE_HOST=1

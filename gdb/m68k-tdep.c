@@ -61,7 +61,7 @@
 #define BPT_VECTOR 0xf
 #endif
 
-constexpr gdb_byte m68k_break_insn[] = {0x4e, (0x40 | BPT_VECTOR)};
+constexpr gdb_byte m68k_break_insn[] = {0x4a, 0xfc};
 
 typedef BP_MANIPULATION (m68k_break_insn) m68k_breakpoint;
 

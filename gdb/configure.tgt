@@ -123,6 +123,8 @@ esac
 case "${targ}" in
 *-*-freebsd* | *-*-kfreebsd*-gnu)
 	os_obs="fbsd-tdep.o solib-svr4.o";;
+*-*-mint*)
+	os_obs="mintelf-tdep.o";;
 *-*-netbsd* | *-*-knetbsd*-gnu)
 	os_obs="netbsd-tdep.o solib-svr4.o";;
 *-*-openbsd*)
@@ -396,6 +398,10 @@ m68*-*-linux*)
 	# Target: Motorola m68k with a.out and ELF
 	gdb_target_obs="m68k-tdep.o m68k-linux-tdep.o solib-svr4.o \
 			linux-tdep.o glibc-tdep.o symfile-mem.o"
+	;;
+m68*-*-mint*)
+	# Target: MiNT/m68k
+	gdb_target_obs="m68k-tdep.o"
 	;;
 m68*-*-netbsd* | m68*-*-knetbsd*-gnu)
 	# Target: NetBSD/m68k

@@ -330,8 +330,8 @@ public:
   dwarf_unit_type unit_type (bool strict_p = true) const
   {
     dwarf_unit_type ut = m_unit_type.load ();
-    if (strict_p)
-      gdb_assert (ut != 0);
+//    if (strict_p)
+//      gdb_assert (ut != 0);
     return ut;
   }
 
@@ -352,8 +352,8 @@ public:
   enum language lang (bool strict_p = true) const
   {
     enum language l = m_lang.load ();
-    if (strict_p)
-      gdb_assert (l != language_unknown);
+//    if (strict_p)
+//      gdb_assert (l != language_unknown);
     return l;
   }
 

@@ -827,6 +827,7 @@ ALL_TARGET_OBS = \
 	mep-tdep.o \
 	microblaze-linux-tdep.o \
 	microblaze-tdep.o \
+	mintelf-tdep.o \
 	mn10300-linux-tdep.o \
 	mn10300-tdep.o \
 	moxie-tdep.o \
@@ -1404,6 +1405,7 @@ HFILES_NO_SRCDIR = \
 	memory-map.h \
 	memrange.h \
 	microblaze-tdep.h \
+	mintelf-nat.h \
 	mips-linux-tdep.h \
 	mips-netbsd-tdep.h \
 	mips-tdep.h \
@@ -1753,6 +1755,8 @@ ALLDEPFILES = \
 	microblaze-linux-tdep.c \
 	microblaze-tdep.c \
 	mingw-hdep.c \
+	mintelf-nat.c \
+	mintelf-tdep.c \
 	mips-fbsd-nat.c \
 	mips-fbsd-tdep.c \
 	mips-linux-nat.c \

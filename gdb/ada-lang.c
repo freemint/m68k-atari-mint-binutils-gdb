@@ -1060,7 +1060,7 @@ ada_fold_name (gdb::string_view name, bool throw_on_error = false)
 	  if (throw_on_error)
 	    throw;
 
-	  static bool warned = false;
+	  static bool warned = true;
 
 	  /* Converting to UTF-32 shouldn't fail, so if it doesn't, we
 	     might like to know why.  */

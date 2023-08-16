@@ -23,7 +23,7 @@
 
 /* See common-inferior.h.  */
 
-bool startup_with_shell = true;
+bool startup_with_shell = false;
 
 /* See common-inferior.h.  */
 
