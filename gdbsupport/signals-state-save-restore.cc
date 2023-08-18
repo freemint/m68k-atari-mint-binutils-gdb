@@ -23,7 +23,7 @@
 
 /* The original signal actions and mask.  */
 
-#if 0 //def HAVE_SIGACTION
+#ifdef HAVE_SIGACTION
 static struct sigaction original_signal_actions[NSIG];
 
 static sigset_t original_signal_mask;
@@ -34,7 +34,7 @@ static sigset_t original_signal_mask;
 void
 save_original_signals_state (bool quiet)
 {
-#if 0 //def HAVE_SIGACTION
+#ifdef HAVE_SIGACTION
   int i;
   int res;
 
@@ -91,7 +91,7 @@ won't be propagated to spawned programs.\n"));
 void
 restore_original_signals_state (void)
 {
-#if 0 //def HAVE_SIGACTION
+#ifdef HAVE_SIGACTION
   int i;
   int res;
 
