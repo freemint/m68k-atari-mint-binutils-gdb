@@ -66,6 +66,8 @@ write_memory (pid_t pid, unsigned const char *writebuf, CORE_ADDR offset,
 	return errno;
     }
 
+  *xfered_len = len;
+
   return 0;
 }
 
@@ -91,6 +93,8 @@ read_memory (pid_t pid, unsigned char *readbuf, CORE_ADDR offset,
 
   /* Copy appropriate bytes out of the buffer.  */
   memcpy (readbuf, (char *) buffer + (offset & (sizeof (int) - 1)), len);
+
+  *xfered_len = len;
 
   return 0;
 }
