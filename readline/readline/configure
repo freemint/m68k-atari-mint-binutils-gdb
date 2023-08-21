@@ -2574,7 +2574,7 @@ opt_multibyte=yes
 opt_static_libs=yes
 opt_shared_libs=no
 opt_install_examples=no
-opt_bracketed_paste_default=yes
+opt_bracketed_paste_default=no
 
 # Check whether --enable-multibyte was given.
 if test "${enable_multibyte+set}" = set; then :
