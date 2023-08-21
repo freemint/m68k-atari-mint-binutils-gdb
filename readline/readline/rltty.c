@@ -529,7 +529,7 @@ prepare_terminal_settings (int meta_flag, TIOTYPE oldtio, TIOTYPE *tiop)
     tiop->c_iflag &= ~(ISTRIP | INPCK);
 
   /* Make sure we differentiate between CR and NL on input. */
-  tiop->c_iflag &= ~(ICRNL | INLCR);
+//  tiop->c_iflag &= ~(ICRNL | INLCR);
 
 #if !defined (HANDLE_SIGNALS)
   tiop->c_lflag &= ~ISIG;
