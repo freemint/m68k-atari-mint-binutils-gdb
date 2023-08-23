@@ -279,8 +279,7 @@ mintelf_init_abi (struct gdbarch_info info, struct gdbarch *gdbarch)
 
   /* MiNT ELF uses the SVR4 ABI.  */
   m68k_svr4_init_abi (info, gdbarch);
-  tdep->struct_return = pcc_struct_return;
-
+  tdep->struct_return = reg_struct_return;
 }
 
 void _initialize_mintelf_tdep ();
