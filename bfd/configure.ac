@@ -168,7 +168,7 @@ AC_ARG_WITH(separate-debug-dir,
 [DEBUGDIR="${withval}"])
 AC_SUBST(DEBUGDIR)
 
-ACX_PKGVERSION([GNU Binutils for MiNT ELF 20230824])
+ACX_PKGVERSION([GNU Binutils for MiNT ELF])
 ACX_BUGURL([https://github.com/freemint/m68k-atari-mint-binutils-gdb/issues])
 
 AM_BINUTILS_WARNINGS
