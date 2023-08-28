@@ -35,3 +35,8 @@
   while (0)
 
 #include "obj-format.h"
+
+/* No shared lib support, so we don't need to ensure externally
+   visible symbols can be overridden.  */
+#undef  EXTERN_FORCE_RELOC
+#define EXTERN_FORCE_RELOC 0
