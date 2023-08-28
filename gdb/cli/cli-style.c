@@ -30,7 +30,7 @@
 #if defined (__MSDOS__)
 bool cli_styling = false;
 #else
-bool cli_styling = false;
+bool cli_styling = true;
 #endif
 
 /* True if source styling is enabled.  Note that this is only
