@@ -39,6 +39,9 @@
 #define ADR_F "0x%08" PRIx32
 typedef uint32_t adr_t;
 
+/* Test if an integer is even.  */
+#define IS_EVEN(x) (((x) & 1) == 0)
+
 /* The main idea here is to reuse the elf32-m68k target, but with a few
    overrides to add a PRG extended header before ELF data, and a PRG relocation
    table just after.  So the ELF executable is actually embedded into a standard
@@ -658,6 +661,7 @@ write_prgelf_header (bfd *abfd)
 
   /* We will write the TPA relocation table right after the ELF data.  */
   myinfo->tparel_pos = elf_next_file_pos (abfd);
+  BFD_ASSERT (IS_EVEN (myinfo->tparel_pos));
 
   /* Compute the size of the PRG symbol table.  */
   prg_symbols_size = myinfo->tparel_pos - myinfo->nonload_pos;
