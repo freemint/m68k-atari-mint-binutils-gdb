@@ -304,6 +304,9 @@ enum long_section_name_handling
    This is also the only behaviour for 'strip'.  */
 static enum long_section_name_handling long_section_names = KEEP;
 
+/* If input_target is elf32-atariprg, force output_target to elf32-m68k.  */
+static bool force_elf_output = false;
+
 /* 150 isn't special; it's just an arbitrary non-ASCII char value.  */
 enum command_line_switch
 {
@@ -3943,6 +3946,9 @@ copy_file (const char *input_filename, const char *output_filename, int ofd,
       if (output_target == NULL)
 	output_target = bfd_get_target (ibfd);
 
+      if (force_elf_output && strcmp (output_target, "elf32-atariprg") == 0)
+	output_target = "elf32-m68k";
+
       if (ofd >= 0)
 	obfd = bfd_fdopenw (output_filename, output_target, ofd);
       else
@@ -4846,6 +4852,7 @@ strip_main (int argc, char *argv[])
 	  break;
 	case OPTION_ONLY_KEEP_DEBUG:
 	  strip_symbols = STRIP_NONDEBUG;
+	  force_elf_output = true;
 	  break;
 	case OPTION_KEEP_FILE_SYMBOLS:
 	  keep_file_symbols = 1;
@@ -5244,6 +5251,7 @@ copy_main (int argc, char *argv[])
 	case 'j':
 	  find_section_list (optarg, true, SECTION_CONTEXT_COPY);
 	  sections_copied = true;
+	  force_elf_output = true;
 	  break;
 
 	case 'R':
@@ -5280,6 +5288,7 @@ copy_main (int argc, char *argv[])
 
 	case OPTION_ONLY_KEEP_DEBUG:
 	  strip_symbols = STRIP_NONDEBUG;
+	  force_elf_output = true;
 	  break;
 
 	case OPTION_KEEP_FILE_SYMBOLS:
