@@ -60,7 +60,7 @@ SECTIONS
   PROVIDE(_etext = .);
 
   /* Global Constructors.  */
-  .ctors (READONLY) : ALIGN(2)
+  .ctors (READONLY) :
   {
     /* gcc uses crtbegin.o to find the start of
        the constructors, so we make sure it is
@@ -83,7 +83,7 @@ SECTIONS
   }
 
   /* Global Destructors.  */
-  .dtors (READONLY) : ALIGN(2)
+  .dtors (READONLY) :
   {
     KEEP (*crtbegin.o(.dtors))
     KEEP (*crtbegin?.o(.dtors))
