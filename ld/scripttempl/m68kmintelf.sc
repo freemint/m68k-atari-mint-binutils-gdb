@@ -59,6 +59,32 @@ SECTIONS
   __etext = .;
   PROVIDE(_etext = .);
 
+  /* Preinitializers array.  */
+  .preinit_array (READONLY) :
+  {
+    PROVIDE_HIDDEN (___preinit_array_start = .);
+    KEEP (*(.preinit_array))
+    PROVIDE_HIDDEN (___preinit_array_end = .);
+  }
+
+  /* Initializers array.  */
+  .init_array (READONLY) :
+  {
+    PROVIDE_HIDDEN (___init_array_start = .);
+    KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+    KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
+    PROVIDE_HIDDEN (___init_array_end = .);
+  }
+
+  /* Finalizers array.  */
+  .fini_array (READONLY) :
+  {
+    PROVIDE_HIDDEN (___fini_array_start = .);
+    KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+    KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
+    PROVIDE_HIDDEN (___fini_array_end = .);
+  }
+
   /* Global Constructors.  */
   .ctors (READONLY) :
   {
