@@ -20,3 +20,6 @@ GENERATE_PIE_SCRIPT=
 
 # Use external linker script files.
 COMPILE_IN=no
+
+# Don't search for dynamic libraries (yet)
+LDEMUL_OPEN_DYNAMIC_ARCHIVE=NULL
