@@ -19,7 +19,6 @@
 
 #define TE_MINTELF
 #define LOCAL_LABELS_FB 1
-#define REGISTER_PREFIX_OPTIONAL 1
 
 /* The .lcomm directive mustn't try to align more than possible.  */
 #define TC_IMPLICIT_LCOMM_ALIGNMENT(SIZE, P2VAR)		\
