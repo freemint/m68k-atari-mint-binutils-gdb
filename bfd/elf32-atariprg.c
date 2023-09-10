@@ -450,7 +450,7 @@ m68k_elf32_atariprg_final_link (bfd *abfd, struct bfd_link_info *info)
   TRACE ("m68k_elf32_atariprg_final_link END %s %s\n", abfd->xvec->name, abfd->filename);
 
   /* Remember the address of the stack size variable.  */
-  h = (struct elf_link_hash_entry *) bfd_hash_lookup (&info->hash->table, "__stksize", false, false);
+  h = (struct elf_link_hash_entry *) bfd_hash_lookup (&info->hash->table, "_stksize", false, false);
   if (h != NULL)
     {
       asection *input_sec;
@@ -685,7 +685,7 @@ write_prgelf_header (bfd *abfd)
 
       if (myinfo->stkpos == 0)
 	{
-	  _bfd_error_handler ("%pB: unable to determine the __stksize position",
+	  _bfd_error_handler ("%pB: unable to determine the _stksize position",
 			      abfd);
 	  bfd_set_error (bfd_error_invalid_operation);
 	  return false;

@@ -10,7 +10,7 @@ cat <<EOF
    notice and this notice are preserved.  */
 
 OUTPUT_FORMAT("${OUTPUT_FORMAT}")
-ENTRY(__start) /* The MiNTLib uses this entry symbol, so we do.  */
+ENTRY(_start) /* The MiNTLib uses this entry symbol, so we do.  */
 
 /* ELF Program Headers are mapped to GEMDOS process segments.  */
 PHDRS
@@ -43,7 +43,7 @@ SECTIONS
   /* Program code.  */
   .text :
   {
-    PROVIDE(__start = .); /* Default entry point if __start isn't defined.  */
+    PROVIDE(_start = .); /* Default entry point if _start isn't defined.  */
     *crt0.o(.text .text.*)
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
@@ -56,33 +56,33 @@ SECTIONS
   } :TEXT =0x4afc /* Pad with ILLEGAL instruction */
 
   /* End of .text section.  */
-  __etext = .;
-  PROVIDE(_etext = .);
+  _etext = .;
+  PROVIDE(etext = .);
 
   /* Preinitializers array.  */
   .preinit_array (READONLY) :
   {
-    PROVIDE_HIDDEN (___preinit_array_start = .);
+    PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array))
-    PROVIDE_HIDDEN (___preinit_array_end = .);
+    PROVIDE_HIDDEN (__preinit_array_end = .);
   }
 
   /* Initializers array.  */
   .init_array (READONLY) :
   {
-    PROVIDE_HIDDEN (___init_array_start = .);
+    PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
     KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
-    PROVIDE_HIDDEN (___init_array_end = .);
+    PROVIDE_HIDDEN (__init_array_end = .);
   }
 
   /* Finalizers array.  */
   .fini_array (READONLY) :
   {
-    PROVIDE_HIDDEN (___fini_array_start = .);
+    PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
     KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
-    PROVIDE_HIDDEN (___fini_array_end = .);
+    PROVIDE_HIDDEN (__fini_array_end = .);
   }
 
   /* Global Constructors.  */
@@ -140,8 +140,7 @@ SECTIONS
   } :DATA
 
   /* End of .data section. */
-  __edata = .;
-  PROVIDE(_edata = .);
+  _edata = .;
 
   /* Exception handling. */
   .eh_frame       : ONLY_IF_RW { KEEP (*(.eh_frame)) *(.eh_frame.*) }
@@ -160,8 +159,7 @@ SECTIONS
   } :BSS
 
   /* End of .bss section */
-  __end = .;
-  PROVIDE(_end = .);
+  _end = .;
 
   /*** Extra sections not loaded by the operating system **********************/
 

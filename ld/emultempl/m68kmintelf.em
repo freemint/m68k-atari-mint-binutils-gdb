@@ -56,10 +56,10 @@ m68kmintelf_before_parse (void)
   /* Then add our own linker initialization here.  */
 
   /* Standard default entry point is the "start" symbol. But the MiNTLib entry
-     point is named "__start". We could change the default here, but that would
+     point is named "_start". We could change the default here, but that would
      be very non-standard. Instead, I prefer to add a custom ENTRY() in the
      linker script.  */
-  /*lang_default_entry ("__start");*/
+  /*lang_default_entry ("_start");*/
 }
 
 /* This method is called after assigning values from the script.  */
