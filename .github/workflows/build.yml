@@ -1,0 +1,38 @@
+name: Linux build
+
+on:
+  push:
+    branches: [ binutils-2_41-mintelf ]
+  pull_request:
+    branches: [ binutils-2_41-mintelf ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        cross_tool: [ "m68k-atari-mintelf" ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install SSH keys
+        if: ${{ github.event_name == 'push' }}
+        env:
+          SSH_ID: ${{ secrets.SSH_ID }}
+        run: ./.scripts/install_ssh_id.sh
+      - name: Setup environment
+        env:
+          PROJECT_VERSION: "2.41"
+          CROSS_TOOL: ${{ matrix.cross_tool }}
+        run: ./.scripts/setup_env.sh
+      - name: Install packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install libzstd-dev liblzma-dev zlib1g-dev
+      - name: build
+        run: ./.scripts/build.sh
+      - name: deploy
+        if: ${{ github.event_name == 'push' }}
+        env:
+          COMMITER_NAME: ${{ github.event.commits[0].author.name }}
+          COMMITER_EMAIL: ${{ github.event.commits[0].author.email }}
+        run: ./.scripts/deploy.sh
