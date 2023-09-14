@@ -325,6 +325,24 @@ bfd_elf32_atariprg_set_nonload_pos (bfd *abfd, file_ptr nonload_pos)
   myinfo->nonload_pos = nonload_pos;
 }
 
+static unsigned int
+bfd_read_4byte_int (bfd *abfd, file_ptr pos)
+{
+  bfd_byte buffer[4];
+  file_ptr offset;
+  unsigned int val;
+
+  offset = bfd_tell(abfd);
+  bfd_seek(abfd, pos, SEEK_SET);
+  if (bfd_bread (buffer, (bfd_size_type) 4, abfd) != 4)
+    {
+      return -1;
+    }
+  val = bfd_get_32 (abfd, buffer);
+  bfd_seek(abfd, offset, SEEK_SET);
+  return val;
+}
+
 /* Add a TPA relocation entry.
    Called for each absolute address in TEXT/DATA segments.
    Actual relocation will be performed by the OS at load time.  */
@@ -719,6 +737,8 @@ fill_tparel (bfd *abfd)
   unsigned int i;
   bfd_size_type bytes;
   bfd_byte *ptr;
+  unsigned int val;
+  bfd_vma last;
 
   TRACE ("fill_tparel %s %s\n", abfd->xvec->name, abfd->filename);
 
@@ -756,16 +776,36 @@ fill_tparel (bfd *abfd)
 
   /* Write the first entry. Always 32-bit.  */
   ptr = myinfo->tparel;
+  i = 1;
+  last = 0;
   if (myinfo->relocs != NULL)
-    bfd_put_32 (abfd, myinfo->relocs[0], ptr);
-  else
-    bfd_put_32 (abfd, 0, ptr);
+    {
+      last = myinfo->relocs[0];
+      while (bfd_read_4byte_int(abfd, last + FILE_OFFSET_TEXT) == 0 && i < myinfo->relocs_used)
+	{
+	  last = myinfo->relocs[i];
+	  i++;
+	}
+    }
+  bfd_put_32 (abfd, last, ptr);
   ptr += 4;
 
   /* Write next entries.  Always 8-bit.  */
-  for (i = 1; i < myinfo->relocs_used; i++)
+  for (; i < myinfo->relocs_used; i++)
     {
-      bfd_signed_vma diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
+      bfd_signed_vma diff;
+
+      /*
+       * Do not add an entry, if the address to be relocated is zero.
+       * This can happen with weak symbols.
+       */
+      val = bfd_read_4byte_int(abfd, myinfo->relocs[i] + FILE_OFFSET_TEXT);
+      if (val == 0)
+	{
+	  continue;
+	}
+      diff = myinfo->relocs[i] - last;
+      last = myinfo->relocs[i];
       while (diff > 254)
 	{
 	  *ptr++ = 1;
