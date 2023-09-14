@@ -348,14 +348,14 @@ bfd_read_4byte_int (bfd *abfd, file_ptr pos)
    Actual relocation will be performed by the OS at load time.  */
 
 static bool
-add_tpa_relocation_entry (bfd *abfd, bfd_vma address)
+add_tpa_relocation_entry (bfd *abfd, bfd *input_bfd, bfd_vma address)
 {
   struct mint_internal_info *myinfo = get_mint_internal_info (abfd);
 
   if (address & 1)
     {
-      _bfd_error_handler ("%pB: TPA relocation at odd address: " ADR_F,
-			  abfd, (adr_t) address);
+      _bfd_error_handler ("%pB(%pB): TPA relocation at odd address: " ADR_F,
+			  abfd, input_bfd, (adr_t) address);
       bfd_set_error (bfd_error_bad_value);
       return false;
     }
@@ -425,7 +425,7 @@ m68k_elf32_atariprg_relocate_section (bfd *output_bfd,
 	    {
 	      /* Absolute 32-bit address.  */
 	      bfd_vma relocation = input_section->output_section->vma + input_section->output_offset + rel->r_offset;
-	      if (! add_tpa_relocation_entry (output_bfd, relocation))
+	      if (! add_tpa_relocation_entry (output_bfd, input_bfd, relocation))
 		return false;
 	    }
 	    break;
