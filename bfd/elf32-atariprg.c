@@ -1031,7 +1031,7 @@ bfd_elf32_atariprg_init (void)
 {
   TRACE0 ("bfd_elf32_atariprg_init\n");
 
-  /* Out target is basically the same as elf32-m68k...  */
+  /* Our target is basically the same as elf32-m68k...  */
   m68k_elf32_atariprg_vec = m68k_elf32_vec;
   m68k_elf32_atariprg_vec.name = "elf32-atariprg";
 
