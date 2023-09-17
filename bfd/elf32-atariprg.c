@@ -762,7 +762,15 @@ fill_tparel (bfd *abfd)
   for (i = 1; i < myinfo->relocs_used; i++)
     {
       bfd_signed_vma diff = myinfo->relocs[i] - myinfo->relocs[i - 1];
-      BFD_ASSERT (diff > 0); /* No backward relocation.  */
+      /* No backward relocation.  */
+      if (diff <= 0)
+	{
+	  _bfd_error_handler ("%pB: duplicate relocation: " ADR_F " <= " ADR_F,
+	    abfd,
+	    (adr_t)myinfo->relocs[i], (adr_t)myinfo->relocs[i - 1]);
+	  bfd_set_error (bfd_error_bad_value);
+	  return false;
+	}
       BFD_ASSERT (! (diff & 1)); /* No relocation to odd address.  */
       bytes += (diff + 253) / 254;
     }
