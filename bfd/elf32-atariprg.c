@@ -140,8 +140,10 @@ get_mint_internal_info_maybe_null (bfd *abfd)
 {
   struct mint_internal_info *myinfo;
 
-  BFD_ASSERT (abfd->xvec == &m68k_elf32_atariprg_vec);
-  BFD_ASSERT (elf_tdata (abfd) != NULL);
+  if (abfd->xvec != &m68k_elf32_atariprg_vec)
+    return NULL;
+  if (elf_tdata (abfd) == NULL)
+    return NULL;
   myinfo = (struct mint_internal_info *) elf_tdata (abfd)->core;
 
   return myinfo;
