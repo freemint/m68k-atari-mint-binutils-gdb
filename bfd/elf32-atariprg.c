@@ -426,9 +426,13 @@ m68k_elf32_atariprg_relocate_section (bfd *output_bfd,
 	  case R_68K_32:
 	    {
 	      /* Absolute 32-bit address.  */
-	      bfd_vma relocation = input_section->output_section->vma + input_section->output_offset + rel->r_offset;
-	      if (! add_tpa_relocation_entry (output_bfd, input_bfd, relocation))
-		return false;
+	      bfd_vma offset = _bfd_elf_section_offset(output_bfd, info, input_section, rel->r_offset);
+	      if (offset != (bfd_vma) -1 && offset != (bfd_vma) -2)
+		{
+		  bfd_vma relocation = input_section->output_section->vma + input_section->output_offset + offset;
+		  if (! add_tpa_relocation_entry (output_bfd, input_bfd, relocation))
+		    return false;
+		}
 	    }
 	    break;
 
