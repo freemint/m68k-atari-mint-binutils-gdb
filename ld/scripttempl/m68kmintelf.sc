@@ -3,7 +3,7 @@ cat <<EOF
    Written by Vincent Riviere, 2023.
    Based on elf.sc and the generated m68kelf.x.  */
 
-/* Copyright (C) 2014-2023 Free Software Foundation, Inc.
+/* Copyright (C) 2014-2024 Free Software Foundation, Inc.
 
    Copying and distribution of this script, with or without modification,
    are permitted in any medium without royalty provided the copyright

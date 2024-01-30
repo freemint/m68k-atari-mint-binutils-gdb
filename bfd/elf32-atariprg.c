@@ -1,7 +1,7 @@
 /* Support for Atari TOS PRG/ELF binaries.
    ELF-specific code written by Vincent Riviere, 2023.
    Based on the original a.out patch by Guido Flohr, 1998.
-   Copyright (C) 1998-2023 Free Software Foundation, Inc.
+   Copyright (C) 1998-2024 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
