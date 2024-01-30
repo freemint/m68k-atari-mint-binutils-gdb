@@ -199,7 +199,7 @@ m68k_elf32_atariprg_object_p (bfd *abfd)
 
   /* Read the PRG extended header from the file.  */
   amt = sizeof (PRGELF_HEADER);
-  if (bfd_bread (&ph_ext, amt, abfd) != amt)
+  if (bfd_read (&ph_ext, amt, abfd) != amt)
     {
       if (bfd_get_error () != bfd_error_system_call)
 	bfd_set_error (bfd_error_wrong_format);
@@ -336,7 +336,7 @@ bfd_read_4byte_int (bfd *abfd, file_ptr pos)
 
   offset = bfd_tell(abfd);
   bfd_seek(abfd, pos, SEEK_SET);
-  if (bfd_bread (buffer, (bfd_size_type) 4, abfd) != 4)
+  if (bfd_read (buffer, (bfd_size_type) 4, abfd) != 4)
     {
       return -1;
     }
@@ -699,7 +699,7 @@ write_prgelf_header (bfd *abfd)
   /* Write the PRG/ELF header.  */
   if (bfd_seek (abfd, 0, SEEK_SET) != 0)
     return false;
-  if (bfd_bwrite (&ph_ext, sizeof ph_ext, abfd) != sizeof ph_ext)
+  if (bfd_write (&ph_ext, sizeof ph_ext, abfd) != sizeof ph_ext)
     return false;
 
   /* Override the stack size.  */
@@ -719,7 +719,7 @@ write_prgelf_header (bfd *abfd)
 
       if (bfd_seek (abfd, myinfo->stkpos, SEEK_SET) != 0)
 	return false;
-      if (bfd_bwrite (big_endian_stack_size, 4, abfd) != 4)
+      if (bfd_write (big_endian_stack_size, 4, abfd) != 4)
 	return false;
   }
 
@@ -848,7 +848,7 @@ write_tparel (bfd *abfd)
   if (bfd_seek (abfd, myinfo->tparel_pos, SEEK_SET) != 0)
     return false;
 
-  if (bfd_bwrite (myinfo->tparel, myinfo->tparel_size, abfd) != myinfo->tparel_size)
+  if (bfd_write (myinfo->tparel, myinfo->tparel_size, abfd) != myinfo->tparel_size)
     return false;
 
   return true;
@@ -980,7 +980,7 @@ static bool read_tparel (bfd *abfd)
 
   for (;;)
     {
-      amt = bfd_bread (myinfo->tparel + already_read, TPAREL_CHUNK_SIZE, abfd);
+      amt = bfd_read (myinfo->tparel + already_read, TPAREL_CHUNK_SIZE, abfd);
       if (amt == (bfd_size_type) -1)
 	return false;
 
