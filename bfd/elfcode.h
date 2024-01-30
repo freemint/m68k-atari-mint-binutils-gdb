@@ -72,6 +72,7 @@
 #include "libbfd.h"
 #include "elf-bfd.h"
 #include "libiberty.h"
+#include "elf32-atariprg.h"
 
 /* Renaming structures, typedefs, macros and functions to be size-specific.  */
 #define Elf_External_Ehdr	NAME(Elf,External_Ehdr)
@@ -1107,9 +1108,19 @@ elf_write_shdrs_and_ehdr (bfd *abfd)
   Elf_Internal_Shdr **i_shdrp;	/* Section header table, internal form */
   unsigned int count;
   size_t amt;
+  file_ptr ehdr_offset = 0;	/* File offset of ELF Header */
 
   i_ehdrp = elf_elfheader (abfd);
   i_shdrp = elf_elfsections (abfd);
+
+  if (abfd->xvec == &m68k_elf32_atariprg_vec)
+    {
+      /* There is an extra header before the ELF file header.  */
+      file_ptr vma_off;
+      bfd_size_type sizeof_extra_header;
+      bfd_elf32_atariprg_get_extra_header_info (abfd, &vma_off, &sizeof_extra_header);
+      ehdr_offset = vma_off + sizeof_extra_header;
+    }
 
   /* swap the header before spitting it out...  */
 
@@ -1118,7 +1129,7 @@ elf_write_shdrs_and_ehdr (bfd *abfd)
 #endif
   elf_swap_ehdr_out (abfd, i_ehdrp, &x_ehdr);
   amt = sizeof (x_ehdr);
-  if (bfd_seek (abfd, 0, SEEK_SET) != 0
+  if (bfd_seek (abfd, ehdr_offset, SEEK_SET) != 0
       || bfd_write (&x_ehdr, amt, abfd) != amt)
     return false;
 

@@ -793,7 +793,16 @@ process_file (const char *file_name)
     ret = process_archive (file_name, file, true);
   else
     {
-      rewind (file);
+      if (armag[0] == 0x60 && armag[1] == 0x1a)
+	{
+	  /* This is a PRG/ELF executable with extra header.  */
+	  if (fseek(file, 0x28, SEEK_SET) != 0)
+	    return 1;
+	}
+      else
+	{
+	  rewind (file);
+	}
       archive_file_size = archive_file_offset = 0;
       ret = process_object (file_name, file);
 #ifdef HAVE_MMAP

@@ -687,12 +687,30 @@ get_sysroot (int argc, char **argv)
 static char *
 get_emulation (int argc, char **argv)
 {
+  char *default_emulation;
   char *emulation;
   int i;
 
+  default_emulation = DEFAULT_EMULATION;
+
+  if (strcmp (default_emulation, "m68kmintelf") == 0)
+    {
+      for (i = 1; i < argc; i++)
+	{
+	  if (strcmp (argv[i], "-r") == 0)
+	    {
+	      /* We are merging .o files using ld -r partial linking.
+		In this case, use the classic ELF linker to produce
+		a standard ELF .o file.  */
+	      default_emulation = "m68kelf";
+	      break;
+	    }
+	}
+    }
+
   emulation = getenv (EMULATION_ENVIRON);
   if (emulation == NULL)
-    emulation = DEFAULT_EMULATION;
+    emulation = default_emulation;
 
   for (i = 1; i < argc; i++)
     {

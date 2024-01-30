@@ -4668,9 +4668,12 @@ md_begin (void)
 
   init_regtable ();
 
-  record_alignment (text_section, 2);
-  record_alignment (data_section, 2);
-  record_alignment (bss_section, 2);
+  /* Default alignment of 2 (= 2**1) is enough for Atari ST programs. It is
+     possible to align data explicitly with .align 4, but that will only be
+     honored if the program is loaded by TOS 4 or FreeMiNT.  */
+  record_alignment (text_section, 1);
+  record_alignment (data_section, 1);
+  record_alignment (bss_section, 1);
 }
 
 

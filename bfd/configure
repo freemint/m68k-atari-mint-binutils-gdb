@@ -12094,7 +12094,7 @@ if test "${with_pkgversion+set}" = set; then :
       *)   PKGVERSION="($withval) " ;;
      esac
 else
-  PKGVERSION="(GNU Binutils) "
+  PKGVERSION="(GNU Binutils for MiNT ELF) "
 
 fi
 
@@ -12112,7 +12112,7 @@ if test "${with_bugurl+set}" = set; then :
 	   ;;
      esac
 else
-  BUGURL="https://sourceware.org/bugzilla/"
+  BUGURL="https://github.com/freemint/m68k-atari-mint-binutils-gdb/issues"
 
 fi
 
@@ -15179,7 +15179,7 @@ _ACEOF
 
 
 case "${host}" in
-*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows*)
+*-*-msdos* | *-*-go32* | *-*-mingw32* | *-*-cygwin* | *-*-windows* | *-*-mint*)
 
 $as_echo "#define USE_BINARY_FOPEN 1" >>confdefs.h
  ;;
@@ -15927,6 +15927,7 @@ do
     m68hc11_elf32_vec)		 tb="$tb elf32-m68hc11.lo elf32-m68hc1x.lo elf32.lo $elf" ;;
     m68hc12_elf32_vec)		 tb="$tb elf32-m68hc12.lo elf32-m68hc1x.lo elf32.lo $elf" ;;
     m68k_elf32_vec)		 tb="$tb elf32-m68k.lo elf32.lo $elf" ;;
+    m68k_elf32_atariprg_vec)	 tb="$tb elf32-atariprg.lo elf32-m68k.lo elf32.lo $elf" ;;
     s12z_elf32_vec)		 tb="$tb elf32-s12z.lo elf32.lo $elf" ;;
     mach_o_be_vec)		 tb="$tb mach-o.lo dwarf2.lo" ;;
     mach_o_le_vec)		 tb="$tb mach-o.lo dwarf2.lo" ;;

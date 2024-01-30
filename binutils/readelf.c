@@ -9563,7 +9563,7 @@ ia64_process_unwind (Filedata * filedata)
 	    printf ("'%s'", printable_section_name (filedata, unwsec));
 
 	  printf (_(" at offset %#" PRIx64 " contains %" PRIu64 " entries:\n"),
-		  unwsec->sh_offset,
+		  (uint64_t) unwsec->sh_offset,
 		  unwsec->sh_size / (3 * eh_addr_size));
 
 	  if (slurp_ia64_unwind_table (filedata, & aux, unwsec)
@@ -9938,7 +9938,7 @@ hppa_process_unwind (Filedata * filedata)
 			    "contains %" PRIu64 " entries:\n",
 			    num_unwind),
 		  printable_section_name (filedata, sec),
-		  sec->sh_offset,
+		  (uint64_t) sec->sh_offset,
 		  num_unwind);
 
           if (! slurp_hppa_unwind_table (filedata, &aux, sec))
@@ -11046,7 +11046,7 @@ arm_process_unwind (Filedata * filedata)
 			      "contains %" PRIu64 " entries:\n",
 			      num_unwind),
 		    printable_section_name (filedata, sec),
-		    sec->sh_offset,
+		    (uint64_t) sec->sh_offset,
 		    num_unwind);
 
 	    if (! dump_arm_unwind (filedata, &aux, sec))
@@ -12634,7 +12634,7 @@ process_version_sections (Filedata * filedata)
 
 	    printf (_(" Addr: 0x%016" PRIx64), section->sh_addr);
 	    printf (_("  Offset: 0x%08" PRIx64 "  Link: %u (%s)\n"),
-		    section->sh_offset, section->sh_link,
+		    (uint64_t) section->sh_offset, section->sh_link,
 		    printable_section_name_from_index (filedata, section->sh_link, NULL));
 
 	    edefs = (Elf_External_Verdef *)
@@ -12780,7 +12780,7 @@ process_version_sections (Filedata * filedata)
 
 	    printf (_(" Addr: 0x%016" PRIx64), section->sh_addr);
 	    printf (_("  Offset: 0x%08" PRIx64 "  Link: %u (%s)\n"),
-		    section->sh_offset, section->sh_link,
+		    (uint64_t) section->sh_offset, section->sh_link,
 		    printable_section_name_from_index (filedata, section->sh_link, NULL));
 
 	    eneed = (Elf_External_Verneed *) get_data (NULL, filedata,
@@ -12945,7 +12945,7 @@ process_version_sections (Filedata * filedata)
 
 	    printf (_(" Addr: 0x%016" PRIx64), section->sh_addr);
 	    printf (_("  Offset: 0x%08" PRIx64 "  Link: %u (%s)\n"),
-		    section->sh_offset, section->sh_link,
+		    (uint64_t) section->sh_offset, section->sh_link,
 		    printable_section_name (filedata, link_section));
 
 	    off = offset_from_vma (filedata,
@@ -22850,6 +22850,18 @@ get_file_header (Filedata * filedata)
   /* Read in the identity array.  */
   if (fread (filedata->file_header.e_ident, EI_NIDENT, 1, filedata->handle) != 1)
     return false;
+
+  if (filedata->file_header.e_ident[0] == 0x60
+      && filedata->file_header.e_ident[1] == 0x1a)
+    {
+      /* This is a PRG/ELF executable with extra header.  */
+      if (fseek(filedata->handle, 0x28, SEEK_SET) != 0)
+	return false;
+
+      /* Read in the identity array again.  */
+      if (fread (filedata->file_header.e_ident, EI_NIDENT, 1, filedata->handle) != 1)
+	return false;
+    }
 
   /* Determine how to read the rest of the header.  */
   switch (filedata->file_header.e_ident[EI_DATA])

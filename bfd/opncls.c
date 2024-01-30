@@ -26,6 +26,9 @@
 #include "libbfd.h"
 #include "libiberty.h"
 #include "elf-bfd.h"
+#include "elf32-atariprg.h"
+
+extern bfd_target m68k_elf32_vec;
 
 #ifndef S_IXUSR
 #define S_IXUSR 0100	/* Execute by owner.  */
@@ -971,7 +974,14 @@ bfd_create (const char *filename, bfd *templ)
       return NULL;
     }
   if (templ)
-    nbfd->xvec = templ->xvec;
+    {
+      /* This is called by ld plugin_get_ir_dummy_bfd ()
+	 when creating some intermediate object files for LTO.  */
+      if (templ->xvec == &m68k_elf32_atariprg_vec)
+	nbfd->xvec = &m68k_elf32_vec;
+      else
+	nbfd->xvec = templ->xvec;
+    }
   nbfd->direction = no_direction;
   bfd_set_format (nbfd, bfd_object);
 

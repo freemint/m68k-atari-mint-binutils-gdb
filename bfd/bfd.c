@@ -662,6 +662,7 @@ EXTERNAL
 #include "libecoff.h"
 #undef obj_symbols
 #include "elf-bfd.h"
+#include "elf32-atariprg.h"
 
 #ifndef EXIT_FAILURE
 #define EXIT_FAILURE 1
@@ -1745,6 +1746,8 @@ bfd_init (void)
   _bfd_error_program_name = NULL;
   _bfd_error_internal = error_handler_fprintf;
   _bfd_assert_handler = _bfd_default_assert_handler;
+
+  bfd_elf32_atariprg_init ();
 
   return BFD_INIT_MAGIC;
 }

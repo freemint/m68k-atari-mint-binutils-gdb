@@ -71,6 +71,7 @@ if test "${ac_default_ld_warn_execstack}" = 2; then
       # use executable stacks for signals and syscalls.
       # Many MIPS targets use executable stacks.
     hppa*-*-* | \
+    m68k-*-mint* | \
     mips*-*-*)
       ac_default_ld_warn_execstack=0
       ;;
@@ -502,6 +503,9 @@ m68hc11-*-*|m6811-*-*)	targ_emul=m68hc11elf
 			;;
 m68hc12-*-*|m6812-*-*)	targ_emul=m68hc12elf
 			targ_extra_emuls="m68hc12elfb m68hc11elf m68hc11elfb"
+			;;
+m68*-*-mintelf*)	targ_emul=m68kmintelf
+			targ_extra_emuls=m68kelf
 			;;
 m68*-*-netbsd*)	targ_emul=m68kelfnbsd
 			;;
