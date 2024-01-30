@@ -335,13 +335,14 @@ bfd_read_4byte_int (bfd *abfd, file_ptr pos)
   unsigned int val;
 
   offset = bfd_tell(abfd);
-  bfd_seek(abfd, pos, SEEK_SET);
-  if (bfd_read (buffer, (bfd_size_type) 4, abfd) != 4)
+  if (bfd_seek(abfd, pos, SEEK_SET) != 0
+      || bfd_read (buffer, (bfd_size_type) 4, abfd) != 4)
     {
       return -1;
     }
   val = bfd_get_32 (abfd, buffer);
-  bfd_seek(abfd, offset, SEEK_SET);
+  if (bfd_seek(abfd, offset, SEEK_SET) != 0)
+    return -1;
   return val;
 }
 
