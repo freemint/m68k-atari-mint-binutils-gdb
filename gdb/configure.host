@@ -121,6 +121,7 @@ ia64-*-linux*)		gdb_host=linux ;;
 loongarch*-linux*)	gdb_host=linux ;;
 
 m68*-*-linux*)		gdb_host=linux ;;
+m68*-*-mint*)		gdb_host=mintelf ;;
 m68*-*-netbsd* | m68*-*-knetbsd*-gnu)
 			gdb_host=nbsdelf ;;
 m68*-*-openbsd*)	gdb_host=obsd ;;

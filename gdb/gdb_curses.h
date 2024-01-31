@@ -71,4 +71,7 @@ EXTERN_C int tgetnum (const char *);
 #undef reg
 #endif
 
+/* ncurses's term.h defines "buttons" and that conflicts with mint/ostruct.h  */
+#undef buttons
+
 #endif /* gdb_curses.h */

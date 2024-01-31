@@ -1543,7 +1543,7 @@ static bool catch_demangler_crashes = true;
 
 /* Stack context and environment for demangler crash recovery.  */
 
-static thread_local SIGJMP_BUF *gdb_demangle_jmp_buf;
+static SIGJMP_BUF *gdb_demangle_jmp_buf;
 
 /* If true, attempt to dump core from the signal handler.  */
 
