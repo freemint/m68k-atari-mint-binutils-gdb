@@ -855,6 +855,10 @@ case "${targ}" in
     targ_selvecs="m68hc11_elf32_vec m68hc12_elf32_vec"
     ;;
 
+  m68k-*-mintelf)
+    targ_defvec=m68k_elf32_vec
+    targ_selvecs="m68k_elf32_vec m68k_elf32_atariprg_vec"
+    ;;
   m68*-*-*)
     targ_defvec=m68k_elf32_vec
     ;;
