@@ -10829,7 +10829,7 @@ if test "${with_bugurl+set}" = set; then :
 	   ;;
      esac
 else
-  BUGURL="http://www.gnu.org/software/gdb/bugs/"
+  BUGURL="https://github.com/vinriviere/m68k-atari-mint-binutils-gdb/issues"
 
 fi
 
