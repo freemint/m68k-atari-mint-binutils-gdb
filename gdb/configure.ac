@@ -472,7 +472,7 @@ AC_ARG_ENABLE([codesign],
   [CODESIGN_CERT=$enableval])
 AC_SUBST([CODESIGN_CERT])
 
-ACX_PKGVERSION([GDB])
+ACX_PKGVERSION([GDB MiNT ELF])
 ACX_BUGURL([https://github.com/vinriviere/m68k-atari-mint-binutils-gdb/issues])
 AC_DEFINE_UNQUOTED([PKGVERSION], ["$PKGVERSION"], [Additional package description])
 AC_DEFINE_UNQUOTED([REPORT_BUGS_TO], ["$REPORT_BUGS_TO"], [Bug reporting address])
