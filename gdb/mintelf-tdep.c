@@ -274,12 +274,16 @@ mintelf_init_abi (struct gdbarch_info info, struct gdbarch *gdbarch)
 {
   m68k_gdbarch_tdep *tdep = gdbarch_tdep<m68k_gdbarch_tdep> (gdbarch);
 
+  /* mint/mintelf use a custom ABI */
+  m68k_svr4_init_abi (info, gdbarch);
+  tdep->float_return = 0; /* floats are returned into d0 */
+  tdep->pointer_result_regnum = M68K_D0_REGNUM;
+  tdep->struct_value_regnum = M68K_A1_REGNUM;
+  tdep->struct_return = reg_struct_return;
+
+  /* Signals */
   set_gdbarch_gdb_signal_from_target (gdbarch, mintelf_gdb_signal_from_target);
   set_gdbarch_gdb_signal_to_target (gdbarch, mintelf_gdb_signal_to_target);
-
-  /* MiNT ELF uses the SVR4 ABI.  */
-  m68k_svr4_init_abi (info, gdbarch);
-  tdep->struct_return = reg_struct_return;
 }
 
 void _initialize_mintelf_tdep ();
