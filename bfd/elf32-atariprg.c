@@ -476,13 +476,10 @@ m68k_elf32_atariprg_final_link (bfd *abfd, struct bfd_link_info *info)
 
   /* Remember the address of the stack size variable.  */
   h = (struct elf_link_hash_entry *) bfd_hash_lookup (&info->hash->table, "_stksize", false, false);
-  if (h != NULL)
+  if (h != NULL && h->root.type == bfd_link_hash_defined && h->type == STT_OBJECT)
     {
       asection *input_sec;
       bfd_vma vma;
-
-      BFD_ASSERT (h->root.type == bfd_link_hash_defined);
-      BFD_ASSERT (h->type == STT_OBJECT);
 
       input_sec = h->root.u.def.section;
       vma = input_sec->output_section->vma + input_sec->output_offset + h->root.u.def.value;
