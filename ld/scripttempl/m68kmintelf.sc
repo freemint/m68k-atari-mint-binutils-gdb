@@ -43,7 +43,6 @@ SECTIONS
   /* Program code.  */
   .text :
   {
-    PROVIDE(_start = .); /* Default entry point if _start isn't defined.  */
     *crt0.o(.text .text.*)
     *(.text.unlikely .text.*_unlikely .text.unlikely.*)
     *(.text.exit .text.exit.*)
