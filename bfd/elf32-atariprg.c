@@ -781,8 +781,10 @@ fill_tparel (bfd *abfd)
     bytes++;
   myinfo->tparel_size = bytes;
 
-  /* Allocate the TPA relocation table.  */
-  myinfo->tparel = bfd_alloc (abfd, bytes);
+  /* Allocate the TPA relocation table.  BYTES is an upper bound: relocations
+     pointing to a zero value are skipped below, so the table is written out
+     with unused trailing space that must not contain garbage.  */
+  myinfo->tparel = bfd_zalloc (abfd, bytes);
   if (myinfo->tparel == NULL)
     return false;
 
