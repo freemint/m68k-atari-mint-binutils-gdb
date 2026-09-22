@@ -4655,6 +4655,8 @@ elf_m68k_grok_psinfo (bfd *abfd, Elf_Internal_Note *note)
 #define elf_backend_grok_prstatus	elf_m68k_grok_prstatus
 #define elf_backend_grok_psinfo		elf_m68k_grok_psinfo
 
+#define elf_backend_relocs_compatible	_bfd_elf_relocs_compatible
+
 #define elf_backend_can_gc_sections 1
 #define elf_backend_can_refcount 1
 #define elf_backend_want_got_plt 1
